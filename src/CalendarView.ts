@@ -47,25 +47,27 @@ export class CalendarZView extends ItemView {
 
 		const header = this.contentEl.createDiv({ cls: "calendarz-header" });
 
-		const prevBtn = header.createEl("button", { cls: "calendarz-nav-btn", text: "‹" });
+		const monthYearText = header.createEl("span", { cls: "calendarz-month-year" });
+		monthYearText.textContent = this.formatMonthYear(this.currentDate);
+
+		const prevBtn = header.createEl("button", { cls: "calendarz-nav-btn" });
+		prevBtn.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='15 18 9 12 15 6'></polyline></svg>";
 		prevBtn.addEventListener("click", () => {
 			this.currentDate.setMonth(this.currentDate.getMonth() - 1);
 			this.renderCalendar();
 		});
 
-		const monthYearText = header.createEl("span", { cls: "calendarz-month-year" });
-		monthYearText.textContent = this.formatMonthYear(this.currentDate);
-
-		const nextBtn = header.createEl("button", { cls: "calendarz-nav-btn", text: "›" });
-		nextBtn.addEventListener("click", () => {
-			this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-			this.renderCalendar();
-		});
-
-		const todayBtn = header.createEl("button", { cls: "calendarz-today-btn", text: this.i18n.calendar.today });
+		const todayBtn = header.createEl("button", { cls: "calendarz-today-btn", text: `${this.i18n.calendar.today}` });
 		todayBtn.addEventListener("click", () => {
 			this.currentDate = new Date();
 			this.selectedDate = new Date();
+			this.renderCalendar();
+		});
+
+		const nextBtn = header.createEl("button", { cls: "calendarz-nav-btn" });
+		nextBtn.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='9 18 15 12 9 6'></polyline></svg>";
+		nextBtn.addEventListener("click", () => {
+			this.currentDate.setMonth(this.currentDate.getMonth() + 1);
 			this.renderCalendar();
 		});
 
@@ -131,7 +133,7 @@ export class CalendarZView extends ItemView {
 	private formatMonthYear(date: Date): string {
 		const year = date.getFullYear();
 		const month = date.getMonth() + 1;
-		return interpolate(this.i18n.calendar.monthFormat, { year, month });
+		return `${month}月 ${year}`;
 	}
 
 	private isSameDate(date1: Date, date2: Date): boolean {
