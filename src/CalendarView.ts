@@ -3,7 +3,7 @@ import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
 import {DaysGrid} from "./ui/DaysGrid";
-import {TitleFormat} from "./settings";
+import {TitleFormat, WeekStart} from "./settings";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
@@ -14,13 +14,15 @@ export class CalendarZView extends ItemView {
 	private monthFormat: string;
 	private language: string;
 	private titleFormat: TitleFormat;
+	private weekStart: WeekStart;
 
-	constructor(leaf: WorkspaceLeaf, i18n: I18n, monthFormat: string = "numeric", language: string = "en-US", titleFormat: TitleFormat = "monthYear") {
+	constructor(leaf: WorkspaceLeaf, i18n: I18n, monthFormat: string = "numeric", language: string = "en-US", titleFormat: TitleFormat = "monthYear", weekStart: WeekStart = "sunday") {
 		super(leaf);
 		this.i18n = i18n;
 		this.monthFormat = monthFormat;
 		this.language = language;
 		this.titleFormat = titleFormat;
+		this.weekStart = weekStart;
 	}
 
 	getViewType(): string {
@@ -49,6 +51,10 @@ export class CalendarZView extends ItemView {
 
 	setTitleFormat(titleFormat: TitleFormat): void {
 		this.titleFormat = titleFormat;
+	}
+
+	setWeekStart(weekStart: WeekStart): void {
+		this.weekStart = weekStart;
 	}
 
 	async onOpen(): Promise<void> {
@@ -91,10 +97,10 @@ export class CalendarZView extends ItemView {
 		);
 		header.render(this.currentDate);
 
-		const weekdaysRow = new WeekdaysRow(this.contentEl, this.i18n);
+		const weekdaysRow = new WeekdaysRow(this.contentEl, this.i18n, this.weekStart);
 		weekdaysRow.render();
 
-		const daysGrid = new DaysGrid(this.contentEl, {
+		const daysGrid = new DaysGrid(this.contentEl, this.weekStart, {
 			onDateSelect: (date: Date) => {
 				this.selectedDate = date;
 				this.renderCalendar();

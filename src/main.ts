@@ -14,7 +14,7 @@ export default class CalendarZ extends Plugin {
 		// Register the calendar view
 		this.registerView(
 			CALENDARZ_VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n, this.settings.monthFormat, this.settings.language, this.settings.titleFormat)
+			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n, this.settings.monthFormat, this.settings.language, this.settings.titleFormat, this.settings.weekStart)
 		);
 
 		// Add ribbon icon to open calendar view
@@ -59,6 +59,7 @@ export default class CalendarZ extends Plugin {
 				leaf.view.setMonthFormat(this.settings.monthFormat);
 				leaf.view.setLanguage(this.settings.language);
 				leaf.view.setTitleFormat(this.settings.titleFormat);
+				leaf.view.setWeekStart(this.settings.weekStart);
 				leaf.view.refresh();
 			}
 		});

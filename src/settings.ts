@@ -4,17 +4,20 @@ import CalendarZ from "./main";
 export type Language = "en-US" | "zh-CN";
 export type MonthFormat = "numeric" | "short" | "long";
 export type TitleFormat = "yearMonth" | "monthYear";
+export type WeekStart = "sunday" | "monday";
 
 export interface CalendarZSettings {
 	language: Language;
 	monthFormat: MonthFormat;
 	titleFormat: TitleFormat;
+	weekStart: WeekStart;
 }
 
 export const DEFAULT_SETTINGS: CalendarZSettings = {
 	language: "en-US",
 	monthFormat: "numeric",
-	titleFormat: "monthYear"
+	titleFormat: "monthYear",
+	weekStart: "sunday"
 };
 
 export class CalendarZSettingTab extends PluginSettingTab {
@@ -70,6 +73,19 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.titleFormat)
 				.onChange(async (value) => {
 					this.plugin.settings.titleFormat = value as TitleFormat;
+					await this.plugin.saveSettings();
+					this.plugin.refreshView();
+				}));
+
+		new Setting(containerEl)
+			.setName(t.settings.weekStart.name)
+			.setDesc(t.settings.weekStart.description)
+			.addDropdown(dropdown => dropdown
+				.addOption("sunday", t.settings.weekStart.options.sunday)
+				.addOption("monday", t.settings.weekStart.options.monday)
+				.setValue(this.plugin.settings.weekStart)
+				.onChange(async (value) => {
+					this.plugin.settings.weekStart = value as WeekStart;
 					await this.plugin.saveSettings();
 					this.plugin.refreshView();
 				}));

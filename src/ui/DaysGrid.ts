@@ -1,13 +1,17 @@
+import { WeekStart } from "../settings";
+
 export interface DaysGridCallbacks {
 	onDateSelect: (date: Date) => void;
 }
 
 export class DaysGrid {
 	private container: HTMLElement;
+	private weekStart: WeekStart;
 	private callbacks: DaysGridCallbacks;
 
-	constructor(container: HTMLElement, callbacks: DaysGridCallbacks) {
+	constructor(container: HTMLElement, weekStart: WeekStart, callbacks: DaysGridCallbacks) {
 		this.container = container;
+		this.weekStart = weekStart;
 		this.callbacks = callbacks;
 	}
 
@@ -20,7 +24,7 @@ export class DaysGrid {
 		const firstDay = new Date(year, month, 1);
 		const lastDay = new Date(year, month + 1, 0);
 		const daysInMonth = lastDay.getDate();
-		const startingDayOfWeek = firstDay.getDay();
+		const startingDayOfWeek = this.getAdjustedDayOfWeek(firstDay.getDay());
 
 		const today = new Date();
 
@@ -63,5 +67,12 @@ export class DaysGrid {
 		return date1.getFullYear() === date2.getFullYear() &&
 			date1.getMonth() === date2.getMonth() &&
 			date1.getDate() === date2.getDate();
+	}
+
+	private getAdjustedDayOfWeek(dayOfWeek: number): number {
+		if (this.weekStart === "monday") {
+			return dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+		}
+		return dayOfWeek;
 	}
 }

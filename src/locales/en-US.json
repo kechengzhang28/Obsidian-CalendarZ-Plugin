@@ -22,8 +22,16 @@
       "name": "Title Format",
       "description": "Select the order of year and month in the calendar header",
       "options": {
-        "yearMonth": "Year Month",
-        "monthYear": "Month Year"
+        "yearMonth": "Year Month (2024 January)",
+        "monthYear": "Month Year (January 2024)"
+      }
+    },
+    "weekStart": {
+      "name": "Week Start",
+      "description": "Select the first day of the week",
+      "options": {
+        "sunday": "Sunday",
+        "monday": "Monday"
       }
     }
   },

@@ -25,6 +25,14 @@
         "yearMonth": "年 月",
         "monthYear": "月 年"
       }
+    },
+    "weekStart": {
+      "name": "星期起始日",
+      "description": "选择每周的第一天",
+      "options": {
+        "sunday": "星期日",
+        "monday": "星期一"
+      }
     }
   },
   "commands": {
