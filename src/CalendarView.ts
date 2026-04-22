@@ -1,10 +1,11 @@
-import {ItemView, WorkspaceLeaf} from "obsidian";
+import {App, ItemView, WorkspaceLeaf} from "obsidian";
 import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
 import {DaysGrid} from "./ui/DaysGrid";
 import {HeatMap, DateCount} from "./ui/HeatMap";
 import {TitleFormat, WeekStart} from "./settings";
+import {getNotesCountByYamlDate} from "./utils/GetNotes";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
@@ -16,14 +17,27 @@ export class CalendarZView extends ItemView {
 	private language: string;
 	private titleFormat: TitleFormat;
 	private weekStart: WeekStart;
+	private dateFieldName: string;
+	private ignoredFolders: string[];
 
-	constructor(leaf: WorkspaceLeaf, i18n: I18n, monthFormat: string = "numeric", language: string = "en-US", titleFormat: TitleFormat = "monthYear", weekStart: WeekStart = "sunday") {
+	constructor(
+		leaf: WorkspaceLeaf,
+		i18n: I18n,
+		monthFormat: string = "numeric",
+		language: string = "en-US",
+		titleFormat: TitleFormat = "monthYear",
+		weekStart: WeekStart = "sunday",
+		dateFieldName: string = "date",
+		ignoredFolders: string[] = []
+	) {
 		super(leaf);
 		this.i18n = i18n;
 		this.monthFormat = monthFormat;
 		this.language = language;
 		this.titleFormat = titleFormat;
 		this.weekStart = weekStart;
+		this.dateFieldName = dateFieldName;
+		this.ignoredFolders = ignoredFolders;
 	}
 
 	getViewType(): string {
@@ -58,6 +72,14 @@ export class CalendarZView extends ItemView {
 		this.weekStart = weekStart;
 	}
 
+	setDateFieldName(dateFieldName: string): void {
+		this.dateFieldName = dateFieldName;
+	}
+
+	setIgnoredFolders(ignoredFolders: string[]): void {
+		this.ignoredFolders = ignoredFolders;
+	}
+
 	async onOpen(): Promise<void> {
 		this.renderCalendar();
 	}
@@ -67,10 +89,10 @@ export class CalendarZView extends ItemView {
 	}
 
 	refresh(): void {
-		this.renderCalendar();
+		void this.renderCalendar();
 	}
 
-	private renderCalendar(): void {
+	private async renderCalendar(): Promise<void> {
 		this.contentEl.empty();
 		this.contentEl.addClass("calendarz-container");
 
@@ -83,16 +105,16 @@ export class CalendarZView extends ItemView {
 			{
 				onPrevMonth: () => {
 					this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-					this.renderCalendar();
+					void this.renderCalendar();
 				},
 				onNextMonth: () => {
 					this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-					this.renderCalendar();
+					void this.renderCalendar();
 				},
 				onToday: () => {
 					this.currentDate = new Date();
 					this.selectedDate = new Date();
-					this.renderCalendar();
+					void this.renderCalendar();
 				}
 			}
 		);
@@ -104,21 +126,21 @@ export class CalendarZView extends ItemView {
 		const daysGrid = new DaysGrid(this.contentEl, this.weekStart, {
 			onDateSelect: (date: Date) => {
 				this.selectedDate = date;
-				this.renderCalendar();
+				void this.renderCalendar();
 				this.onDateSelected(date);
 			}
 		});
 		daysGrid.render(this.currentDate, this.selectedDate);
 
-		const heatMap = new HeatMap(this.contentEl, this.weekStart, "created", {
+		const heatMap = new HeatMap(this.contentEl, this.weekStart, {
 			onDateSelect: (date: Date) => {
 				this.selectedDate = date;
-				this.renderCalendar();
+				void this.renderCalendar();
 				this.onDateSelected(date);
 			}
 		});
-		const dateCounts: DateCount[] = [];
-		heatMap.render(this.currentDate, this.selectedDate, dateCounts);
+		const dateCounts = await this.getDateCounts();
+		heatMap.render(this.currentDate, dateCounts);
 	}
 
 	private onDateSelected(date: Date): void {
@@ -126,5 +148,9 @@ export class CalendarZView extends ItemView {
 		const month = String(date.getMonth() + 1).padStart(2, "0");
 		const day = String(date.getDate()).padStart(2, "0");
 		const dateStr = `${year}-${month}-${day}`;
+	}
+
+	private async getDateCounts(): Promise<DateCount[]> {
+		return await getNotesCountByYamlDate(this.app, this.ignoredFolders, this.dateFieldName);
 	}
 }

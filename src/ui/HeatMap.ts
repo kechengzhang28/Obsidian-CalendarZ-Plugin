@@ -12,23 +12,20 @@ export interface DateCount {
 export class HeatMap {
 	private container: HTMLElement;
 	private weekStart: WeekStart;
-	private dateFieldName: string;
 	private callbacks: HeatMapCallbacks;
 	private dateCounts: Map<string, number> = new Map();
 
 	constructor(
 		container: HTMLElement,
 		weekStart: WeekStart,
-		dateFieldName: string,
 		callbacks: HeatMapCallbacks
 	) {
 		this.container = container;
 		this.weekStart = weekStart;
-		this.dateFieldName = dateFieldName;
 		this.callbacks = callbacks;
 	}
 
-	render(currentDate: Date, selectedDate: Date, dateCounts: DateCount[]): void {
+	render(currentDate: Date, dateCounts: DateCount[]): void {
 		this.dateCounts.clear();
 		for (const item of dateCounts) {
 			this.dateCounts.set(item.date, item.count);
@@ -44,13 +41,11 @@ export class HeatMap {
 		const daysInMonth = lastDay.getDate();
 		const startingDayOfWeek = this.getAdjustedDayOfWeek(firstDay.getDay());
 
-		const today = new Date();
-
 		const prevMonthLastDay = new Date(year, month, 0).getDate();
 		for (let i = startingDayOfWeek - 1; i >= 0; i--) {
 			const prevDay = prevMonthLastDay - i;
 			const dayEl = heatMapGrid.createDiv({ cls: "calendarz-heatmap-day calendarz-heatmap-day-other-month" });
-			dayEl.textContent = prevDay.toString();
+			dayEl.textContent = "";
 		}
 
 		const maxCount = this.getMaxCount();
@@ -61,23 +56,18 @@ export class HeatMap {
 			const count = this.dateCounts.get(dateStr) || 0;
 
 			const dayEl = heatMapGrid.createDiv({ cls: "calendarz-heatmap-day" });
-			dayEl.textContent = day.toString();
+			dayEl.textContent = "";
 
 			const intensity = maxCount > 0 ? count / maxCount : 0;
-			dayEl.style.setProperty("--heatmap-intensity", intensity.toString());
+			const opacity = count > 0 ? 0.25 + intensity * 0.75 : 0.15;
+			dayEl.style.opacity = opacity.toString();
 
 			if (count > 0) {
-				dayEl.addClass("calendarz-heatmap-day-has-data");
 				dayEl.setAttribute("data-count", count.toString());
 			}
 
-			if (this.isSameDate(date, today)) {
-				dayEl.addClass("calendarz-heatmap-day-today");
-			}
-
-			if (this.isSameDate(date, selectedDate)) {
-				dayEl.addClass("calendarz-heatmap-day-selected");
-			}
+			dayEl.setAttribute("data-date", dateStr);
+			dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
 
 			dayEl.addEventListener("click", () => {
 				this.callbacks.onDateSelect(date);
@@ -90,12 +80,8 @@ export class HeatMap {
 
 		for (let day = 1; day <= nextMonthDays; day++) {
 			const dayEl = heatMapGrid.createDiv({ cls: "calendarz-heatmap-day calendarz-heatmap-day-other-month" });
-			dayEl.textContent = day.toString();
+			dayEl.textContent = "";
 		}
-	}
-
-	setDateFieldName(dateFieldName: string): void {
-		this.dateFieldName = dateFieldName;
 	}
 
 	private getMaxCount(): number {
@@ -113,12 +99,6 @@ export class HeatMap {
 		const month = String(date.getMonth() + 1).padStart(2, "0");
 		const day = String(date.getDate()).padStart(2, "0");
 		return `${year}-${month}-${day}`;
-	}
-
-	private isSameDate(date1: Date, date2: Date): boolean {
-		return date1.getFullYear() === date2.getFullYear() &&
-			date1.getMonth() === date2.getMonth() &&
-			date1.getDate() === date2.getDate();
 	}
 
 	private getAdjustedDayOfWeek(dayOfWeek: number): number {

@@ -33,6 +33,18 @@
         "sunday": "Sunday",
         "monday": "Monday"
       }
+    },
+    "ignoredFolders": {
+      "name": "Ignored Folders",
+      "description": "Set folder paths to ignore. Notes in these folders will not be counted",
+      "addButton": "Add",
+      "removeButton": "Remove",
+      "placeholder": "Enter folder path (e.g., Templates, Archive)",
+      "empty": "No ignored folders"
+    },
+    "dateFieldName": {
+      "name": "Date Field Name",
+      "description": "The YAML frontmatter field name to use for date statistics (e.g., created, date, published)"
     }
   },
   "commands": {
