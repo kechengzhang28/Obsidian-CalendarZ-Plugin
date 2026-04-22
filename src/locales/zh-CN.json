@@ -2,13 +2,21 @@
   "calendar": {
     "today": "今天",
     "weekdays": ["日", "一", "二", "三", "四", "五", "六"],
-    "monthFormat": "{{year}}年{{month}}月",
+    "dateFormat": "{{year}} {{month}}",
     "viewTitle": "CalendarZ"
   },
   "settings": {
     "language": {
       "name": "语言",
       "description": "选择日历的显示语言"
+    },
+    "monthFormat": {
+      "name": "月份格式",
+      "description": "选择日历标题中月份的显示方式",
+      "options": {
+        "short": "短名称 (1月-12月)",
+        "long": "长名称 (一月-十二月)"
+      }
     }
   },
   "commands": {

@@ -7,10 +7,14 @@ export class CalendarZView extends ItemView {
 	private currentDate: Date = new Date();
 	private selectedDate: Date = new Date();
 	private i18n: I18n;
+	private monthFormat: string;
+	private language: string;
 
-	constructor(leaf: WorkspaceLeaf, i18n: I18n) {
+	constructor(leaf: WorkspaceLeaf, i18n: I18n, monthFormat: string = "numeric", language: string = "en-US") {
 		super(leaf);
 		this.i18n = i18n;
+		this.monthFormat = monthFormat;
+		this.language = language;
 	}
 
 	getViewType(): string {
@@ -27,6 +31,14 @@ export class CalendarZView extends ItemView {
 
 	setI18n(i18n: I18n): void {
 		this.i18n = i18n;
+	}
+
+	setMonthFormat(monthFormat: string): void {
+		this.monthFormat = monthFormat;
+	}
+
+	setLanguage(language: string): void {
+		this.language = language;
 	}
 
 	async onOpen(): Promise<void> {
@@ -132,8 +144,9 @@ export class CalendarZView extends ItemView {
 
 	private formatMonthYear(date: Date): string {
 		const year = date.getFullYear();
-		const month = date.getMonth() + 1;
-		return `${month}月 ${year}`;
+		let month: string | number;
+		month = date.toLocaleString(this.language, { month: this.monthFormat as any });
+		return interpolate(this.i18n.calendar.dateFormat, { year, month });
 	}
 
 	private isSameDate(date1: Date, date2: Date): boolean {

@@ -2,13 +2,22 @@
   "calendar": {
     "today": "Today",
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    "monthFormat": "{{year}}-{{month}}",
+    "dateFormat": "{{month}} {{year}}",
     "viewTitle": "CalendarZ"
   },
   "settings": {
     "language": {
       "name": "Language",
       "description": "Select the display language for the calendar"
+    },
+    "monthFormat": {
+      "name": "Month Format",
+      "description": "Select how months are displayed in the calendar header",
+      "options": {
+        "numeric": "Numeric (1-12)",
+        "short": "Short (Jan-Dec)",
+        "long": "Long (January-December)"
+      }
     }
   },
   "commands": {
