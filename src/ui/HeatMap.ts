@@ -1,9 +1,5 @@
 import { WeekStart } from "../settings";
 
-export interface HeatMapCallbacks {
-	onDateSelect: (date: Date) => void;
-}
-
 export interface DateCount {
 	date: string;
 	count: number;
@@ -12,17 +8,14 @@ export interface DateCount {
 export class HeatMap {
 	private container: HTMLElement;
 	private weekStart: WeekStart;
-	private callbacks: HeatMapCallbacks;
 	private dateCounts: Map<string, number> = new Map();
 
 	constructor(
 		container: HTMLElement,
-		weekStart: WeekStart,
-		callbacks: HeatMapCallbacks
+		weekStart: WeekStart
 	) {
 		this.container = container;
 		this.weekStart = weekStart;
-		this.callbacks = callbacks;
 	}
 
 	render(currentDate: Date, dateCounts: DateCount[]): void {
@@ -68,10 +61,6 @@ export class HeatMap {
 
 			dayEl.setAttribute("data-date", dateStr);
 			dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
-
-			dayEl.addEventListener("click", () => {
-				this.callbacks.onDateSelect(date);
-			});
 		}
 
 		const totalCells = 42;

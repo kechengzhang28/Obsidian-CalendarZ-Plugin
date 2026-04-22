@@ -125,20 +125,12 @@ export class CalendarZView extends ItemView {
 
 		const daysGrid = new DaysGrid(this.contentEl, this.weekStart, {
 			onDateSelect: (date: Date) => {
-				this.selectedDate = date;
-				void this.renderCalendar();
 				this.onDateSelected(date);
 			}
 		});
-		daysGrid.render(this.currentDate, this.selectedDate);
+		daysGrid.render(this.currentDate);
 
-		const heatMap = new HeatMap(this.contentEl, this.weekStart, {
-			onDateSelect: (date: Date) => {
-				this.selectedDate = date;
-				void this.renderCalendar();
-				this.onDateSelected(date);
-			}
-		});
+		const heatMap = new HeatMap(this.contentEl, this.weekStart);
 		const dateCounts = await this.getDateCounts();
 		heatMap.render(this.currentDate, dateCounts);
 	}

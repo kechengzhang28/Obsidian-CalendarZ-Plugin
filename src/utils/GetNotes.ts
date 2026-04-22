@@ -173,9 +173,7 @@ function extractYamlFrontmatter(content: string): Record<string, unknown> | null
 
 	try {
 		return parseYaml(match[1]) || {};
-	} catch (error) {
-		// eslint-disable-next-line no-console
-		console.error("[CalendarZ] Error parsing YAML frontmatter:", error);
+	} catch {
 		return null;
 	}
 }
@@ -195,9 +193,6 @@ export async function getNotesCountByYamlDate(
 	const files = app.vault.getMarkdownFiles();
 	const dateCount = new Map<string, number>();
 
-	// eslint-disable-next-line no-console
-	console.log("[CalendarZ] Scanning files for date field:", dateFieldName);
-
 	for (const file of files) {
 		if (isPathIgnored(file.path, ignoredFolders)) {
 			continue;
@@ -207,19 +202,11 @@ export async function getNotesCountByYamlDate(
 			const content = await app.vault.read(file);
 			const frontmatter = extractYamlFrontmatter(content);
 
-			// Debug: log first few files to see their frontmatter
-			if (files.indexOf(file) < 3) {
-				// eslint-disable-next-line no-console
-				console.log("[CalendarZ] File:", file.path, "frontmatter keys:", frontmatter ? Object.keys(frontmatter) : "none");
-			}
-
 			if (!frontmatter || !(dateFieldName in frontmatter)) {
 				continue;
 			}
 
 			const dateValue = frontmatter[dateFieldName];
-			// eslint-disable-next-line no-console
-			console.log("[CalendarZ] Found date value in", file.path, ":", dateValue, "type:", typeof dateValue, "constructor:", dateValue?.constructor?.name);
 			let date: Date | null = null;
 
 			if (typeof dateValue === "string") {
@@ -240,8 +227,6 @@ export async function getNotesCountByYamlDate(
 
 			if (date && !isNaN(date.getTime())) {
 				const dateStr = formatDateKey(date);
-				// eslint-disable-next-line no-console
-				console.log("[CalendarZ] Parsed date:", dateStr);
 				const count = dateCount.get(dateStr) || 0;
 				dateCount.set(dateStr, count + 1);
 			}
@@ -255,9 +240,6 @@ export async function getNotesCountByYamlDate(
 	for (const [date, count] of dateCount.entries()) {
 		result.push({ date, count });
 	}
-
-	// eslint-disable-next-line no-console
-	console.log("[CalendarZ] Final date counts:", result);
 
 	return result;
 }

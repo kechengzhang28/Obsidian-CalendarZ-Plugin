@@ -109,11 +109,6 @@
 	background-color: var(--interactive-accent-hover);
 }
 
-.calendarz-day-selected {
-	outline: 2px solid var(--interactive-accent);
-	outline-offset: -2px;
-}
-
 .calendarz-day-other-month {
 	color: var(--text-muted);
 	opacity: 0.6;
@@ -142,12 +137,10 @@
 	align-items: center;
 	justify-content: center;
 	font-size: 13px;
-	cursor: pointer;
 	border-radius: 4px;
 	transition: all 0.15s ease;
 	color: var(--text-normal);
 	background-color: var(--interactive-accent);
-	position: relative;
 }
 
 .calendarz-heatmap-day-other-month {

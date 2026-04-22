@@ -15,7 +15,7 @@ export class DaysGrid {
 		this.callbacks = callbacks;
 	}
 
-	render(currentDate: Date, selectedDate: Date): void {
+	render(currentDate: Date): void {
 		const daysGrid = this.container.createDiv({ cls: "calendarz-days" });
 
 		const year = currentDate.getFullYear();
@@ -42,10 +42,6 @@ export class DaysGrid {
 
 			if (this.isSameDate(date, today)) {
 				dayEl.addClass("calendarz-day-today");
-			}
-
-			if (this.isSameDate(date, selectedDate)) {
-				dayEl.addClass("calendarz-day-selected");
 			}
 
 			dayEl.addEventListener("click", () => {
