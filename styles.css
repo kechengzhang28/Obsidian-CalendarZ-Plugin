@@ -1,8 +1,122 @@
-/*
+/* CalendarZ Plugin Styles */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.calendarz-container {
+	padding: 12px;
+	user-select: none;
+}
 
-If your plugin does not need CSS, delete this file.
+.calendarz-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12px;
+	gap: 4px;
+}
 
-*/
+.calendarz-nav-btn {
+	background: transparent;
+	border: none;
+	color: var(--text-muted);
+	font-size: 18px;
+	cursor: pointer;
+	padding: 4px 8px;
+	border-radius: 4px;
+	transition: all 0.2s ease;
+}
+
+.calendarz-nav-btn:hover {
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.calendarz-month-year {
+	font-weight: 600;
+	font-size: 14px;
+	color: var(--text-normal);
+	flex: 1;
+	text-align: center;
+}
+
+.calendarz-today-btn {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border: none;
+	border-radius: 4px;
+	padding: 4px 10px;
+	font-size: 12px;
+	cursor: pointer;
+	transition: opacity 0.2s ease;
+}
+
+.calendarz-today-btn:hover {
+	opacity: 0.8;
+}
+
+.calendarz-weekdays {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 2px;
+	margin-bottom: 6px;
+}
+
+.calendarz-weekday {
+	text-align: center;
+	font-size: 11px;
+	font-weight: 500;
+	color: var(--text-muted);
+	padding: 4px 0;
+}
+
+.calendarz-days {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 2px;
+}
+
+.calendarz-day {
+	aspect-ratio: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
+	cursor: pointer;
+	border-radius: 4px;
+	transition: all 0.15s ease;
+	color: var(--text-normal);
+}
+
+.calendarz-day:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.calendarz-day-empty {
+	cursor: default;
+}
+
+.calendarz-day-empty:hover {
+	background-color: transparent;
+}
+
+.calendarz-day-today {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-weight: 600;
+}
+
+.calendarz-day-today:hover {
+	background-color: var(--interactive-accent-hover);
+}
+
+.calendarz-day-selected {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: -2px;
+}
+
+/* Dark theme adjustments */
+.theme-dark .calendarz-day {
+	color: var(--text-normal);
+}
+
+.theme-dark .calendarz-day-today {
+	background-color: var(--interactive-accent);
+}

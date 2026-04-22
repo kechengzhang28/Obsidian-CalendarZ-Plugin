@@ -1,7 +1,6 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
+import {App, Plugin, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, CalendarZSettings, CalendarZSettingTab} from "./settings";
-
-// Remember to rename these classes and interfaces!
+import {CALENDARZ_VIEW_TYPE, CalendarZView} from "./CalendarView";
 
 export default class CalendarZ extends Plugin {
 	settings: CalendarZSettings;
@@ -9,68 +8,32 @@ export default class CalendarZ extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'CalendarZ', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+		// Register the calendar view
+		this.registerView(
+			CALENDARZ_VIEW_TYPE,
+			(leaf: WorkspaceLeaf) => new CalendarZView(leaf)
+		);
+
+		// Add ribbon icon to open calendar view
+		this.addRibbonIcon('calendar', 'Open CalendarZ', async () => {
+			await this.activateView();
 		});
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
-
-		// This adds a simple command that can be triggered anywhere
+		// Command to open calendar view
 		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new CalendarZModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection('CalendarZ editor command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new CalendarZModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
+			id: 'open-calendarz-view',
+			name: 'Open CalendarZ view',
+			callback: async () => {
+				await this.activateView();
 			}
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			new Notice("Click");
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-
 	}
 
 	onunload() {
+		this.app.workspace.detachLeavesOfType(CALENDARZ_VIEW_TYPE);
 	}
 
 	async loadSettings() {
@@ -80,20 +43,29 @@ export default class CalendarZ extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
-}
 
-class CalendarZModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
+	async activateView(): Promise<void> {
+		const { workspace } = this.app;
 
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
+		// Check if view already exists
+		const existingLeaf = workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)[0];
 
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
+		if (existingLeaf) {
+			workspace.revealLeaf(existingLeaf);
+			return;
+		}
+
+		// Create new leaf in right sidebar
+		const leaf = workspace.getRightLeaf(false);
+		if (!leaf) {
+			return;
+		}
+		await leaf.setViewState({
+			type: CALENDARZ_VIEW_TYPE,
+			active: true,
+		});
+
+		// Reveal the leaf
+		workspace.revealLeaf(leaf);
 	}
 }
