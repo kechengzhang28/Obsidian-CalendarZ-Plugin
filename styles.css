@@ -1,7 +1,7 @@
 /* CalendarZ Plugin Styles */
 
 .calendarz-container {
-	padding: 12px  !important;
+	padding: 16px  !important;
 	user-select: none;
 }
 
@@ -9,7 +9,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: 12px;
+	margin: 0px 8px 12px 8px;
 	gap: 4px;
 }
 
@@ -19,22 +19,27 @@
 	color: var(--text-muted);
 	font-size: 18px;
 	cursor: pointer;
-	padding: 4px 8px;
+	padding: 4px 0px;
 	border-radius: 4px;
-	transition: all 0.2s ease;
 	box-shadow: none !important;
 }
 
-.calendarz-nav-btn:hover {
-	color: var(--text-normal);
-}
-
 .calendarz-month-year {
-	font-weight: 600;
-	font-size: 18px;
-	color: var(--text-normal);
 	flex: 1;
 	text-align: left;
+}
+
+.calendarz-month {
+	font-weight: 600;
+	font-size: 24px;
+	color: var(--text-normal);
+	margin-right: 8px;
+}
+
+.calendarz-year {
+	font-weight: 600;
+	font-size: 24px;
+	color: var(--text-accent);
 }
 
 .calendarz-today-btn {
@@ -42,15 +47,10 @@
 	color: var(--text-muted);
 	border: none !important;
 	border-radius: 4px;
-	padding: 4px 10px;
+	padding: 4px 0px;
 	font-size: 12px;
 	cursor: pointer;
-	transition: all 0.2s ease;
 	box-shadow: none !important;
-}
-
-.calendarz-today-btn:hover {
-	color: var(--text-normal);
 }
 
 .calendarz-weekdays {

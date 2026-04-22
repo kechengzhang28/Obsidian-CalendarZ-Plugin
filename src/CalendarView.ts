@@ -59,8 +59,11 @@ export class CalendarZView extends ItemView {
 
 		const header = this.contentEl.createDiv({ cls: "calendarz-header" });
 
-		const monthYearText = header.createEl("span", { cls: "calendarz-month-year" });
-		monthYearText.textContent = this.formatMonthYear(this.currentDate);
+		const monthYearContainer = header.createDiv({ cls: "calendarz-month-year" });
+		const monthText = monthYearContainer.createEl("span", { cls: "calendarz-month" });
+		monthText.textContent = this.formatMonth(this.currentDate);
+		const yearText = monthYearContainer.createEl("span", { cls: "calendarz-year" });
+		yearText.textContent = this.currentDate.getFullYear().toString();
 
 		const prevBtn = header.createEl("button", { cls: "calendarz-nav-btn" });
 		prevBtn.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='15 18 9 12 15 6'></polyline></svg>";
@@ -104,7 +107,6 @@ export class CalendarZView extends ItemView {
 		const prevMonthLastDay = new Date(year, month, 0).getDate();
 		for (let i = startingDayOfWeek - 1; i >= 0; i--) {
 			const prevDay = prevMonthLastDay - i;
-			const prevDate = new Date(year, month - 1, prevDay);
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
 			dayEl.textContent = prevDay.toString();
 		}
@@ -136,17 +138,16 @@ export class CalendarZView extends ItemView {
 		const nextMonthDays = totalCells - currentCells;
 
 		for (let day = 1; day <= nextMonthDays; day++) {
-			const nextDate = new Date(year, month + 1, day);
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
 			dayEl.textContent = day.toString();
 		}
 	}
 
-	private formatMonthYear(date: Date): string {
-		const year = date.getFullYear();
-		let month: string | number;
-		month = date.toLocaleString(this.language, { month: this.monthFormat as any });
-		return interpolate(this.i18n.calendar.dateFormat, { year, month });
+	private formatMonth(date: Date): string {
+		if (this.language === "zh-CN" && this.monthFormat === "numeric") {
+			return (date.getMonth() + 1).toString();
+		}
+		return date.toLocaleString(this.language, { month: this.monthFormat as any });
 	}
 
 	private isSameDate(date1: Date, date2: Date): boolean {
