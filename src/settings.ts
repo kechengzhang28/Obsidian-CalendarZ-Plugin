@@ -2,11 +2,14 @@ import {App, PluginSettingTab, Setting} from "obsidian";
 import CalendarZ from "./main";
 
 export interface CalendarZSettings {
-	showOnStartup: boolean;
+	mySetting: string;
 }
 
+export interface CalendarZSettings {
+	mySetting: string;
+}
 export const DEFAULT_SETTINGS: CalendarZSettings = {
-	showOnStartup: false
+	mySetting: 'default'
 }
 
 export class CalendarZSettingTab extends PluginSettingTab {
@@ -22,15 +25,14 @@ export class CalendarZSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "CalendarZ Settings" });
-
 		new Setting(containerEl)
-			.setName('Show heatmap on startup')
-			.setDesc('Automatically display the note heatmap in the right sidebar when Obsidian starts')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.showOnStartup)
+			.setName('Settings #1')
+			.setDesc('It\'s a secret')
+			.addText(text => text
+				.setPlaceholder('Enter your secret')
+				.setValue(this.plugin.settings.mySetting)
 				.onChange(async (value) => {
-					this.plugin.settings.showOnStartup = value;
+					this.plugin.settings.mySetting = value;
 					await this.plugin.saveSettings();
 				}));
 	}
