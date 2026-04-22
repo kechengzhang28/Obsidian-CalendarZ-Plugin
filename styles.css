@@ -150,49 +150,10 @@
 	position: relative;
 }
 
-.calendarz-heatmap-day:hover::before {
-	content: attr(data-date) "\A" attr(data-count) " notes";
-	position: absolute;
-	bottom: 100%;
-	left: 50%;
-	transform: translateX(-50%);
-	background-color: var(--background-modifier-form-field);
-	color: var(--text-normal);
-	padding: 6px 10px;
-	border-radius: 6px;
-	font-size: 12px;
-	white-space: pre;
-	text-align: center;
-	z-index: 100;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-	border: 1px solid var(--background-modifier-border);
-	margin-bottom: 6px;
-	line-height: 1.4;
-	pointer-events: none;
-}
-
-.calendarz-heatmap-day:hover::after {
-	content: "";
-	position: absolute;
-	bottom: 100%;
-	left: 50%;
-	transform: translateX(-50%);
-	border: 5px solid transparent;
-	border-top-color: var(--background-modifier-form-field);
-	margin-bottom: -4px;
-	z-index: 100;
-	pointer-events: none;
-}
-
 .calendarz-heatmap-day-other-month {
 	background-color: var(--background-modifier-border-hover);
 	opacity: 0.5;
 	cursor: default;
-}
-
-.calendarz-heatmap-day-other-month:hover::before,
-.calendarz-heatmap-day-other-month:hover::after {
-	display: none;
 }
 
 /* Dark theme heatmap adjustments */
