@@ -3,6 +3,7 @@ import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
 import {DaysGrid} from "./ui/DaysGrid";
+import {HeatMap, DateCount} from "./ui/HeatMap";
 import {TitleFormat, WeekStart} from "./settings";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
@@ -108,6 +109,16 @@ export class CalendarZView extends ItemView {
 			}
 		});
 		daysGrid.render(this.currentDate, this.selectedDate);
+
+		const heatMap = new HeatMap(this.contentEl, this.weekStart, "created", {
+			onDateSelect: (date: Date) => {
+				this.selectedDate = date;
+				this.renderCalendar();
+				this.onDateSelected(date);
+			}
+		});
+		const dateCounts: DateCount[] = [];
+		heatMap.render(this.currentDate, this.selectedDate, dateCounts);
 	}
 
 	private onDateSelected(date: Date): void {
