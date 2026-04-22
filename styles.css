@@ -112,6 +112,11 @@
 	outline-offset: -2px;
 }
 
+.calendarz-day-other-month {
+	color: var(--text-muted);
+	opacity: 0.6;
+}
+
 /* Dark theme adjustments */
 .theme-dark .calendarz-day {
 	color: var(--text-normal);

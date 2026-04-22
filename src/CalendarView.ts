@@ -86,10 +86,16 @@ export class CalendarZView extends ItemView {
 
 		const today = new Date();
 
-		for (let i = 0; i < startingDayOfWeek; i++) {
-			daysGrid.createDiv({ cls: "calendarz-day calendarz-day-empty" });
+		// Calculate dates from previous month to display
+		const prevMonthLastDay = new Date(year, month, 0).getDate();
+		for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+			const prevDay = prevMonthLastDay - i;
+			const prevDate = new Date(year, month - 1, prevDay);
+			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
+			dayEl.textContent = prevDay.toString();
 		}
 
+		// Display current month dates
 		for (let day = 1; day <= daysInMonth; day++) {
 			const date = new Date(year, month, day);
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day" });
@@ -108,6 +114,17 @@ export class CalendarZView extends ItemView {
 				this.renderCalendar();
 				this.onDateSelected(date);
 			});
+		}
+
+		// Calculate dates from next month to display, ensuring 6 rows total (42 cells)
+		const totalCells = 42; // 6 rows x 7 columns
+		const currentCells = startingDayOfWeek + daysInMonth;
+		const nextMonthDays = totalCells - currentCells;
+
+		for (let day = 1; day <= nextMonthDays; day++) {
+			const nextDate = new Date(year, month + 1, day);
+			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
+			dayEl.textContent = day.toString();
 		}
 	}
 
