@@ -1,6 +1,8 @@
 import esbuild from "esbuild";
 import process from "process";
 import { builtinModules } from 'node:module';
+import fs from 'fs';
+import path from 'path';
 
 const banner =
 `/*
@@ -10,6 +12,24 @@ if you want to view the source, please visit the github repository of this plugi
 `;
 
 const prod = (process.argv[2] === "production");
+
+// Plugin to import JSON files as modules
+const jsonPlugin = {
+	name: 'json',
+	setup(build) {
+		build.onResolve({ filter: /\.json$/ }, args => ({
+			path: path.resolve(args.resolveDir, args.path),
+			namespace: 'json',
+		}));
+		build.onLoad({ filter: /.*/, namespace: 'json' }, async (args) => {
+			const contents = await fs.promises.readFile(args.path, 'utf8');
+			return {
+				contents: `export default ${contents};`,
+				loader: 'js',
+			};
+		});
+	},
+};
 
 const context = await esbuild.context({
 	banner: {
@@ -39,6 +59,7 @@ const context = await esbuild.context({
 	treeShaking: true,
 	outfile: "main.js",
 	minify: prod,
+	plugins: [jsonPlugin],
 });
 
 if (prod) {

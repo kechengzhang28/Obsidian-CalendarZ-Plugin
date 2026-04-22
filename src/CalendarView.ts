@@ -1,13 +1,16 @@
 import {ItemView, WorkspaceLeaf} from "obsidian";
+import {I18n, interpolate} from "./i18n";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
 export class CalendarZView extends ItemView {
 	private currentDate: Date = new Date();
 	private selectedDate: Date = new Date();
+	private i18n: I18n;
 
-	constructor(leaf: WorkspaceLeaf) {
+	constructor(leaf: WorkspaceLeaf, i18n: I18n) {
 		super(leaf);
+		this.i18n = i18n;
 	}
 
 	getViewType(): string {
@@ -15,11 +18,15 @@ export class CalendarZView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return "CalendarZ";
+		return this.i18n.calendar.viewTitle;
 	}
 
 	getIcon(): string {
 		return "calendar";
+	}
+
+	setI18n(i18n: I18n): void {
+		this.i18n = i18n;
 	}
 
 	async onOpen(): Promise<void> {
@@ -28,6 +35,10 @@ export class CalendarZView extends ItemView {
 
 	async onClose(): Promise<void> {
 		this.contentEl.empty();
+	}
+
+	refresh(): void {
+		this.renderCalendar();
 	}
 
 	private renderCalendar(): void {
@@ -51,7 +62,7 @@ export class CalendarZView extends ItemView {
 			this.renderCalendar();
 		});
 
-		const todayBtn = header.createEl("button", { cls: "calendarz-today-btn", text: "Today" });
+		const todayBtn = header.createEl("button", { cls: "calendarz-today-btn", text: this.i18n.calendar.today });
 		todayBtn.addEventListener("click", () => {
 			this.currentDate = new Date();
 			this.selectedDate = new Date();
@@ -59,8 +70,7 @@ export class CalendarZView extends ItemView {
 		});
 
 		const weekdayRow = this.contentEl.createDiv({ cls: "calendarz-weekdays" });
-		const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-		weekdays.forEach(day => {
+		this.i18n.calendar.weekdays.forEach((day: string) => {
 			weekdayRow.createEl("span", { cls: "calendarz-weekday", text: day });
 		});
 
@@ -104,7 +114,7 @@ export class CalendarZView extends ItemView {
 	private formatMonthYear(date: Date): string {
 		const year = date.getFullYear();
 		const month = date.getMonth() + 1;
-		return `${year}-${month}`;
+		return interpolate(this.i18n.calendar.monthFormat, { year, month });
 	}
 
 	private isSameDate(date1: Date, date2: Date): boolean {

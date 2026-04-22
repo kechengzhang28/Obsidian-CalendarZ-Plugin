@@ -1,28 +1,31 @@
 import {App, Plugin, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, CalendarZSettings, CalendarZSettingTab} from "./settings";
 import {CALENDARZ_VIEW_TYPE, CalendarZView} from "./CalendarView";
+import {I18n, loadI18n} from "./i18n";
 
 export default class CalendarZ extends Plugin {
 	settings: CalendarZSettings;
+	i18n: I18n;
 
 	async onload() {
 		await this.loadSettings();
+		this.loadI18n();
 
 		// Register the calendar view
 		this.registerView(
 			CALENDARZ_VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => new CalendarZView(leaf)
+			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n)
 		);
 
 		// Add ribbon icon to open calendar view
-		this.addRibbonIcon('calendar', 'Open CalendarZ', async () => {
+		this.addRibbonIcon('calendar', this.i18n.ribbon.tooltip, async () => {
 			await this.activateView();
 		});
 
 		// Command to open calendar view
 		this.addCommand({
 			id: 'open-calendarz-view',
-			name: 'Open CalendarZ view',
+			name: this.i18n.commands.openCalendar,
 			callback: async () => {
 				await this.activateView();
 			}
@@ -42,6 +45,20 @@ export default class CalendarZ extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	loadI18n(): void {
+		this.i18n = loadI18n(this.settings.language);
+	}
+
+	refreshView(): void {
+		const leaves = this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE);
+		leaves.forEach(leaf => {
+			if (leaf.view instanceof CalendarZView) {
+				leaf.view.setI18n(this.i18n);
+				leaf.view.refresh();
+			}
+		});
 	}
 
 	async activateView(): Promise<void> {

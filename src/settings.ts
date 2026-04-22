@@ -1,16 +1,15 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
 import CalendarZ from "./main";
 
-export interface CalendarZSettings {
-	mySetting: string;
-}
+export type Language = "en" | "zh";
 
 export interface CalendarZSettings {
-	mySetting: string;
+	language: Language;
 }
+
 export const DEFAULT_SETTINGS: CalendarZSettings = {
-	mySetting: 'default'
-}
+	language: "en"
+};
 
 export class CalendarZSettingTab extends PluginSettingTab {
 	plugin: CalendarZ;
@@ -25,15 +24,21 @@ export class CalendarZSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		const t = this.plugin.i18n;
+
 		new Setting(containerEl)
-			.setName('Settings #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
+			.setName(t.settings.language.name)
+			.setDesc(t.settings.language.description)
+			.addDropdown(dropdown => dropdown
+				.addOption("en", "English")
+				.addOption("zh", "中文")
+				.setValue(this.plugin.settings.language)
 				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
+					this.plugin.settings.language = value as Language;
 					await this.plugin.saveSettings();
+					this.plugin.loadI18n();
+					this.display();
+					this.plugin.refreshView();
 				}));
 	}
 }

@@ -1,0 +1,20 @@
+{
+  "calendar": {
+    "today": "今天",
+    "weekdays": ["日", "一", "二", "三", "四", "五", "六"],
+    "monthFormat": "{{year}}年{{month}}月",
+    "viewTitle": "CalendarZ"
+  },
+  "settings": {
+    "language": {
+      "name": "语言",
+      "description": "选择日历的显示语言"
+    }
+  },
+  "commands": {
+    "openCalendar": "打开 CalendarZ 视图"
+  },
+  "ribbon": {
+    "tooltip": "打开 CalendarZ"
+  }
+}

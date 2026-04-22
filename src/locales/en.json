@@ -1,0 +1,20 @@
+{
+  "calendar": {
+    "today": "Today",
+    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "monthFormat": "{{year}}-{{month}}",
+    "viewTitle": "CalendarZ"
+  },
+  "settings": {
+    "language": {
+      "name": "Language",
+      "description": "Select the display language for the calendar"
+    }
+  },
+  "commands": {
+    "openCalendar": "Open CalendarZ view"
+  },
+  "ribbon": {
+    "tooltip": "Open CalendarZ"
+  }
+}
