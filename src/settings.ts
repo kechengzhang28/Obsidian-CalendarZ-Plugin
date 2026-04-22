@@ -3,15 +3,18 @@ import CalendarZ from "./main";
 
 export type Language = "en-US" | "zh-CN";
 export type MonthFormat = "numeric" | "short" | "long";
+export type TitleFormat = "yearMonth" | "monthYear";
 
 export interface CalendarZSettings {
 	language: Language;
 	monthFormat: MonthFormat;
+	titleFormat: TitleFormat;
 }
 
 export const DEFAULT_SETTINGS: CalendarZSettings = {
 	language: "en-US",
-	monthFormat: "numeric"
+	monthFormat: "numeric",
+	titleFormat: "monthYear"
 };
 
 export class CalendarZSettingTab extends PluginSettingTab {
@@ -54,6 +57,19 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.monthFormat)
 				.onChange(async (value) => {
 					this.plugin.settings.monthFormat = value as MonthFormat;
+					await this.plugin.saveSettings();
+					this.plugin.refreshView();
+				}));
+
+		new Setting(containerEl)
+			.setName(t.settings.titleFormat.name)
+			.setDesc(t.settings.titleFormat.description)
+			.addDropdown(dropdown => dropdown
+				.addOption("yearMonth", t.settings.titleFormat.options.yearMonth)
+				.addOption("monthYear", t.settings.titleFormat.options.monthYear)
+				.setValue(this.plugin.settings.titleFormat)
+				.onChange(async (value) => {
+					this.plugin.settings.titleFormat = value as TitleFormat;
 					await this.plugin.saveSettings();
 					this.plugin.refreshView();
 				}));

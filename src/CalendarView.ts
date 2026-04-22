@@ -3,6 +3,7 @@ import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
 import {DaysGrid} from "./ui/DaysGrid";
+import {TitleFormat} from "./settings";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
@@ -12,12 +13,14 @@ export class CalendarZView extends ItemView {
 	private i18n: I18n;
 	private monthFormat: string;
 	private language: string;
+	private titleFormat: TitleFormat;
 
-	constructor(leaf: WorkspaceLeaf, i18n: I18n, monthFormat: string = "numeric", language: string = "en-US") {
+	constructor(leaf: WorkspaceLeaf, i18n: I18n, monthFormat: string = "numeric", language: string = "en-US", titleFormat: TitleFormat = "monthYear") {
 		super(leaf);
 		this.i18n = i18n;
 		this.monthFormat = monthFormat;
 		this.language = language;
+		this.titleFormat = titleFormat;
 	}
 
 	getViewType(): string {
@@ -44,6 +47,10 @@ export class CalendarZView extends ItemView {
 		this.language = language;
 	}
 
+	setTitleFormat(titleFormat: TitleFormat): void {
+		this.titleFormat = titleFormat;
+	}
+
 	async onOpen(): Promise<void> {
 		this.renderCalendar();
 	}
@@ -65,6 +72,7 @@ export class CalendarZView extends ItemView {
 			this.i18n,
 			this.monthFormat,
 			this.language,
+			this.titleFormat,
 			{
 				onPrevMonth: () => {
 					this.currentDate.setMonth(this.currentDate.getMonth() - 1);

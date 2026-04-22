@@ -2,7 +2,6 @@
   "calendar": {
     "today": "Today",
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    "dateFormat": "{{month}} {{year}}",
     "viewTitle": "CalendarZ"
   },
   "settings": {
@@ -17,6 +16,14 @@
         "numeric": "Numeric (1-12)",
         "short": "Short (Jan-Dec)",
         "long": "Long (January-December)"
+      }
+    },
+    "titleFormat": {
+      "name": "Title Format",
+      "description": "Select the order of year and month in the calendar header",
+      "options": {
+        "yearMonth": "Year Month",
+        "monthYear": "Month Year"
       }
     }
   },

@@ -1,4 +1,5 @@
 import { I18n } from "../i18n";
+import { TitleFormat } from "../settings";
 
 export interface CalendarHeaderCallbacks {
 	onPrevMonth: () => void;
@@ -11,6 +12,7 @@ export class CalendarHeader {
 	private i18n: I18n;
 	private monthFormat: string;
 	private language: string;
+	private titleFormat: TitleFormat;
 	private callbacks: CalendarHeaderCallbacks;
 
 	constructor(
@@ -18,12 +20,14 @@ export class CalendarHeader {
 		i18n: I18n,
 		monthFormat: string,
 		language: string,
+		titleFormat: TitleFormat,
 		callbacks: CalendarHeaderCallbacks
 	) {
 		this.container = container;
 		this.i18n = i18n;
 		this.monthFormat = monthFormat;
 		this.language = language;
+		this.titleFormat = titleFormat;
 		this.callbacks = callbacks;
 	}
 
@@ -31,10 +35,18 @@ export class CalendarHeader {
 		const header = this.container.createDiv({ cls: "calendarz-header" });
 
 		const monthYearContainer = header.createDiv({ cls: "calendarz-month-year" });
-		const monthText = monthYearContainer.createEl("span", { cls: "calendarz-month" });
-		monthText.textContent = this.formatMonth(currentDate);
-		const yearText = monthYearContainer.createEl("span", { cls: "calendarz-year" });
-		yearText.textContent = currentDate.getFullYear().toString();
+
+		if (this.titleFormat === "yearMonth") {
+			const yearText = monthYearContainer.createEl("span", { cls: "calendarz-year" });
+			yearText.textContent = currentDate.getFullYear().toString();
+			const monthText = monthYearContainer.createEl("span", { cls: "calendarz-month" });
+			monthText.textContent = this.formatMonth(currentDate);
+		} else {
+			const monthText = monthYearContainer.createEl("span", { cls: "calendarz-month" });
+			monthText.textContent = this.formatMonth(currentDate);
+			const yearText = monthYearContainer.createEl("span", { cls: "calendarz-year" });
+			yearText.textContent = currentDate.getFullYear().toString();
+		}
 
 		const prevBtn = header.createEl("button", { cls: "calendarz-nav-btn" });
 		prevBtn.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='15 18 9 12 15 6'></polyline></svg>";
