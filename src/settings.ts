@@ -1,5 +1,6 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
 import CalendarZ from "./main";
+import {IgnoredFoldersModal} from "./ui/IgnoredFoldersModal";
 
 /** Supported display languages */
 export type Language = "en-US" | "zh-CN";
@@ -235,61 +236,57 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					}));
 		}
 
-		// Ignored folders setting header
+		// Ignored folders setting
+		const ignoredFoldersDesc = this.getIgnoredFoldersDescription();
 		new Setting(statSettingContent)
 			.setName(t.settings.ignoredFolders.name)
-			.setDesc(t.settings.ignoredFolders.description)
+			.setDesc(ignoredFoldersDesc)
 			.addButton(button => {
-				button.setButtonText(t.settings.ignoredFolders.addButton);
+				button.setButtonText(t.settings.ignoredFolders.manageButton || "Manage");
 				button.onClick(() => {
-					void (async () => {
-						const input = containerEl.querySelector(".calendarz-folder-input") as HTMLInputElement;
-						const folderPath = input.value.trim();
-						if (folderPath && !this.plugin.settings.ignoredFolders.includes(folderPath)) {
-							this.plugin.settings.ignoredFolders.push(folderPath);
+					const modal = new IgnoredFoldersModal(
+						this.app,
+						this.plugin.settings.ignoredFolders,
+						this.plugin.i18n,
+						async (folders) => {
+							this.plugin.settings.ignoredFolders = folders;
 							await this.plugin.saveSettings();
-							input.value = "";
+							this.display();
 							this.plugin.refreshView();
 						}
-					})();
+					);
+					modal.open();
 				});
 				return button;
 			});
 	}
 
 	/**
-	 * Renders the list of ignored folders with remove buttons.
-	 * @param container - Container element for the list
+	 * Generates a description element showing the currently ignored folders.
+	 * @returns DocumentFragment with description and bullet list
 	 */
-	private renderIgnoredFoldersList(container: HTMLElement): void {
-		container.empty();
-		const t = this.plugin.i18n;
+	private getIgnoredFoldersDescription(): DocumentFragment {
+		const t = this.plugin.i18n.settings.ignoredFolders;
+		const fragment = document.createDocumentFragment();
 
-		if (this.plugin.settings.ignoredFolders.length === 0) {
-			container.createEl("div", {
-				text: t.settings.ignoredFolders.empty,
-				cls: "calendarz-ignored-folders-empty"
-			});
-			return;
+		// Add description text
+		fragment.appendText(t.description);
+
+		if (this.plugin.settings.ignoredFolders.length > 0) {
+			// Add line break
+			fragment.appendChild(document.createElement("br"));
+
+			// Add each folder as a bullet point with line break
+			for (let i = 0; i < this.plugin.settings.ignoredFolders.length; i++) {
+				const folder = this.plugin.settings.ignoredFolders[i];
+				const line = document.createElement("div");
+				line.style.marginTop = "4px";
+				line.textContent = `• ${folder}`;
+				fragment.appendChild(line);
+			}
 		}
 
-		const list = container.createEl("ul", { cls: "calendarz-ignored-folders-list" });
-		for (const folder of this.plugin.settings.ignoredFolders) {
-			const item = list.createEl("li", { cls: "calendarz-ignored-folder-item" });
-			item.createSpan({ text: folder, cls: "calendarz-folder-path" });
-
-			const removeBtn = item.createEl("button", {
-				text: t.settings.ignoredFolders.removeButton,
-				cls: "calendarz-remove-folder-btn"
-			});
-			removeBtn.addEventListener("click", () => {
-				void (async () => {
-					this.plugin.settings.ignoredFolders = this.plugin.settings.ignoredFolders.filter(f => f !== folder);
-					await this.plugin.saveSettings();
-					this.renderIgnoredFoldersList(container);
-					this.plugin.refreshView();
-				})();
-			});
-		}
+		return fragment;
 	}
+
 }

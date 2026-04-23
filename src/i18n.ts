@@ -68,6 +68,18 @@ export interface I18n {
 			removeButton: string;
 			placeholder: string;
 			empty: string;
+			/** Button to open the management modal */
+			manageButton: string;
+			/** Currently ignored folders prefix */
+			currentlyIgnored: string;
+			/** Modal title */
+			modalTitle: string;
+			/** Add new folder section title */
+			addNewFolder: string;
+			/** Save button text */
+			saveButton: string;
+			/** Cancel button text */
+			cancelButton: string;
 		};
 		/** Date field name setting strings */
 		dateFieldName: {

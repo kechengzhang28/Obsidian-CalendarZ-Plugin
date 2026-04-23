@@ -44,7 +44,13 @@
       "addButton": "Add",
       "removeButton": "Remove",
       "placeholder": "Enter folder path (e.g., Templates, Archive)",
-      "empty": "No ignored folders"
+      "empty": "No ignored folders",
+      "manageButton": "Manage",
+      "currentlyIgnored": "Currently ignored",
+      "modalTitle": "Manage Ignored Folders",
+      "addNewFolder": "Add Folder",
+      "saveButton": "Save",
+      "cancelButton": "Cancel"
     },
     "dateFieldName": {
       "name": "Date Field Name",

@@ -44,7 +44,13 @@
       "addButton": "添加",
       "removeButton": "删除",
       "placeholder": "输入文件夹路径（如：Templates, Archive）",
-      "empty": "暂无忽略的文件夹"
+      "empty": "暂无忽略的文件夹",
+      "manageButton": "管理",
+      "currentlyIgnored": "当前已忽略",
+      "modalTitle": "管理忽略的文件夹",
+      "addNewFolder": "添加文件夹",
+      "saveButton": "保存",
+      "cancelButton": "取消"
     },
     "dateFieldName": {
       "name": "日期字段名称",

@@ -157,6 +157,13 @@
 	background-color: var(--text-normal);
 }
 
+/* Remove button in modal */
+.calendarz-modal-remove-btn {
+	background-color: transparent !important;
+	box-shadow: none !important;
+	cursor: pointer;
+}
+
 /* Dots container for dots mode */
 .calendarz-dots-container {
 	display: flex;
