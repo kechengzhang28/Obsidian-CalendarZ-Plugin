@@ -35,96 +35,26 @@ function parseDateString(dateStr: string): Date | null {
 }
 
 /**
- * Converts format pattern to regex for date extraction.
- * Maps format tokens to regex capture groups.
- */
-const FORMAT_TOKEN_MAP: Record<string, { regex: string; parser: (v: string) => number }> = {
-	YYYY: { regex: "(\\d{4})", parser: v => parseInt(v, 10) },
-	YY: { 
-		regex: "(\\d{2})", 
-		parser: v => {
-			const year = parseInt(v, 10);
-			const currentYear = dayjs().year();
-			const currentCentury = Math.floor(currentYear / 100) * 100;
-			const fullYear = currentCentury + year;
-			return fullYear > currentYear + 50 ? fullYear - 100 : fullYear;
-		}
-	},
-	MM: { regex: "(\\d{2})", parser: v => parseInt(v, 10) },
-	M: { regex: "(\\d{1,2})", parser: v => parseInt(v, 10) },
-	DD: { regex: "(\\d{2})", parser: v => parseInt(v, 10) },
-	D: { regex: "(\\d{1,2})", parser: v => parseInt(v, 10) },
-};
-
-/**
  * Extracts a date from a filename based on a format pattern.
- * Uses a simpler approach: convert format to regex and extract values.
+ * Supports YYYY-MM-DD format variations.
  */
 function extractDateFromFilename(filename: string, format: string): Date | null {
-	// Find all format tokens and their positions
-	const tokens: { type: string; pos: number }[] = [];
+	// Simple approach: convert format to regex for YYYY-MM-DD style patterns
+	const pattern = format
+		.replace(/YYYY/g, "(\\d{4})")
+		.replace(/MM/g, "(\\d{2})")
+		.replace(/DD/g, "(\\d{2})")
+		.replace(/[-/.]/g, "[-/.]");
 	
-	for (const token of Object.keys(FORMAT_TOKEN_MAP)) {
-		const pos = format.indexOf(token);
-		if (pos !== -1) tokens.push({ type: token, pos });
-	}
+	const regex = new RegExp(`^.*${pattern}.*$`);
+	const match = filename.match(regex);
 	
-	// Sort by position and remove duplicates (prefer longer tokens)
-	tokens.sort((a, b) => a.pos - b.pos);
-	const uniqueTokens: typeof tokens = [];
-	for (const token of tokens) {
-		const lastToken = uniqueTokens[uniqueTokens.length - 1];
-		if (!lastToken || token.pos !== lastToken.pos) {
-			uniqueTokens.push(token);
-		}
-	}
-	
-	if (uniqueTokens.length < 3) return null; // Need at least year, month, day
-
-	// Build regex pattern
-	let regexPattern = "^.*";
-	let lastEnd = 0;
-
-	for (const token of uniqueTokens) {
-		if (token.pos > lastEnd) {
-			const separator = format.slice(lastEnd, token.pos);
-			regexPattern += separator.replace(/[-/.]/g, "[-/.]");
-		}
-		const tokenConfig = FORMAT_TOKEN_MAP[token.type];
-		if (tokenConfig) {
-			regexPattern += tokenConfig.regex;
-		}
-		lastEnd = token.pos + token.type.length;
-	}
-	regexPattern += ".*$";
-
-	const match = filename.match(new RegExp(regexPattern));
 	if (!match) return null;
-
-	// Extract date components
-	let year: number | null = null;
-	let month: number | null = null;
-	let day: number | null = null;
-
-	for (let i = 0; i < uniqueTokens.length; i++) {
-		const token = uniqueTokens[i];
-		if (!token) continue;
-		
-		const value = match[i + 1];
-		if (!value) continue;
-
-		const tokenConfig = FORMAT_TOKEN_MAP[token.type];
-		if (!tokenConfig) continue;
-		
-		const parsed = tokenConfig.parser(value);
-		
-		if (token.type.startsWith("Y")) year = parsed;
-		else if (token.type.startsWith("M")) month = parsed;
-		else if (token.type.startsWith("D")) day = parsed;
-	}
-
-	if (year === null || month === null || day === null) return null;
-
+	
+	const year = parseInt(match[1] ?? "0", 10);
+	const month = parseInt(match[2] ?? "0", 10);
+	const day = parseInt(match[3] ?? "0", 10);
+	
 	const date = dayjs(`${year}-${month}-${day}`, "YYYY-M-D", true);
 	return date.isValid() ? date.toDate() : null;
 }

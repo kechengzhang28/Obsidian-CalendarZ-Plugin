@@ -1,43 +1,25 @@
-import { ItemView, WorkspaceLeaf, TFile, Notice } from "obsidian";
+import { ItemView, WorkspaceLeaf } from "obsidian";
 import dayjs from "dayjs";
 import { I18n } from "./i18n";
 import { CalendarHeader } from "./ui/CalendarHeader";
 import { WeekdaysRow } from "./ui/WeekdaysRow";
 import { DaysGrid, DateCount } from "./ui/DaysGrid";
 import { ConfirmModal } from "./ui/ConfirmModal";
-import { TitleFormat, WeekStart, DateSource, DisplayMode } from "./settings/index";
+import { CalendarZSettings } from "./settings/index";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/GetNotes";
-import { formatDate, isSameDay, getYearMonth } from "./utils/dateUtils";
 import { createDailyNote, findDailyNote } from "./utils/createNote";
 import { CSS_CLASSES } from "./constants";
 import CalendarZ from "./main";
 
-/** Unique identifier for the CalendarZ view type */
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
-/** Settings interface for CalendarZViewView constructor */
-export interface CalendarZViewSettings {
-	monthFormat: string;
-	language: string;
-	titleFormat: TitleFormat;
-	weekStart: WeekStart;
-	dateFieldName: string;
-	ignoredFolders: string[];
-	dateSource: DateSource;
-	filenameDateFormat: string;
-	displayMode: DisplayMode;
-	dotThreshold: number;
-	confirmBeforeCreate: boolean;
-}
-
-/** Default settings for CalendarZView */
-const DEFAULT_VIEW_SETTINGS: CalendarZViewSettings = {
-	monthFormat: "numeric",
+const DEFAULT_VIEW_SETTINGS: CalendarZSettings = {
 	language: "en-US",
+	monthFormat: "numeric",
 	titleFormat: "monthYear",
 	weekStart: "sunday",
-	dateFieldName: "date",
 	ignoredFolders: [],
+	dateFieldName: "date",
 	dateSource: "yaml",
 	filenameDateFormat: "YYYY-MM-DD",
 	displayMode: "heatmap",
@@ -51,19 +33,11 @@ const DEFAULT_VIEW_SETTINGS: CalendarZViewSettings = {
  */
 export class CalendarZView extends ItemView {
 	private currentDate: Date = new Date();
-	private selectedDate: Date = new Date();
 	private i18n: I18n;
-	private settings: CalendarZViewSettings;
+	private settings: CalendarZSettings;
 	private plugin: CalendarZ;
 
-	/**
-	 * Creates a new CalendarZView instance.
-	 * @param leaf - Obsidian workspace leaf
-	 * @param i18n - Internationalization strings
-	 * @param settings - Partial view settings (defaults applied for missing values)
-	 * @param plugin - CalendarZ plugin instance
-	 */
-	constructor(leaf: WorkspaceLeaf, i18n: I18n, settings: Partial<CalendarZViewSettings> = {}, plugin: CalendarZ) {
+	constructor(leaf: WorkspaceLeaf, i18n: I18n, settings: Partial<CalendarZSettings> = {}, plugin: CalendarZ) {
 		super(leaf);
 		this.i18n = i18n;
 		this.settings = { ...DEFAULT_VIEW_SETTINGS, ...settings };
@@ -82,54 +56,18 @@ export class CalendarZView extends ItemView {
 		return "calendar";
 	}
 
-	// Settings update methods
-	setI18n(i18n: I18n): void {
-		this.i18n = i18n;
-	}
-
-	setMonthFormat(monthFormat: string): void {
-		this.settings.monthFormat = monthFormat;
-	}
-
-	setLanguage(language: string): void {
-		this.settings.language = language;
-	}
-
-	setTitleFormat(titleFormat: TitleFormat): void {
-		this.settings.titleFormat = titleFormat;
-	}
-
-	setWeekStart(weekStart: WeekStart): void {
-		this.settings.weekStart = weekStart;
-	}
-
-	setDateFieldName(dateFieldName: string): void {
-		this.settings.dateFieldName = dateFieldName;
-	}
-
-	setIgnoredFolders(ignoredFolders: string[]): void {
-		this.settings.ignoredFolders = ignoredFolders;
-	}
-
-	setDateSource(dateSource: DateSource): void {
-		this.settings.dateSource = dateSource;
-	}
-
-	setFilenameDateFormat(filenameDateFormat: string): void {
-		this.settings.filenameDateFormat = filenameDateFormat;
-	}
-
-	setDisplayMode(displayMode: DisplayMode): void {
-		this.settings.displayMode = displayMode;
-	}
-
-	setDotThreshold(dotThreshold: number): void {
-		this.settings.dotThreshold = dotThreshold;
-	}
-
-	setConfirmBeforeCreate(confirmBeforeCreate: boolean): void {
-		this.settings.confirmBeforeCreate = confirmBeforeCreate;
-	}
+	setI18n(i18n: I18n): void { this.i18n = i18n; }
+	setMonthFormat(v: CalendarZSettings['monthFormat']): void { this.settings.monthFormat = v; }
+	setLanguage(v: CalendarZSettings['language']): void { this.settings.language = v; }
+	setTitleFormat(v: CalendarZSettings['titleFormat']): void { this.settings.titleFormat = v; }
+	setWeekStart(v: CalendarZSettings['weekStart']): void { this.settings.weekStart = v; }
+	setDateFieldName(v: string): void { this.settings.dateFieldName = v; }
+	setIgnoredFolders(v: string[]): void { this.settings.ignoredFolders = v; }
+	setDateSource(v: CalendarZSettings['dateSource']): void { this.settings.dateSource = v; }
+	setFilenameDateFormat(v: string): void { this.settings.filenameDateFormat = v; }
+	setDisplayMode(v: CalendarZSettings['displayMode']): void { this.settings.displayMode = v; }
+	setDotThreshold(v: number): void { this.settings.dotThreshold = v; }
+	setConfirmBeforeCreate(v: boolean): void { this.settings.confirmBeforeCreate = v; }
 
 	async onOpen(): Promise<void> {
 		await this.renderCalendar();
@@ -145,120 +83,17 @@ export class CalendarZView extends ItemView {
 
 	/**
 	 * Refreshes only the statistics data without re-rendering the entire calendar.
-	 * Delegates to DaysGrid for actual DOM updates.
 	 */
 	async refreshStatsOnly(): Promise<void> {
-		if (this.settings.displayMode === "none") return;
-
-		const dateCounts = await this.fetchDateCounts();
-		const dateCountsMap = this.buildDateCountsMap(dateCounts);
-
-		const daysGrid = this.contentEl.querySelector(`.${CSS_CLASSES.DAYS}`);
-		if (!daysGrid) return;
-
-		this.updateDayElementsStats(daysGrid as HTMLElement, dateCountsMap);
-	}
-
-	/**
-	 * Updates statistics on existing day elements.
-	 */
-	private updateDayElementsStats(daysGrid: HTMLElement, dateCountsMap: Map<string, number>): void {
-		const { year, month } = getYearMonth(this.currentDate);
-		const maxCount = this.calculateMaxCount(dateCountsMap);
-		const today = dayjs();
-
-		const dayElements = daysGrid.querySelectorAll(`.${CSS_CLASSES.DAY}:not(.${CSS_CLASSES.DAY_OTHER_MONTH})`);
-
-		dayElements.forEach((dayEl) => {
-			const day = this.parseDayNumber(dayEl.textContent);
-			if (day === null) return;
-
-			const date = dayjs(new Date(year, month, day));
-			const dateStr = formatDate(date);
-			const count = dateCountsMap.get(dateStr) || 0;
-
-			this.clearDayStats(dayEl as HTMLElement);
-			this.applyDayStats(dayEl as HTMLElement, date, dateStr, count, maxCount, today);
-		});
-	}
-
-	/**
-	 * Parses day number from element text content.
-	 */
-	private parseDayNumber(text: string | null): number | null {
-		if (!text) return null;
-		const day = parseInt(text, 10);
-		return isNaN(day) ? null : day;
-	}
-
-	/**
-	 * Clears existing statistics from a day element.
-	 */
-	private clearDayStats(dayEl: HTMLElement): void {
-		dayEl.removeClass(CSS_CLASSES.DAY_HEATMAP);
-		dayEl.style.removeProperty("--heatmap-opacity");
-		dayEl.removeAttribute("data-count");
-		dayEl.removeAttribute("aria-label");
-
-		const existingDots = dayEl.querySelector(`.${CSS_CLASSES.DOTS_CONTAINER}`);
-		if (existingDots) {
-			existingDots.remove();
+		// 简化逻辑：直接重新渲染整个日历
+		if (this.settings.displayMode !== "none") {
+			void this.renderCalendar();
 		}
 	}
 
-	/**
-	 * Applies statistics styling to a day element.
-	 */
-	private applyDayStats(
-		dayEl: HTMLElement,
-		date: dayjs.Dayjs,
-		dateStr: string,
-		count: number,
-		maxCount: number,
-		today: dayjs.Dayjs
-	): void {
-		const isTodayDate = isSameDay(date, today);
-		const isBeforeToday = date.isBefore(today, "day");
 
-		if (this.settings.displayMode === "heatmap" && count > 0) {
-			this.applyHeatmapStyle(dayEl, count, maxCount, dateStr);
-		}
 
-		if (this.settings.displayMode === "dots") {
-			this.renderDots(dayEl, count, isTodayDate, isBeforeToday);
-			if (count > 0 || isBeforeToday) {
-				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
-			}
-		}
-	}
 
-	/**
-	 * Applies heatmap styling to a day element.
-	 */
-	private applyHeatmapStyle(dayEl: HTMLElement, count: number, maxCount: number, dateStr: string): void {
-		dayEl.addClass(CSS_CLASSES.DAY_HEATMAP);
-		const intensity = maxCount > 0 ? count / maxCount : 0;
-		const opacity = 0.25 + intensity * 0.75;
-		dayEl.style.setProperty("--heatmap-opacity", opacity.toFixed(2));
-		dayEl.setAttribute("data-count", count.toString());
-		dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
-	}
-
-	/**
-	 * Renders dots below the date to represent note count.
-	 */
-	private renderDots(dayEl: HTMLElement, count: number, isToday: boolean, isBeforeToday: boolean): void {
-		const dotsContainer = dayEl.createDiv({ cls: CSS_CLASSES.DOTS_CONTAINER });
-
-		if (count > 0) {
-			const numDots = Math.min(4, Math.ceil(count / this.settings.dotThreshold));
-			for (let i = 0; i < numDots; i++) {
-				dotsContainer.createDiv({ cls: CSS_CLASSES.DOT });
-			}
-		} else if (isBeforeToday) {
-			dotsContainer.createDiv({ cls: `${CSS_CLASSES.DOT} ${CSS_CLASSES.DOT_GRAY}` });
-		}
-	}
 
 	/**
 	 * Updates the "today" highlight on the calendar.
@@ -269,26 +104,8 @@ export class CalendarZView extends ItemView {
 
 		if (today.year() !== current.year() || today.month() !== current.month()) {
 			this.currentDate = new Date();
-			await this.renderCalendar();
-			return;
 		}
-
-		const daysGrid = this.contentEl.querySelector(`.${CSS_CLASSES.DAYS}`);
-		if (!daysGrid) return;
-
-		const todayDay = today.date();
-		const dayElements = daysGrid.querySelectorAll(`.${CSS_CLASSES.DAY}:not(.${CSS_CLASSES.DAY_OTHER_MONTH})`);
-
-		dayElements.forEach((dayEl) => {
-			const day = this.parseDayNumber(dayEl.textContent);
-			if (day === null) return;
-
-			if (day === todayDay) {
-				dayEl.addClass(CSS_CLASSES.DAY_TODAY);
-			} else {
-				dayEl.removeClass(CSS_CLASSES.DAY_TODAY);
-			}
-		});
+		await this.renderCalendar();
 	}
 
 	/**
@@ -335,7 +152,6 @@ export class CalendarZView extends ItemView {
 	 */
 	private goToToday(): void {
 		this.currentDate = new Date();
-		this.selectedDate = new Date();
 		void this.renderCalendar();
 	}
 
@@ -361,7 +177,7 @@ export class CalendarZView extends ItemView {
 			this.settings.weekStart,
 			this.settings.displayMode,
 			this.settings.dotThreshold,
-			(date) => this.handleDayClick(date)
+			(date) => void this.handleDayClick(date)
 		);
 		daysGrid.render(this.currentDate, dateCounts);
 	}
@@ -385,9 +201,7 @@ export class CalendarZView extends ItemView {
 					this.app,
 					this.plugin.i18n,
 					dateStr,
-					async () => {
-						await this.createDailyNote(date);
-					},
+					() => void this.createDailyNote(date),
 					() => {
 						// User cancelled, do nothing
 					}
@@ -424,25 +238,5 @@ export class CalendarZView extends ItemView {
 		}
 	}
 
-	/**
-	 * Builds a map from date counts array for efficient lookup.
-	 */
-	private buildDateCountsMap(dateCounts: DateCount[]): Map<string, number> {
-		const map = new Map<string, number>();
-		for (const item of dateCounts) {
-			map.set(item.date, item.count);
-		}
-		return map;
-	}
 
-	/**
-	 * Calculates the maximum count from date counts map.
-	 */
-	private calculateMaxCount(dateCountsMap: Map<string, number>): number {
-		let max = 0;
-		for (const count of dateCountsMap.values()) {
-			if (count > max) max = count;
-		}
-		return max;
-	}
 }

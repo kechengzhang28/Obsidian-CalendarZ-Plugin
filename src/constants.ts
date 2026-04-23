@@ -30,19 +30,12 @@ export const GRID = {
 	TOTAL_CELLS: 42,
 	/** Days in a week */
 	DAYS_PER_WEEK: 7,
-	/** Weeks to display */
-	WEEKS_TO_SHOW: 6,
 } as const;
 
 /** Day of week indices */
 export const DAY_OF_WEEK = {
 	SUNDAY: 0,
 	MONDAY: 1,
-	TUESDAY: 2,
-	WEDNESDAY: 3,
-	THURSDAY: 4,
-	FRIDAY: 5,
-	SATURDAY: 6,
 } as const;
 
 /** CSS class names for calendar elements */

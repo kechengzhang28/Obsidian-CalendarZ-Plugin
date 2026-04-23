@@ -1,11 +1,10 @@
-import {Notice, TFile} from "obsidian";
+import {Notice, TFile, moment} from "obsidian";
 import {
 	createDailyNote as createDailyNoteInterface,
 	appHasDailyNotesPluginLoaded,
 	getDailyNote,
 	getAllDailyNotes,
 } from "obsidian-daily-notes-interface";
-import moment from "moment";
 import CalendarZ from "../main";
 
 /**
