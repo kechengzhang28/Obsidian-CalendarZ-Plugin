@@ -12,7 +12,7 @@ export type WeekStart = "sunday" | "monday";
 /** Date source options for extracting dates from notes */
 export type DateSource = "yaml" | "filename";
 /** Display mode options for note statistics */
-export type DisplayMode = "heatmap" | "dots" | "none";
+export type DisplayMode = "none" | "dots" | "heatmap";
 
 /**
  * Plugin settings interface.
@@ -147,9 +147,9 @@ export class CalendarZSettingTab extends PluginSettingTab {
 			.setName(t.settings.displayMode.name)
 			.setDesc(t.settings.displayMode.description)
 			.addDropdown(dropdown => dropdown
-				.addOption("heatmap", t.settings.displayMode.options.heatmap)
-				.addOption("dots", t.settings.displayMode.options.dots)
 				.addOption("none", t.settings.displayMode.options.none)
+				.addOption("dots", t.settings.displayMode.options.dots)
+				.addOption("heatmap", t.settings.displayMode.options.heatmap)
 				.setValue(this.plugin.settings.displayMode)
 				.onChange(async (value) => {
 					this.plugin.settings.displayMode = value as DisplayMode;
