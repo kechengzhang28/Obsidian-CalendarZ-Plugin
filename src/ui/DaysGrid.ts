@@ -72,12 +72,21 @@ export class DaysGrid {
 
 		// Render padding days from previous month
 		const prevMonthLastDay = dayjs(new Date(year, month, 0)).date();
+		const prevMonth = month === 0 ? 11 : month - 1;
+		const prevYear = month === 0 ? year - 1 : year;
 		for (let i = startingDayOfWeek - 1; i >= 0; i--) {
 			const prevDay = prevMonthLastDay - i;
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
 			dayEl.textContent = prevDay.toString();
-			if (this.displayMode === "dots"){
-				dayEl.createDiv({ cls: "calendarz-dots-container" });
+
+			// Add dots for dots mode
+			if (this.displayMode === "dots") {
+				const date = dayjs(new Date(prevYear, prevMonth, prevDay));
+				const dateStr = date.format("YYYY-MM-DD");
+				const count = this.dateCounts.get(dateStr) || 0;
+				const isToday = this.isSameDate(date, today);
+				const isBeforeToday = date.isBefore(today, "day");
+				this.renderDots(dayEl, count, isToday, isBeforeToday);
 			}
 		}
 
@@ -92,6 +101,7 @@ export class DaysGrid {
 
 			// Check if today
 			const isToday = this.isSameDate(date, today);
+			const isBeforeToday = date.isBefore(today, "day");
 			if (isToday) {
 				dayEl.addClass("calendarz-day-today");
 			}
@@ -107,9 +117,11 @@ export class DaysGrid {
 			}
 
 			// Add dots for dots mode
-			if (this.displayMode === "dots" && count > 0) {
-				this.renderDots(dayEl, count);
-				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+			if (this.displayMode === "dots") {
+				this.renderDots(dayEl, count, isToday, isBeforeToday);
+				if (count > 0 || isBeforeToday) {
+					dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+				}
 			}
 
 			// For non-heatmap modes, apply theme color to today's date
@@ -129,12 +141,21 @@ export class DaysGrid {
 		const totalCells = 42;
 		const currentCells = startingDayOfWeek + daysInMonth;
 		const nextMonthDays = totalCells - currentCells;
+		const nextMonth = month === 11 ? 0 : month + 1;
+		const nextYear = month === 11 ? year + 1 : year;
 
 		for (let day = 1; day <= nextMonthDays; day++) {
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
 			dayEl.textContent = day.toString();
-			if (this.displayMode === "dots"){
-				dayEl.createDiv({ cls: "calendarz-dots-container" });
+
+			// Add dots for dots mode
+			if (this.displayMode === "dots") {
+				const date = dayjs(new Date(nextYear, nextMonth, day));
+				const dateStr = date.format("YYYY-MM-DD");
+				const count = this.dateCounts.get(dateStr) || 0;
+				const isToday = this.isSameDate(date, today);
+				const isBeforeToday = date.isBefore(today, "day");
+				this.renderDots(dayEl, count, isToday, isBeforeToday);
 			}
 		}
 	}
@@ -157,16 +178,27 @@ export class DaysGrid {
 	/**
 	 * Renders dots below the date to represent note count.
 	 * Maximum 4 dots, each representing dotThreshold notes.
+	 * For dates before today: show dots if notes exist, otherwise show a gray dot.
+	 * For today: show dots only if notes exist.
 	 * @param dayEl - The day element to add dots to
 	 * @param count - Number of notes for this date
+	 * @param isToday - Whether this date is today
+	 * @param isBeforeToday - Whether this date is before today
 	 */
-	private renderDots(dayEl: HTMLElement, count: number): void {
+	private renderDots(dayEl: HTMLElement, count: number, isToday: boolean, isBeforeToday: boolean): void {
 		const dotsContainer = dayEl.createDiv({ cls: "calendarz-dots-container" });
-		const numDots = Math.min(4, Math.ceil(count / this.dotThreshold));
 
-		for (let i = 0; i < numDots; i++) {
-			dotsContainer.createDiv({ cls: "calendarz-dot" });
+		if (count > 0) {
+			// Has notes: show colored dots
+			const numDots = Math.min(4, Math.ceil(count / this.dotThreshold));
+			for (let i = 0; i < numDots; i++) {
+				dotsContainer.createDiv({ cls: "calendarz-dot" });
+			}
+		} else if (isBeforeToday) {
+			// No notes but before today: show gray dot
+			dotsContainer.createDiv({ cls: "calendarz-dot calendarz-dot-gray" });
 		}
+		// Today with no notes: show nothing
 	}
 
 	/**

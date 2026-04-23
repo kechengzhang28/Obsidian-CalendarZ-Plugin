@@ -198,6 +198,8 @@ export class CalendarZView extends ItemView {
 			if (count > maxCount) maxCount = count;
 		}
 
+		const today = dayjs();
+
 		dayElements.forEach((dayEl) => {
 			const dayText = dayEl.textContent;
 			if (!dayText) return;
@@ -205,8 +207,11 @@ export class CalendarZView extends ItemView {
 			const day = parseInt(dayText, 10);
 			if (isNaN(day)) return;
 
-			const dateStr = dayjs(new Date(year, month, day)).format("YYYY-MM-DD");
+			const date = dayjs(new Date(year, month, day));
+			const dateStr = date.format("YYYY-MM-DD");
 			const count = dateCountsMap.get(dateStr) || 0;
+			const isToday = date.isSame(today, "day");
+			const isBeforeToday = date.isBefore(today, "day");
 
 			// Remove existing heatmap classes and styles
 			dayEl.removeClass("calendarz-day-heatmap");
@@ -231,9 +236,11 @@ export class CalendarZView extends ItemView {
 			}
 
 			// Add dots for dots mode
-			if (this.displayMode === "dots" && count > 0) {
-				this.renderDots(dayEl as HTMLElement, count);
-				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+			if (this.displayMode === "dots") {
+				this.renderDots(dayEl as HTMLElement, count, isToday, isBeforeToday);
+				if (count > 0 || isBeforeToday) {
+					dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+				}
 			}
 		});
 	}
@@ -241,16 +248,27 @@ export class CalendarZView extends ItemView {
 	/**
 	 * Renders dots below the date to represent note count.
 	 * Maximum 4 dots, each representing dotThreshold notes.
+	 * For dates before today: show dots if notes exist, otherwise show a gray dot.
+	 * For today: show dots only if notes exist.
 	 * @param dayEl - The day element to add dots to
 	 * @param count - Number of notes for this date
+	 * @param isToday - Whether this date is today
+	 * @param isBeforeToday - Whether this date is before today
 	 */
-	private renderDots(dayEl: HTMLElement, count: number): void {
+	private renderDots(dayEl: HTMLElement, count: number, isToday: boolean, isBeforeToday: boolean): void {
 		const dotsContainer = dayEl.createDiv({ cls: "calendarz-dots-container" });
-		const numDots = Math.min(4, Math.ceil(count / this.dotThreshold));
 
-		for (let i = 0; i < numDots; i++) {
-			dotsContainer.createDiv({ cls: "calendarz-dot" });
+		if (count > 0) {
+			// Has notes: show colored dots
+			const numDots = Math.min(4, Math.ceil(count / this.dotThreshold));
+			for (let i = 0; i < numDots; i++) {
+				dotsContainer.createDiv({ cls: "calendarz-dot" });
+			}
+		} else if (isBeforeToday) {
+			// No notes but before today: show gray dot
+			dotsContainer.createDiv({ cls: "calendarz-dot calendarz-dot-gray" });
 		}
+		// Today with no notes: show nothing
 	}
 
 	/**

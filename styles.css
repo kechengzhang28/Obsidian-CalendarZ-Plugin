@@ -177,6 +177,12 @@
 	background-color: var(--text-normal) !important;
 }
 
+/* Gray dot for dates before today with no notes */
+.calendarz-dot-gray {
+	background-color: var(--text-muted);
+	opacity: 0.4;
+}
+
 /* Settings folder item */
 .calendarz-settings-folder-item {
 	margin-top: 4px;
