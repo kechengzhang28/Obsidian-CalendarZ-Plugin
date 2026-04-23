@@ -3,6 +3,8 @@ import { DATE_FORMAT } from "../../constants";
 
 /**
  * Formats a date to YYYY-MM-DD string
+ * @param date - Date to format (Date object or dayjs instance)
+ * @returns Formatted date string in YYYY-MM-DD format
  */
 export function formatDate(date: Date | dayjs.Dayjs): string {
 	return dayjs(date).format(DATE_FORMAT);
@@ -10,6 +12,9 @@ export function formatDate(date: Date | dayjs.Dayjs): string {
 
 /**
  * Formats a date using a custom format string
+ * @param date - Date to format (Date object or dayjs instance)
+ * @param format - dayjs format string (e.g., "YYYY-MM-DD", "MMM D, YYYY")
+ * @returns Formatted date string
  */
 export function formatDateWithFormat(date: Date | dayjs.Dayjs, format: string): string {
 	return dayjs(date).format(format);
@@ -17,6 +22,15 @@ export function formatDateWithFormat(date: Date | dayjs.Dayjs, format: string): 
 
 /**
  * Formats a month display based on language and format preferences
+ * 
+ * Special handling for Chinese locale with numeric format:
+ * - Returns month number (1-12) without leading zero
+ * - Other locales use standard toLocaleString formatting
+ * 
+ * @param date - Date to extract month from
+ * @param language - Locale string (e.g., "en-US", "zh-CN")
+ * @param format - Month format: "numeric" | "short" | "long"
+ * @returns Formatted month string
  */
 export function formatMonth(
 	date: Date,

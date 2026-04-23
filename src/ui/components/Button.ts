@@ -1,22 +1,49 @@
 import { Component } from "../../core/Component";
 
+/**
+ * Configuration options for Button component
+ */
 export interface ButtonConfig {
+	/** Button text content */
 	text?: string;
+	/** Additional CSS class names */
 	className?: string;
+	/** Whether this is a call-to-action button (primary style) */
 	cta?: boolean;
+	/** Click event handler */
 	onClick: () => void;
 }
 
 /**
  * Reusable button component
+ * Wraps a standard HTML button with consistent styling and event handling
+ * 
+ * @example
+ * ```typescript
+ * const button = new Button({
+ *   text: 'Save',
+ *   cta: true,
+ *   onClick: () => saveData()
+ * });
+ * button.render(container);
+ * ```
  */
 export class Button extends Component {
+	/** The underlying button element */
 	private buttonEl: HTMLButtonElement | null = null;
 
+	/**
+	 * Creates a new Button component
+	 * @param config - Button configuration
+	 */
 	constructor(private config: ButtonConfig) {
 		super();
 	}
 
+	/**
+	 * Renders the button into the given container
+	 * @param container - Parent element to render into
+	 */
 	render(container: HTMLElement): void {
 		this.buttonEl = container.createEl("button", {
 			cls: this.config.className,
@@ -36,12 +63,20 @@ export class Button extends Component {
 		this.isRendered = true;
 	}
 
+	/**
+	 * Updates the button text
+	 * @param text - New button text
+	 */
 	setText(text: string): void {
 		if (this.buttonEl) {
 			this.buttonEl.textContent = text;
 		}
 	}
 
+	/**
+	 * Sets the disabled state of the button
+	 * @param disabled - Whether the button should be disabled
+	 */
 	setDisabled(disabled: boolean): void {
 		if (this.buttonEl) {
 			this.buttonEl.disabled = disabled;
@@ -50,11 +85,25 @@ export class Button extends Component {
 }
 
 /**
- * Creates an SVG icon button
+ * Icon button component with SVG arrow icons
+ * Used for navigation controls (previous/next)
+ * 
+ * @example
+ * ```typescript
+ * const prevBtn = new IconButton('prev', () => goToPrevious());
+ * prevBtn.render(header);
+ * ```
  */
 export class IconButton extends Component {
+	/** The underlying button element */
 	private buttonEl: HTMLButtonElement | null = null;
 
+	/**
+	 * Creates a new IconButton
+	 * @param direction - Arrow direction ('prev' or 'next')
+	 * @param onClick - Click event handler
+	 * @param className - Additional CSS class names
+	 */
 	constructor(
 		private direction: "prev" | "next",
 		private onClick: () => void,
@@ -63,6 +112,10 @@ export class IconButton extends Component {
 		super();
 	}
 
+	/**
+	 * Renders the icon button into the given container
+	 * @param container - Parent element to render into
+	 */
 	render(container: HTMLElement): void {
 		this.buttonEl = container.createEl("button", { cls: this.className });
 		this.buttonEl.appendChild(this.createSvgIcon());
@@ -76,6 +129,10 @@ export class IconButton extends Component {
 		this.isRendered = true;
 	}
 
+	/**
+	 * Creates the SVG arrow icon
+	 * @returns SVG element for the arrow
+	 */
 	private createSvgIcon(): SVGSVGElement {
 		const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		svg.setAttribute("viewBox", "0 0 24 24");
