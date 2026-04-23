@@ -35,4 +35,22 @@ export function renderLanguageSettings(
 				refreshDisplay();
 				plugin.refreshView();
 			}));
+
+	new Setting(contentEl)
+		.setName(t.settings.openCalendar.name)
+		.setDesc(t.settings.openCalendar.description)
+		.addButton(button => button
+			.setButtonText(t.settings.openCalendar.buttonText)
+			.onClick(() => {
+				void plugin.activateView();
+			}));
+
+	new Setting(contentEl)
+		.setName(t.settings.refreshPlugin.name)
+		.setDesc(t.settings.refreshPlugin.description)
+		.addButton(button => button
+			.setButtonText(t.settings.refreshPlugin.buttonText)
+			.onClick(() => {
+				plugin.refreshView();
+			}));
 }

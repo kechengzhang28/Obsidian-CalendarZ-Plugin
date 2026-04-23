@@ -85,6 +85,16 @@
     "confirmBeforeCreate": {
       "name": "Confirm Before Creating",
       "description": "Show a confirmation dialog before creating a daily note when left-clicking a date"
+    },
+    "openCalendar": {
+      "name": "Open Calendar View",
+      "description": "Display the calendar view in the right sidebar",
+      "buttonText": "Open"
+    },
+    "refreshPlugin": {
+      "name": "Refresh Plugin",
+      "description": "Refresh the calendar view to apply latest settings",
+      "buttonText": "Refresh"
     }
   },
   "commands": {

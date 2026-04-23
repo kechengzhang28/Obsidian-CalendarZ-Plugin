@@ -122,6 +122,18 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
+		/** Open calendar button setting strings */
+		openCalendar: {
+			name: string;
+			description: string;
+			buttonText: string;
+		};
+		/** Refresh plugin button setting strings */
+		refreshPlugin: {
+			name: string;
+			description: string;
+			buttonText: string;
+		};
 	};
 	/** Command names */
 	commands: {

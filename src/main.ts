@@ -16,8 +16,6 @@ export default class CalendarZ extends Plugin {
 			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n, this.settings, this)
 		);
 
-		this.addRibbonIcon('calendar', this.i18n.ribbon.tooltip, () => void this.activateView());
-
 		this.addCommand({
 			id: 'open-calendar-view',
 			name: this.i18n.commands.openCalendar,
