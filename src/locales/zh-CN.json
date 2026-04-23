@@ -6,7 +6,8 @@
   },
   "sectionTitles": {
     "basic": "基本设置",
-    "statistics": "统计设置"
+    "statistics": "统计设置",
+    "click": "点击设置"
   },
   "settings": {
     "language": {
@@ -80,6 +81,10 @@
     "dotThreshold": {
       "name": "每点代表笔记数",
       "description": "每个点代表的笔记数量（1-10）"
+    },
+    "confirmBeforeCreate": {
+      "name": "创建前确认",
+      "description": "左键点击日期时，是否在创建日记前弹出确认对话框"
     }
   },
   "commands": {
@@ -87,5 +92,15 @@
   },
   "ribbon": {
     "tooltip": "打开 CalendarZ"
+  },
+  "notifications": {
+    "dailyNotesNotEnabled": "请先启用日记核心插件",
+    "dailyNotesCreateFailed": "创建日记失败，请检查日记插件设置"
+  },
+  "modal": {
+    "confirmTitle": "创建日记",
+    "confirmMessage": "是否创建 {{date}} 的日记？",
+    "cancelButton": "取消",
+    "createButton": "创建"
   }
 }

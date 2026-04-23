@@ -16,6 +16,11 @@ import {
 import { CSS_CLASSES, CSS_VARS, ATTRS, DOTS } from "../constants";
 
 /**
+ * Callback function type for day click events
+ */
+export type DayClickHandler = (date: Date) => void;
+
+/**
  * Interface representing the count of notes for a specific date
  */
 export interface DateCount {
@@ -43,17 +48,20 @@ export class DaysGrid {
 	private displayMode: DisplayMode;
 	private dotThreshold: number;
 	private dateCounts: Map<string, number> = new Map();
+	private onDayClick?: DayClickHandler;
 
 	constructor(
 		container: HTMLElement,
 		weekStart: WeekStart,
 		displayMode: DisplayMode,
-		dotThreshold: number = 1
+		dotThreshold: number = 1,
+		onDayClick?: DayClickHandler
 	) {
 		this.container = container;
 		this.weekStart = weekStart;
 		this.displayMode = displayMode;
 		this.dotThreshold = dotThreshold;
+		this.onDayClick = onDayClick;
 	}
 
 	/**
@@ -105,10 +113,10 @@ export class DaysGrid {
 
 		for (let i = paddingDays - 1; i >= 0; i--) {
 			const day = prevMonthLastDay - i;
-			const dayEl = this.createDayElement(daysGrid, day, true);
+			const date = dayjs(new Date(prevYear, prevMonth, day));
+			const dayEl = this.createDayElement(daysGrid, day, true, date);
 
 			if (this.displayMode === "dots") {
-				const date = dayjs(new Date(prevYear, prevMonth, day));
 				this.renderDotsIfNeeded(dayEl, date, today);
 			}
 		}
@@ -128,7 +136,7 @@ export class DaysGrid {
 	): void {
 		for (let day = 1; day <= daysInMonth; day++) {
 			const date = dayjs(new Date(year, month, day));
-			const dayEl = this.createDayElement(daysGrid, day, false);
+			const dayEl = this.createDayElement(daysGrid, day, false, date);
 
 			const config = this.createDayConfig(date, today);
 
@@ -157,10 +165,10 @@ export class DaysGrid {
 		const { year: nextYear, month: nextMonth } = getAdjacentMonth(year, month, 1);
 
 		for (let day = 1; day <= nextMonthDays; day++) {
-			const dayEl = this.createDayElement(daysGrid, day, true);
+			const date = dayjs(new Date(nextYear, nextMonth, day));
+			const dayEl = this.createDayElement(daysGrid, day, true, date);
 
 			if (this.displayMode === "dots") {
-				const date = dayjs(new Date(nextYear, nextMonth, day));
 				this.renderDotsIfNeeded(dayEl, date, today);
 			}
 		}
@@ -169,12 +177,20 @@ export class DaysGrid {
 	/**
 	 * Creates a day element with appropriate classes.
 	 */
-	private createDayElement(daysGrid: HTMLElement, day: number, isOtherMonth: boolean): HTMLElement {
+	private createDayElement(daysGrid: HTMLElement, day: number, isOtherMonth: boolean, date?: dayjs.Dayjs): HTMLElement {
 		const classes = isOtherMonth
 			? `${CSS_CLASSES.DAY} ${CSS_CLASSES.DAY_OTHER_MONTH}`
 			: CSS_CLASSES.DAY;
 		const dayEl = daysGrid.createDiv({ cls: classes });
 		dayEl.textContent = day.toString();
+
+		// Add click handler if provided and date is available
+		if (this.onDayClick && date) {
+			dayEl.addEventListener("click", () => {
+				this.onDayClick!(date.toDate());
+			});
+		}
+
 		return dayEl;
 	}
 

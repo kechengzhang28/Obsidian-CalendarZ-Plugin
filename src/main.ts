@@ -13,7 +13,7 @@ export default class CalendarZ extends Plugin {
 
 		this.registerView(
 			CALENDARZ_VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n, this.settings)
+			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n, this.settings, this)
 		);
 
 		this.addRibbonIcon('calendar', this.i18n.ribbon.tooltip, () => this.activateView());
@@ -93,6 +93,7 @@ export default class CalendarZ extends Plugin {
 			view.setFilenameDateFormat(settings.filenameDateFormat);
 			view.setDisplayMode(settings.displayMode);
 			view.setDotThreshold(settings.dotThreshold);
+			view.setConfirmBeforeCreate(settings.confirmBeforeCreate);
 			void view.refresh();
 		});
 	}

@@ -41,4 +41,6 @@ export interface CalendarZSettings {
 	displayMode: DisplayMode;
 	/** Number of notes each dot represents (for dots mode) */
 	dotThreshold: number;
+	/** Whether to confirm before creating a daily note on click */
+	confirmBeforeCreate: boolean;
 }

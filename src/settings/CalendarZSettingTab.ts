@@ -3,6 +3,7 @@ import CalendarZ from "../main";
 import {renderLanguageSettings} from "./modules/language";
 import {renderBasicSettings} from "./modules/basic";
 import {renderStatisticsSettings} from "./modules/statistics";
+import {renderClickSettings} from "./modules/click";
 
 /**
  * Settings tab for the CalendarZ plugin.
@@ -32,5 +33,6 @@ export class CalendarZSettingTab extends PluginSettingTab {
 		renderLanguageSettings(containerEl, this.plugin, () => this.display());
 		renderBasicSettings(containerEl, this.plugin);
 		renderStatisticsSettings(containerEl, this.plugin, this.app, () => this.display());
+		renderClickSettings(containerEl, this.plugin);
 	}
 }

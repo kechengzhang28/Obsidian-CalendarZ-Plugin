@@ -11,5 +11,6 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	dateSource: "yaml",
 	filenameDateFormat: "YYYY-MM-DD",
 	displayMode: "none",
-	dotThreshold: 1
+	dotThreshold: 1,
+	confirmBeforeCreate: true
 };

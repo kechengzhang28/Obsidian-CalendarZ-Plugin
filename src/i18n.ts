@@ -24,6 +24,8 @@ export interface I18n {
 		basic: string;
 		/** Statistics settings section title */
 		statistics: string;
+		/** Click settings section title */
+		click: string;
 	};
 	/** Settings panel strings */
 	settings: {
@@ -115,6 +117,11 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
+		/** Confirm before creating daily note setting strings */
+		confirmBeforeCreate: {
+			name: string;
+			description: string;
+		};
 	};
 	/** Command names */
 	commands: {
@@ -125,6 +132,24 @@ export interface I18n {
 	ribbon: {
 		/** Tooltip text for the ribbon icon */
 		tooltip: string;
+	};
+	/** Notification messages */
+	notifications: {
+		/** Message shown when daily notes plugin is not enabled */
+		dailyNotesNotEnabled: string;
+		/** Message shown when daily note creation fails */
+		dailyNotesCreateFailed: string;
+	};
+	/** Modal dialog strings */
+	modal: {
+		/** Confirm modal title */
+		confirmTitle: string;
+		/** Confirm modal message template with {{date}} placeholder */
+		confirmMessage: string;
+		/** Cancel button text */
+		cancelButton: string;
+		/** Create button text */
+		createButton: string;
 	};
 }
 

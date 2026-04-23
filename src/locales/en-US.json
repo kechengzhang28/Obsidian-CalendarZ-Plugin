@@ -6,7 +6,8 @@
   },
   "sectionTitles": {
     "basic": "Basic",
-    "statistics": "Statistics"
+    "statistics": "Statistics",
+    "click": "Click Behavior"
   },
   "settings": {
     "language": {
@@ -80,6 +81,10 @@
     "dotThreshold": {
       "name": "Notes per Dot",
       "description": "Number of notes represented by each dot (1-10)"
+    },
+    "confirmBeforeCreate": {
+      "name": "Confirm Before Creating",
+      "description": "Show a confirmation dialog before creating a daily note when left-clicking a date"
     }
   },
   "commands": {
@@ -87,5 +92,15 @@
   },
   "ribbon": {
     "tooltip": "Open CalendarZ"
+  },
+  "notifications": {
+    "dailyNotesNotEnabled": "Please enable the Daily Notes core plugin first",
+    "dailyNotesCreateFailed": "Failed to create daily note, please check the daily notes plugin settings"
+  },
+  "modal": {
+    "confirmTitle": "Create Daily Note",
+    "confirmMessage": "Create daily note for {{date}}?",
+    "cancelButton": "Cancel",
+    "createButton": "Create"
   }
 }

@@ -1,13 +1,16 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import dayjs from "dayjs";
 import { I18n } from "./i18n";
 import { CalendarHeader } from "./ui/CalendarHeader";
 import { WeekdaysRow } from "./ui/WeekdaysRow";
 import { DaysGrid, DateCount } from "./ui/DaysGrid";
+import { ConfirmModal } from "./ui/ConfirmModal";
 import { TitleFormat, WeekStart, DateSource, DisplayMode } from "./settings/index";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/GetNotes";
 import { formatDate, isSameDay, getYearMonth } from "./utils/dateUtils";
+import { createDailyNote } from "./utils/createNote";
 import { CSS_CLASSES } from "./constants";
+import CalendarZ from "./main";
 
 /** Unique identifier for the CalendarZ view type */
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
@@ -24,6 +27,7 @@ export interface CalendarZViewSettings {
 	filenameDateFormat: string;
 	displayMode: DisplayMode;
 	dotThreshold: number;
+	confirmBeforeCreate: boolean;
 }
 
 /** Default settings for CalendarZView */
@@ -38,6 +42,7 @@ const DEFAULT_VIEW_SETTINGS: CalendarZViewSettings = {
 	filenameDateFormat: "YYYY-MM-DD",
 	displayMode: "heatmap",
 	dotThreshold: 1,
+	confirmBeforeCreate: true,
 };
 
 /**
@@ -49,17 +54,20 @@ export class CalendarZView extends ItemView {
 	private selectedDate: Date = new Date();
 	private i18n: I18n;
 	private settings: CalendarZViewSettings;
+	private plugin: CalendarZ;
 
 	/**
 	 * Creates a new CalendarZView instance.
 	 * @param leaf - Obsidian workspace leaf
 	 * @param i18n - Internationalization strings
 	 * @param settings - Partial view settings (defaults applied for missing values)
+	 * @param plugin - CalendarZ plugin instance
 	 */
-	constructor(leaf: WorkspaceLeaf, i18n: I18n, settings: Partial<CalendarZViewSettings> = {}) {
+	constructor(leaf: WorkspaceLeaf, i18n: I18n, settings: Partial<CalendarZViewSettings> = {}, plugin: CalendarZ) {
 		super(leaf);
 		this.i18n = i18n;
 		this.settings = { ...DEFAULT_VIEW_SETTINGS, ...settings };
+		this.plugin = plugin;
 	}
 
 	getViewType(): string {
@@ -117,6 +125,10 @@ export class CalendarZView extends ItemView {
 
 	setDotThreshold(dotThreshold: number): void {
 		this.settings.dotThreshold = dotThreshold;
+	}
+
+	setConfirmBeforeCreate(confirmBeforeCreate: boolean): void {
+		this.settings.confirmBeforeCreate = confirmBeforeCreate;
 	}
 
 	async onOpen(): Promise<void> {
@@ -348,9 +360,77 @@ export class CalendarZView extends ItemView {
 			this.contentEl,
 			this.settings.weekStart,
 			this.settings.displayMode,
-			this.settings.dotThreshold
+			this.settings.dotThreshold,
+			(date) => this.handleDayClick(date)
 		);
 		daysGrid.render(this.currentDate, dateCounts);
+	}
+
+	/**
+	 * Handles day click events.
+	 * Opens existing daily note or creates a new one.
+	 */
+	private async handleDayClick(date: Date): Promise<void> {
+		const dateStr = dayjs(date).format("YYYY-MM-DD");
+		const existingNote = await this.findDailyNote(date);
+
+		if (existingNote) {
+			// Open existing note
+			await this.app.workspace.openLinkText(existingNote.path, "", false);
+		} else {
+			// Create new daily note
+			if (this.settings.confirmBeforeCreate) {
+				// Show confirmation modal
+				new ConfirmModal(
+					this.app,
+					this.plugin.i18n,
+					dateStr,
+					async () => {
+						await this.createDailyNote(date);
+					},
+					() => {
+						// User cancelled, do nothing
+					}
+				).open();
+			} else {
+				// Create directly without confirmation
+				await this.createDailyNote(date);
+			}
+		}
+	}
+
+	/**
+	 * Finds an existing daily note for the given date.
+	 */
+	private async findDailyNote(date: Date): Promise<TFile | null> {
+		const dateStr = dayjs(date).format("YYYY-MM-DD");
+		const files = this.app.vault.getMarkdownFiles();
+
+		for (const file of files) {
+			// Check if filename contains the date
+			if (file.basename.includes(dateStr)) {
+				return file;
+			}
+			// Check YAML frontmatter if using yaml date source
+			if (this.settings.dateSource === "yaml") {
+				const cache = this.app.metadataCache.getFileCache(file);
+				if (cache?.frontmatter?.[this.settings.dateFieldName]) {
+					const fileDate = cache.frontmatter[this.settings.dateFieldName];
+					if (fileDate === dateStr) {
+						return file;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Creates or opens a daily note for the given date using the core Daily Notes plugin.
+	 */
+	private async createDailyNote(date: Date): Promise<void> {
+		await createDailyNote(this.plugin, date);
 	}
 
 	/**
