@@ -45,6 +45,18 @@
     "dateFieldName": {
       "name": "日期字段名称",
       "description": "用于日期统计的 YAML 前置元数据字段名称（如：created, date, published）"
+    },
+    "dateSource": {
+      "name": "日期来源",
+      "description": "选择用于统计笔记日期的来源",
+      "options": {
+        "yaml": "YAML 前置元数据",
+        "filename": "文件名中的日期"
+      }
+    },
+    "filenameDateFormat": {
+      "name": "文件名日期格式",
+      "description": "从文件名中提取日期的格式模式（如：YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD）"
     }
   },
   "commands": {

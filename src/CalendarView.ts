@@ -4,8 +4,8 @@ import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
 import {DaysGrid} from "./ui/DaysGrid";
 import {HeatMap, DateCount} from "./ui/HeatMap";
-import {TitleFormat, WeekStart} from "./settings";
-import {getNotesCountByYamlDate} from "./utils/GetNotes";
+import {TitleFormat, WeekStart, DateSource} from "./settings";
+import {getNotesCountByYamlDate, getNotesCountByFilenameDate} from "./utils/GetNotes";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
@@ -19,6 +19,8 @@ export class CalendarZView extends ItemView {
 	private weekStart: WeekStart;
 	private dateFieldName: string;
 	private ignoredFolders: string[];
+	private dateSource: DateSource;
+	private filenameDateFormat: string;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -28,7 +30,9 @@ export class CalendarZView extends ItemView {
 		titleFormat: TitleFormat = "monthYear",
 		weekStart: WeekStart = "sunday",
 		dateFieldName: string = "date",
-		ignoredFolders: string[] = []
+		ignoredFolders: string[] = [],
+		dateSource: DateSource = "yaml",
+		filenameDateFormat: string = "YYYY-MM-DD"
 	) {
 		super(leaf);
 		this.i18n = i18n;
@@ -38,6 +42,8 @@ export class CalendarZView extends ItemView {
 		this.weekStart = weekStart;
 		this.dateFieldName = dateFieldName;
 		this.ignoredFolders = ignoredFolders;
+		this.dateSource = dateSource;
+		this.filenameDateFormat = filenameDateFormat;
 	}
 
 	getViewType(): string {
@@ -78,6 +84,14 @@ export class CalendarZView extends ItemView {
 
 	setIgnoredFolders(ignoredFolders: string[]): void {
 		this.ignoredFolders = ignoredFolders;
+	}
+
+	setDateSource(dateSource: DateSource): void {
+		this.dateSource = dateSource;
+	}
+
+	setFilenameDateFormat(filenameDateFormat: string): void {
+		this.filenameDateFormat = filenameDateFormat;
 	}
 
 	async onOpen(): Promise<void> {
@@ -145,6 +159,13 @@ export class CalendarZView extends ItemView {
 	}
 
 	private async getDateCounts(): Promise<DateCount[]> {
-		return await getNotesCountByYamlDate(this.app, this.ignoredFolders, this.dateFieldName);
+		switch (this.dateSource) {
+			case "yaml":
+				return await getNotesCountByYamlDate(this.app, this.ignoredFolders, this.dateFieldName);
+			case "filename":
+				return await getNotesCountByFilenameDate(this.app, this.ignoredFolders, this.filenameDateFormat);
+			default:
+				return await getNotesCountByYamlDate(this.app, this.ignoredFolders, this.dateFieldName);
+		}
 	}
 }

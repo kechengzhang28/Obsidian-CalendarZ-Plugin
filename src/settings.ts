@@ -5,6 +5,7 @@ export type Language = "en-US" | "zh-CN";
 export type MonthFormat = "numeric" | "short" | "long";
 export type TitleFormat = "yearMonth" | "monthYear";
 export type WeekStart = "sunday" | "monday";
+export type DateSource = "yaml" | "filename";
 
 export interface CalendarZSettings {
 	language: Language;
@@ -13,6 +14,8 @@ export interface CalendarZSettings {
 	weekStart: WeekStart;
 	ignoredFolders: string[];
 	dateFieldName: string;
+	dateSource: DateSource;
+	filenameDateFormat: string;
 }
 
 export const DEFAULT_SETTINGS: CalendarZSettings = {
@@ -21,7 +24,9 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	titleFormat: "monthYear",
 	weekStart: "sunday",
 	ignoredFolders: [],
-	dateFieldName: "date"
+	dateFieldName: "date",
+	dateSource: "yaml",
+	filenameDateFormat: "YYYY-MM-DD"
 };
 
 export class CalendarZSettingTab extends PluginSettingTab {
@@ -107,6 +112,38 @@ export class CalendarZSettingTab extends PluginSettingTab {
 						this.plugin.refreshView();
 					})();
 				}));
+
+		// Date source setting
+		new Setting(containerEl)
+			.setName(t.settings.dateSource.name)
+			.setDesc(t.settings.dateSource.description)
+			.addDropdown(dropdown => dropdown
+				.addOption("yaml", t.settings.dateSource.options.yaml)
+				.addOption("filename", t.settings.dateSource.options.filename)
+				.setValue(this.plugin.settings.dateSource)
+				.onChange(async (value) => {
+					this.plugin.settings.dateSource = value as DateSource;
+					await this.plugin.saveSettings();
+					this.plugin.refreshView();
+				}));
+
+		// Filename date format setting (only shown when dateSource is "filename")
+		if (this.plugin.settings.dateSource === "filename") {
+			new Setting(containerEl)
+				.setName(t.settings.filenameDateFormat.name)
+				.setDesc(t.settings.filenameDateFormat.description)
+				.addText(text => text
+					// eslint-disable-next-line obsidianmd/ui/sentence-case
+					.setPlaceholder("YYYY-MM-DD")
+					.setValue(this.plugin.settings.filenameDateFormat)
+					.onChange((value) => {
+						void (async () => {
+							this.plugin.settings.filenameDateFormat = value.trim() || "YYYY-MM-DD";
+							await this.plugin.saveSettings();
+							this.plugin.refreshView();
+						})();
+					}));
+		}
 
 		// Ignored folders setting
 		new Setting(containerEl)

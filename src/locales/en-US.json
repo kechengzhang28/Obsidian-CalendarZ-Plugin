@@ -45,6 +45,18 @@
     "dateFieldName": {
       "name": "Date Field Name",
       "description": "The YAML frontmatter field name to use for date statistics (e.g., created, date, published)"
+    },
+    "dateSource": {
+      "name": "Date Source",
+      "description": "Select the source for note date statistics",
+      "options": {
+        "yaml": "YAML frontmatter",
+        "filename": "Date in filename"
+      }
+    },
+    "filenameDateFormat": {
+      "name": "Filename Date Format",
+      "description": "The format pattern to extract date from filename (e.g., YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD)"
     }
   },
   "commands": {

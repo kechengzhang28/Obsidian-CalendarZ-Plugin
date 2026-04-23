@@ -53,6 +53,18 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
+		dateSource: {
+			name: string;
+			description: string;
+			options: {
+				yaml: string;
+				filename: string;
+			};
+		};
+		filenameDateFormat: {
+			name: string;
+			description: string;
+		};
 	};
 	commands: {
 		openCalendar: string;

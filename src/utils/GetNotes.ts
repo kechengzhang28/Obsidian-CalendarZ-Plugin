@@ -163,6 +163,127 @@ function parseDateString(dateStr: string): Date | null {
 }
 
 /**
+ * Convert format pattern to regex pattern
+ * @param format Format pattern like "YYYY-MM-DD"
+ * @returns Regex pattern string
+ */
+function formatToRegex(format: string): string {
+	return format
+		.replace(/YYYY/g, "(\\d{4})")
+		.replace(/YY/g, "(\\d{2})")
+		.replace(/MM/g, "(\\d{2})")
+		.replace(/M/g, "(\\d{1,2})")
+		.replace(/DD/g, "(\\d{2})")
+		.replace(/D/g, "(\\d{1,2})")
+		.replace(/[-/.]/g, "[-/.]?");
+}
+
+/**
+ * Get the order of year, month, day in the format pattern
+ * @param format Format pattern like "YYYY-MM-DD"
+ * @returns Object with indices for year, month, day
+ */
+function getDateComponentOrder(format: string): { year: number; month: number; day: number } {
+	const yearIndex = format.indexOf("YYYY") !== -1 ? format.indexOf("YYYY") : format.indexOf("YY");
+	const monthIndex = format.indexOf("MM") !== -1 ? format.indexOf("MM") : format.indexOf("M");
+	const dayIndex = format.indexOf("DD") !== -1 ? format.indexOf("DD") : format.indexOf("D");
+
+	// Create array of indices and sort them
+	const indices = [
+		{ type: "year", index: yearIndex },
+		{ type: "month", index: monthIndex },
+		{ type: "day", index: dayIndex }
+	].sort((a, b) => a.index - b.index);
+
+	const order: { year: number; month: number; day: number } = { year: -1, month: -1, day: -1 };
+	indices.forEach((item, idx) => {
+		order[item.type as keyof typeof order] = idx + 1;
+	});
+
+	return order;
+}
+
+/**
+ * Extract date from filename based on format pattern
+ * @param filename Filename without extension
+ * @param format Format pattern like "YYYY-MM-DD"
+ * @returns Date object or null if not found
+ */
+export function extractDateFromFilename(filename: string, format: string): Date | null {
+	const regexPattern = formatToRegex(format);
+	const regex = new RegExp(regexPattern);
+	const match = filename.match(regex);
+
+	if (!match) return null;
+
+	const order = getDateComponentOrder(format);
+	const yearStr = match[order.year];
+	const monthStr = match[order.month];
+	const dayStr = match[order.day];
+
+	if (!yearStr || !monthStr || !dayStr) return null;
+
+	let year = parseInt(yearStr);
+	const month = parseInt(monthStr) - 1; // 0-based month
+	const day = parseInt(dayStr);
+
+	// Handle 2-digit year
+	if (yearStr.length === 2) {
+		const currentYear = new Date().getFullYear();
+		const currentCentury = Math.floor(currentYear / 100) * 100;
+		year = currentCentury + year;
+		// If resulting year is more than 50 years in the future, assume previous century
+		if (year > currentYear + 50) {
+			year -= 100;
+		}
+	}
+
+	const date = new Date(year, month, day);
+	if (isNaN(date.getTime())) return null;
+
+	return date;
+}
+
+/**
+ * Get note counts grouped by date from filename
+ * @param app Obsidian App instance
+ * @param ignoredFolders List of ignored folder paths
+ * @param filenameDateFormat Format pattern for date in filename (e.g., "YYYY-MM-DD")
+ * @returns Array of DateCount
+ */
+export async function getNotesCountByFilenameDate(
+	app: App,
+	ignoredFolders: string[],
+	filenameDateFormat: string
+): Promise<DateCount[]> {
+	const files = app.vault.getFiles();
+	const dateCount = new Map<string, number>();
+
+	for (const file of files) {
+		if (isPathIgnored(file.path, ignoredFolders)) {
+			continue;
+		}
+
+		// Get filename without extension
+		const filename = file.name.replace(/\.[^/.]+$/, "");
+		const date = extractDateFromFilename(filename, filenameDateFormat);
+
+		if (date && !isNaN(date.getTime())) {
+			const dateStr = formatDateKey(date);
+			const count = dateCount.get(dateStr) || 0;
+			dateCount.set(dateStr, count + 1);
+		}
+	}
+
+	const result: DateCount[] = [];
+	for (const [date, count] of dateCount.entries()) {
+		result.push({ date, count });
+	}
+
+	return result;
+}
+
+/**
  * Extract YAML frontmatter from file content
  * @param content File content
  * @returns Parsed YAML object or null
