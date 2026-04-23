@@ -1,4 +1,5 @@
 import {ItemView, WorkspaceLeaf} from "obsidian";
+import dayjs from "dayjs";
 import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
@@ -118,11 +119,11 @@ export class CalendarZView extends ItemView {
 			this.titleFormat,
 			{
 				onPrevMonth: () => {
-					this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+					this.currentDate = dayjs(this.currentDate).subtract(1, "month").toDate();
 					void this.renderCalendar();
 				},
 				onNextMonth: () => {
-					this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+					this.currentDate = dayjs(this.currentDate).add(1, "month").toDate();
 					void this.renderCalendar();
 				},
 				onToday: () => {
@@ -150,10 +151,7 @@ export class CalendarZView extends ItemView {
 	}
 
 	private onDateSelected(date: Date): void {
-		const year = date.getFullYear();
-		const month = String(date.getMonth() + 1).padStart(2, "0");
-		const day = String(date.getDate()).padStart(2, "0");
-		const dateStr = `${year}-${month}-${day}`;
+		const dateStr = dayjs(date).format("YYYY-MM-DD");
 		// TODO: Implement date selection functionality
 		console.warn("Selected date:", dateStr);
 	}

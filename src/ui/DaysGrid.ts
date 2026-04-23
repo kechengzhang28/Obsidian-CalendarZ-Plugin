@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { WeekStart } from "../settings";
 
 export interface DaysGridCallbacks {
@@ -18,17 +19,18 @@ export class DaysGrid {
 	render(currentDate: Date): void {
 		const daysGrid = this.container.createDiv({ cls: "calendarz-days" });
 
-		const year = currentDate.getFullYear();
-		const month = currentDate.getMonth();
+		const current = dayjs(currentDate);
+		const year = current.year();
+		const month = current.month();
 
-		const firstDay = new Date(year, month, 1);
-		const lastDay = new Date(year, month + 1, 0);
-		const daysInMonth = lastDay.getDate();
-		const startingDayOfWeek = this.getAdjustedDayOfWeek(firstDay.getDay());
+		const firstDay = dayjs(new Date(year, month, 1));
+		const lastDay = dayjs(new Date(year, month + 1, 0));
+		const daysInMonth = lastDay.date();
+		const startingDayOfWeek = this.getAdjustedDayOfWeek(firstDay.day());
 
-		const today = new Date();
+		const today = dayjs();
 
-		const prevMonthLastDay = new Date(year, month, 0).getDate();
+		const prevMonthLastDay = dayjs(new Date(year, month, 0)).date();
 		for (let i = startingDayOfWeek - 1; i >= 0; i--) {
 			const prevDay = prevMonthLastDay - i;
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
@@ -40,7 +42,7 @@ export class DaysGrid {
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day" });
 			dayEl.textContent = day.toString();
 
-			if (this.isSameDate(date, today)) {
+			if (this.isSameDate(dayjs(date), today)) {
 				dayEl.addClass("calendarz-day-today");
 			}
 
@@ -59,10 +61,8 @@ export class DaysGrid {
 		}
 	}
 
-	private isSameDate(date1: Date, date2: Date): boolean {
-		return date1.getFullYear() === date2.getFullYear() &&
-			date1.getMonth() === date2.getMonth() &&
-			date1.getDate() === date2.getDate();
+	private isSameDate(date1: dayjs.Dayjs, date2: dayjs.Dayjs): boolean {
+		return date1.isSame(date2, "day");
 	}
 
 	private getAdjustedDayOfWeek(dayOfWeek: number): number {

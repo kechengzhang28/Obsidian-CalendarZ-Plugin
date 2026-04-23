@@ -1,4 +1,8 @@
 import {App, parseYaml} from "obsidian";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 export interface NoteInfo {
 	path: string;
@@ -74,7 +78,7 @@ export function getNotesCountByDate(
 
 	for (const note of notes) {
 		const date = dateType === "created" ? note.created : note.modified;
-		const dateStr = formatDateKey(date);
+		const dateStr = dayjs(date).format("YYYY-MM-DD");
 
 		const count = dateCount.get(dateStr) || 0;
 		dateCount.set(dateStr, count + 1);
@@ -100,26 +104,15 @@ export function getNotesInDateRange(
 	dateType: "created" | "modified" = "created"
 ): NoteInfo[] {
 	const notes = getAllNotes(app, ignoredFolders);
-	const start = startDate.getTime();
-	const end = endDate.getTime();
+	const start = dayjs(startDate);
+	const end = dayjs(endDate);
 
 	return notes.filter(note => {
 		const date = dateType === "created" ? note.created : note.modified;
-		const time = date.getTime();
-		return time >= start && time <= end;
+		const d = dayjs(date);
+		return d.isAfter(start) || d.isSame(start, "day") && 
+			(d.isBefore(end) || d.isSame(end, "day"));
 	});
-}
-
-/**
- * Format date to YYYY-MM-DD format
- * @param date Date object
- * @returns Formatted string
- */
-function formatDateKey(date: Date): string {
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-	return `${year}-${month}-${day}`;
 }
 
 /**
@@ -131,76 +124,44 @@ function formatDateKey(date: Date): string {
 function parseDateString(dateStr: string): Date | null {
 	if (!dateStr) return null;
 
-	// Try parsing as ISO format first
-	let date = new Date(dateStr);
-	if (!isNaN(date.getTime())) {
-		return date;
-	}
-
-	// Try common formats
 	const formats = [
-		/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/,  // YYYY-MM-DD or YYYY/MM/DD
-		/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/,  // DD-MM-YYYY or MM-DD-YYYY
+		"YYYY-MM-DD",
+		"YYYY/MM/DD",
+		"DD-MM-YYYY",
+		"DD/MM/YYYY",
+		"MM-DD-YYYY",
+		"MM/DD/YYYY",
 	];
 
 	for (const format of formats) {
-		const match = dateStr.match(format);
-		if (match && match[1] && match[2] && match[3]) {
-			// Try YYYY-MM-DD first
-			if (match[1].length === 4) {
-				date = new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
-			} else {
-				// Assume DD-MM-YYYY
-				date = new Date(parseInt(match[3]), parseInt(match[2]) - 1, parseInt(match[1]));
-			}
-			if (!isNaN(date.getTime())) {
-				return date;
-			}
+		const parsed = dayjs(dateStr, format, true);
+		if (parsed.isValid()) {
+			return parsed.toDate();
 		}
+	}
+
+	// Try ISO format as fallback
+	const isoParsed = dayjs(dateStr);
+	if (isoParsed.isValid()) {
+		return isoParsed.toDate();
 	}
 
 	return null;
 }
 
 /**
- * Convert format pattern to regex pattern
+ * Convert format pattern to dayjs format for parsing
  * @param format Format pattern like "YYYY-MM-DD"
- * @returns Regex pattern string
+ * @returns dayjs format string
  */
-function formatToRegex(format: string): string {
+function normalizeFormat(format: string): string {
 	return format
-		.replace(/YYYY/g, "(\\d{4})")
-		.replace(/YY/g, "(\\d{2})")
-		.replace(/MM/g, "(\\d{2})")
-		.replace(/M/g, "(\\d{1,2})")
-		.replace(/DD/g, "(\\d{2})")
-		.replace(/D/g, "(\\d{1,2})")
-		.replace(/[-/.]/g, "[-/.]?");
-}
-
-/**
- * Get the order of year, month, day in the format pattern
- * @param format Format pattern like "YYYY-MM-DD"
- * @returns Object with indices for year, month, day
- */
-function getDateComponentOrder(format: string): { year: number; month: number; day: number } {
-	const yearIndex = format.indexOf("YYYY") !== -1 ? format.indexOf("YYYY") : format.indexOf("YY");
-	const monthIndex = format.indexOf("MM") !== -1 ? format.indexOf("MM") : format.indexOf("M");
-	const dayIndex = format.indexOf("DD") !== -1 ? format.indexOf("DD") : format.indexOf("D");
-
-	// Create array of indices and sort them
-	const indices = [
-		{ type: "year", index: yearIndex },
-		{ type: "month", index: monthIndex },
-		{ type: "day", index: dayIndex }
-	].sort((a, b) => a.index - b.index);
-
-	const order: { year: number; month: number; day: number } = { year: -1, month: -1, day: -1 };
-	indices.forEach((item, idx) => {
-		order[item.type as keyof typeof order] = idx + 1;
-	});
-
-	return order;
+		.replace(/YYYY/g, "YYYY")
+		.replace(/YY/g, "YY")
+		.replace(/MM/g, "MM")
+		.replace(/M/g, "M")
+		.replace(/DD/g, "DD")
+		.replace(/D/g, "D");
 }
 
 /**
@@ -210,38 +171,121 @@ function getDateComponentOrder(format: string): { year: number; month: number; d
  * @returns Date object or null if not found
  */
 export function extractDateFromFilename(filename: string, format: string): Date | null {
-	const regexPattern = formatToRegex(format);
+	const normalizedFormat = normalizeFormat(format);
+	
+	// Try to find the date pattern in the filename
+	// Build a regex to extract the date components based on the format
+	const formatTokens: { type: string; pos: number }[] = [];
+	const formatPattern = normalizedFormat;
+	
+	// Find positions of each token
+	const year4Pos = formatPattern.indexOf("YYYY");
+	const year2Pos = formatPattern.indexOf("YY");
+	const month2Pos = formatPattern.indexOf("MM");
+	const month1Pos = formatPattern.indexOf("M");
+	const day2Pos = formatPattern.indexOf("DD");
+	const day1Pos = formatPattern.indexOf("D");
+	
+	if (year4Pos !== -1) formatTokens.push({ type: "YYYY", pos: year4Pos });
+	else if (year2Pos !== -1) formatTokens.push({ type: "YY", pos: year2Pos });
+	
+	if (month2Pos !== -1) formatTokens.push({ type: "MM", pos: month2Pos });
+	else if (month1Pos !== -1) formatTokens.push({ type: "M", pos: month1Pos });
+	
+	if (day2Pos !== -1) formatTokens.push({ type: "DD", pos: day2Pos });
+	else if (day1Pos !== -1) formatTokens.push({ type: "D", pos: day1Pos });
+	
+	// Sort by position
+	formatTokens.sort((a, b) => a.pos - b.pos);
+	
+	// Build regex pattern
+	let regexPattern = "";
+	let lastEnd = 0;
+	
+	for (const token of formatTokens) {
+		// Add separator before this token
+		if (token.pos > lastEnd) {
+			const separator = formatPattern.slice(lastEnd, token.pos);
+			regexPattern += separator.replace(/[-/.]/g, "[-/.]");
+		}
+		
+		// Add capture group for the token
+		switch (token.type) {
+			case "YYYY":
+				regexPattern += "(\\d{4})";
+				break;
+			case "YY":
+				regexPattern += "(\\d{2})";
+				break;
+			case "MM":
+				regexPattern += "(\\d{2})";
+				break;
+			case "M":
+				regexPattern += "(\\d{1,2})";
+				break;
+			case "DD":
+				regexPattern += "(\\d{2})";
+				break;
+			case "D":
+				regexPattern += "(\\d{1,2})";
+				break;
+		}
+		
+		lastEnd = token.pos + token.type.length;
+	}
+	
+	// Match from the beginning of the string, allow any characters after the date pattern
+	regexPattern = "^.*" + regexPattern + ".*$";
+	
 	const regex = new RegExp(regexPattern);
 	const match = filename.match(regex);
-
+	
 	if (!match) return null;
-
-	const order = getDateComponentOrder(format);
-	const yearStr = match[order.year];
-	const monthStr = match[order.month];
-	const dayStr = match[order.day];
-
-	if (!yearStr || !monthStr || !dayStr) return null;
-
-	let year = parseInt(yearStr);
-	const month = parseInt(monthStr) - 1; // 0-based month
-	const day = parseInt(dayStr);
-
-	// Handle 2-digit year
-	if (yearStr.length === 2) {
-		const currentYear = new Date().getFullYear();
-		const currentCentury = Math.floor(currentYear / 100) * 100;
-		year = currentCentury + year;
-		// If resulting year is more than 50 years in the future, assume previous century
-		if (year > currentYear + 50) {
-			year -= 100;
+	
+	// Extract values based on token order
+	let year: number | null = null;
+	let month: number | null = null;
+	let day: number | null = null;
+	
+	for (let i = 0; i < formatTokens.length; i++) {
+		const token = formatTokens[i];
+		if (!token) continue;
+		
+		const value = match[i + 1];
+		if (!value) continue;
+		
+		switch (token.type) {
+			case "YYYY":
+				year = parseInt(value, 10);
+				break;
+			case "YY": {
+				year = parseInt(value, 10);
+				// Handle 2-digit year
+				const currentYear = dayjs().year();
+				const currentCentury = Math.floor(currentYear / 100) * 100;
+				year = currentCentury + year;
+				if (year > currentYear + 50) {
+					year -= 100;
+				}
+				break;
+			}
+			case "MM":
+			case "M":
+				month = parseInt(value, 10);
+				break;
+			case "DD":
+			case "D":
+				day = parseInt(value, 10);
+				break;
 		}
 	}
-
-	const date = new Date(year, month, day);
-	if (isNaN(date.getTime())) return null;
-
-	return date;
+	
+	if (year === null || month === null || day === null) return null;
+	
+	const date = dayjs(`${year}-${month}-${day}`, "YYYY-M-D", true);
+	if (!date.isValid()) return null;
+	
+	return date.toDate();
 }
 
 /**
@@ -268,8 +312,8 @@ export async function getNotesCountByFilenameDate(
 		const filename = file.name.replace(/\.[^/.]+$/, "");
 		const date = extractDateFromFilename(filename, filenameDateFormat);
 
-		if (date && !isNaN(date.getTime())) {
-			const dateStr = formatDateKey(date);
+		if (date) {
+			const dateStr = dayjs(date).format("YYYY-MM-DD");
 			const count = dateCount.get(dateStr) || 0;
 			dateCount.set(dateStr, count + 1);
 		}
@@ -337,18 +381,21 @@ export async function getNotesCountByYamlDate(
 				date = dateValue;
 			} else if (typeof dateValue === "number") {
 				// Handle timestamp
-				date = new Date(dateValue);
+				date = dayjs(dateValue).toDate();
 			} else if (dateValue && typeof dateValue === "object") {
 				// Handle Obsidian's parsed date object (may have different structure)
 				// Try to extract date from various possible formats
 				const obj = dateValue as Record<string, unknown>;
 				if ("year" in obj && "month" in obj && "day" in obj) {
-					date = new Date(obj.year as number, (obj.month as number) - 1, obj.day as number);
+					const year = String(obj.year);
+					const month = String(obj.month);
+					const day = String(obj.day);
+					date = dayjs(`${year}-${month}-${day}`, "YYYY-M-D").toDate();
 				}
 			}
 
-			if (date && !isNaN(date.getTime())) {
-				const dateStr = formatDateKey(date);
+			if (date) {
+				const dateStr = dayjs(date).format("YYYY-MM-DD");
 				const count = dateCount.get(dateStr) || 0;
 				dateCount.set(dateStr, count + 1);
 			}

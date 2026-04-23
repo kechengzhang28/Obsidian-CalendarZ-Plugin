@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { WeekStart } from "../settings";
 
 /**
@@ -51,17 +52,18 @@ export class HeatMap {
 		const heatMapGrid = this.container.createDiv({ cls: "calendarz-heatmap" });
 
 		// Extract year and month from the current date
-		const year = currentDate.getFullYear();
-		const month = currentDate.getMonth();
+		const current = dayjs(currentDate);
+		const year = current.year();
+		const month = current.month();
 
 		// Calculate first and last day of the month
-		const firstDay = new Date(year, month, 1);
-		const lastDay = new Date(year, month + 1, 0);
-		const daysInMonth = lastDay.getDate();
-		const startingDayOfWeek = this.getAdjustedDayOfWeek(firstDay.getDay());
+		const firstDay = dayjs(new Date(year, month, 1));
+		const lastDay = dayjs(new Date(year, month + 1, 0));
+		const daysInMonth = lastDay.date();
+		const startingDayOfWeek = this.getAdjustedDayOfWeek(firstDay.day());
 
 		// Render padding cells for previous month's days
-		const prevMonthLastDay = new Date(year, month, 0).getDate();
+		const prevMonthLastDay = dayjs(new Date(year, month, 0)).date();
 		for (let i = startingDayOfWeek - 1; i >= 0; i--) {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const prevDay = prevMonthLastDay - i;
@@ -74,8 +76,8 @@ export class HeatMap {
 
 		// Render cells for each day of the current month
 		for (let day = 1; day <= daysInMonth; day++) {
-			const date = new Date(year, month, day);
-			const dateStr = this.formatDate(date);
+			const date = dayjs(new Date(year, month, day));
+			const dateStr = date.format("YYYY-MM-DD");
 			const count = this.dateCounts.get(dateStr) || 0;
 
 			// Create the day cell element
@@ -121,18 +123,6 @@ export class HeatMap {
 			}
 		}
 		return max;
-	}
-
-	/**
-	 * Formats a Date object to YYYY-MM-DD string format
-	 * @param date - The date to format
-	 * @returns Formatted date string
-	 */
-	private formatDate(date: Date): string {
-		const year = date.getFullYear();
-		const month = String(date.getMonth() + 1).padStart(2, "0");
-		const day = String(date.getDate()).padStart(2, "0");
-		return `${year}-${month}-${day}`;
 	}
 
 	/**

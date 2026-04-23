@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { I18n } from "../i18n";
 import { TitleFormat } from "../settings";
 
@@ -35,17 +36,18 @@ export class CalendarHeader {
 		const header = this.container.createDiv({ cls: "calendarz-header" });
 
 		const monthYearContainer = header.createDiv({ cls: "calendarz-month-year" });
+		const current = dayjs(currentDate);
 
 		if (this.titleFormat === "yearMonth") {
 			const yearText = monthYearContainer.createEl("span", { cls: "calendarz-year" });
-			yearText.textContent = currentDate.getFullYear().toString();
+			yearText.textContent = current.year().toString();
 			const monthText = monthYearContainer.createEl("span", { cls: "calendarz-month" });
 			monthText.textContent = this.formatMonth(currentDate);
 		} else {
 			const monthText = monthYearContainer.createEl("span", { cls: "calendarz-month" });
 			monthText.textContent = this.formatMonth(currentDate);
 			const yearText = monthYearContainer.createEl("span", { cls: "calendarz-year" });
-			yearText.textContent = currentDate.getFullYear().toString();
+			yearText.textContent = current.year().toString();
 		}
 
 		const prevBtn = header.createEl("button", { cls: "calendarz-nav-btn" });
@@ -61,10 +63,11 @@ export class CalendarHeader {
 	}
 
 	private formatMonth(date: Date): string {
+		const current = dayjs(date);
 		if (this.language === "zh-CN" && this.monthFormat === "numeric") {
-			return (date.getMonth() + 1).toString();
+			return (current.month() + 1).toString();
 		}
-		return date.toLocaleString(this.language, { month: this.monthFormat as "numeric" | "short" | "long" | undefined });
+		return current.toDate().toLocaleString(this.language, { month: this.monthFormat as "numeric" | "short" | "long" | undefined });
 	}
 
 	private createSvgIcon(direction: "prev" | "next"): SVGSVGElement {
