@@ -1,5 +1,3 @@
-import { Component } from "../../core/Component";
-
 /**
  * Configuration options for SettingGroup component
  */
@@ -13,15 +11,15 @@ export interface SettingGroupConfig {
 /**
  * Reusable setting group component
  * Creates a container with heading and content area for settings
- * 
+ *
  * Provides consistent styling and structure for grouping related settings.
  * The content area can be accessed via getContentEl() to add individual settings.
- * 
+ *
  * @example
  * ```typescript
  * const group = new SettingGroup({ title: 'Basic Settings' });
  * group.render(container);
- * 
+ *
  * const contentEl = group.getContentEl();
  * if (contentEl) {
  *   new Setting(contentEl)
@@ -30,17 +28,17 @@ export interface SettingGroupConfig {
  * }
  * ```
  */
-export class SettingGroup extends Component {
+export class SettingGroup {
 	/** Container element for settings content */
 	private contentEl: HTMLElement | null = null;
+	/** Group container element */
+	private container: HTMLElement | null = null;
 
 	/**
 	 * Creates a new SettingGroup
 	 * @param config - Group configuration
 	 */
-	constructor(private config: SettingGroupConfig) {
-		super();
-	}
+	constructor(private config: SettingGroupConfig) {}
 
 	/**
 	 * Renders the setting group into the given container
@@ -58,9 +56,7 @@ export class SettingGroup extends Component {
 
 		// Create content container
 		this.contentEl = groupEl.createDiv({ cls: "setting-items" });
-
 		this.container = groupEl;
-		this.isRendered = true;
 	}
 
 	/**

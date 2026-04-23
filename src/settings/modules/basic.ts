@@ -1,6 +1,6 @@
 import type { PluginLike } from "../../types";
 import type { MonthFormat, TitleFormat, WeekStart } from "../types";
-import { SettingGroup } from "../../ui/components/SettingGroup";
+import { SettingGroup } from "../ui/SettingGroup";
 import { DropdownSettingRenderer } from "../ui/SettingRenderer";
 import { createTypedSettingHandler } from "../settingUtils";
 

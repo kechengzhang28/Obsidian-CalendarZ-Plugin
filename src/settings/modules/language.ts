@@ -1,7 +1,7 @@
 import { Setting } from "obsidian";
 import type { PluginLike } from "../../types";
 import type { Language } from "../types";
-import { SettingGroup } from "../../ui/components/SettingGroup";
+import { SettingGroup } from "../ui/SettingGroup";
 
 /**
  * Renders language settings.

@@ -2,7 +2,7 @@ import { App, Setting } from "obsidian";
 import type { PluginLike } from "../../types";
 import { IgnoredFoldersModal } from "../../ui/IgnoredFoldersModal";
 import type { DateSource, DisplayMode } from "../types";
-import { SettingGroup } from "../../ui/components/SettingGroup";
+import { SettingGroup } from "../ui/SettingGroup";
 import {
 	DropdownSettingRenderer,
 	SliderSettingRenderer,

@@ -73,19 +73,4 @@ export async function openOrCreateDailyNote(
 	}
 }
 
-/**
- * @deprecated Use openOrCreateDailyNote instead
- * Creates or opens a daily note for the given date using the core Daily Notes plugin.
- * If the note already exists, it will be opened. Otherwise, a new note will be created.
- * @param app - Obsidian App instance
- * @param i18n - Internationalization strings
- * @param date - The date for which to create/open the daily note
- * @returns Promise that resolves when the note is created/opened
- */
-export async function createDailyNote(
-	app: App,
-	i18n: I18n,
-	date: Date
-): Promise<void> {
-	return openOrCreateDailyNote(app, i18n, date);
-}
+
