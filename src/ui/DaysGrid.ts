@@ -103,10 +103,12 @@ export class DaysGrid {
 				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
 			}
 
-			// Add dots for dots mode
-			if (this.displayMode === "dots" && count > 0) {
+			// Add dots for dots mode (always create container for alignment)
+			if (this.displayMode === "dots") {
 				this.renderDots(dayEl, count);
-				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+				if (count > 0) {
+					dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+				}
 			}
 
 			// For non-heatmap modes, apply theme color to today's date
@@ -150,6 +152,7 @@ export class DaysGrid {
 	/**
 	 * Renders dots below the date to represent note count.
 	 * Maximum 4 dots, each representing dotThreshold notes.
+	 * Always creates container for alignment even when count is 0.
 	 * @param dayEl - The day element to add dots to
 	 * @param count - Number of notes for this date
 	 */
