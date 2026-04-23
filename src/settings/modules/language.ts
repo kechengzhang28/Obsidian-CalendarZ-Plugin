@@ -1,7 +1,7 @@
-import { Setting } from "obsidian";
 import type { PluginLike } from "../../types";
 import type { Language } from "../types";
 import { SettingGroup } from "../ui/SettingGroup";
+import { DropdownSettingRenderer, ButtonSettingRenderer } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
 
 /**
@@ -32,34 +32,32 @@ export function renderLanguageSettings(
 		},
 	});
 
-	new Setting(contentEl)
-		.setName(t.settings.language.name)
-		.setDesc(t.settings.language.description)
-		.addDropdown(dropdown => dropdown
-			.addOption("en-US", "English")
-			.addOption("zh-CN", "中文")
-			.setValue(plugin.settings.language)
-			.onChange(async (value) => {
-				await handleLanguageChange(value as Language);
-			}));
+	const languageRenderer = new DropdownSettingRenderer<Language>(plugin, {
+		"en-US": "English",
+		"zh-CN": "中文",
+	});
+	languageRenderer.render(contentEl, {
+		name: t.settings.language.name,
+		description: t.settings.language.description,
+		value: plugin.settings.language,
+		onChange: handleLanguageChange,
+	});
 
 	// Open calendar button
-	new Setting(contentEl)
-		.setName(t.settings.openCalendar.name)
-		.setDesc(t.settings.openCalendar.description)
-		.addButton(button => button
-			.setButtonText(t.settings.openCalendar.buttonText)
-			.onClick(() => {
-				void plugin.activateView();
-			}));
+	const openCalendarRenderer = new ButtonSettingRenderer(plugin);
+	openCalendarRenderer.render(contentEl, {
+		name: t.settings.openCalendar.name,
+		description: t.settings.openCalendar.description,
+		buttonText: t.settings.openCalendar.buttonText,
+		onClick: () => plugin.activateView(),
+	});
 
 	// Refresh plugin button
-	new Setting(contentEl)
-		.setName(t.settings.refreshPlugin.name)
-		.setDesc(t.settings.refreshPlugin.description)
-		.addButton(button => button
-			.setButtonText(t.settings.refreshPlugin.buttonText)
-			.onClick(() => {
-				plugin.refreshView();
-			}));
+	const refreshPluginRenderer = new ButtonSettingRenderer(plugin);
+	refreshPluginRenderer.render(contentEl, {
+		name: t.settings.refreshPlugin.name,
+		description: t.settings.refreshPlugin.description,
+		buttonText: t.settings.refreshPlugin.buttonText,
+		onClick: () => plugin.refreshView(),
+	});
 }

@@ -58,6 +58,18 @@
 		return Math.min(maxDots, Math.ceil(count / threshold));
 	}
 
+	function createDayCell(date: dayjs.Dayjs, isOtherMonth: boolean): DayCell {
+		const dateStr = formatDate(date);
+		return {
+			date,
+			isOtherMonth,
+			count: countsMap.get(dateStr) || 0,
+			isToday: isSameDay(date, today),
+			isBeforeToday: isBeforeToday(date),
+			dateStr,
+		};
+	}
+
 	let cells = $derived.by((): DayCell[] => {
 		const { year, month } = getYearMonth(currentDate);
 		const daysInMonth = getDaysInMonth(year, month);
@@ -67,44 +79,26 @@
 		if (paddingDays > 0) {
 			const lastDay = getPreviousMonthLastDay(year, month);
 			for (let i = paddingDays - 1; i >= 0; i--) {
-				const date = dayjs(new Date(year, month - 1, lastDay - i));
-				const dateStr = formatDate(date);
-				result.push({
-					date,
-					isOtherMonth: true,
-					count: countsMap.get(dateStr) || 0,
-					isToday: isSameDay(date, today),
-					isBeforeToday: isBeforeToday(date),
-					dateStr,
-				});
+				result.push(createDayCell(
+					dayjs(new Date(year, month - 1, lastDay - i)),
+					true
+				));
 			}
 		}
 
 		for (let day = 1; day <= daysInMonth; day++) {
-			const date = dayjs(new Date(year, month, day));
-			const dateStr = formatDate(date);
-			result.push({
-				date,
-				isOtherMonth: false,
-				count: countsMap.get(dateStr) || 0,
-				isToday: isSameDay(date, today),
-				isBeforeToday: isBeforeToday(date),
-				dateStr,
-			});
+			result.push(createDayCell(
+				dayjs(new Date(year, month, day)),
+				false
+			));
 		}
 
 		const remainingCells = GRID.TOTAL_CELLS - result.length;
 		for (let day = 1; day <= remainingCells; day++) {
-			const date = dayjs(new Date(year, month + 1, day));
-			const dateStr = formatDate(date);
-			result.push({
-				date,
-				isOtherMonth: true,
-				count: countsMap.get(dateStr) || 0,
-				isToday: isSameDay(date, today),
-				isBeforeToday: isBeforeToday(date),
-				dateStr,
-			});
+			result.push(createDayCell(
+				dayjs(new Date(year, month + 1, day)),
+				true
+			));
 		}
 
 		return result;

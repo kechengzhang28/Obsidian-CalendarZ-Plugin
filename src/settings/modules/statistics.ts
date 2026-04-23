@@ -1,4 +1,4 @@
-import { App, Setting } from "obsidian";
+import { App } from "obsidian";
 import type { PluginLike } from "../../types";
 import { IgnoredFoldersModal } from "../../ui/IgnoredFoldersModal";
 import type { DateSource, DisplayMode } from "../types";
@@ -7,6 +7,7 @@ import {
 	DropdownSettingRenderer,
 	SliderSettingRenderer,
 	TextSettingRenderer,
+	ButtonSettingRenderer,
 } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
 import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE } from "../../constants";
@@ -110,27 +111,26 @@ export function renderStatisticsSettings(
 
 	// Ignored folders setting
 	const ignoredFoldersDesc = getIgnoredFoldersDescription(plugin);
-	new Setting(contentEl)
-		.setName(t.settings.ignoredFolders.name)
-		.setDesc(ignoredFoldersDesc)
-		.addButton(button => {
-			button.setButtonText(t.settings.ignoredFolders.manageButton || "Manage");
-			button.onClick(() => {
-				const modal = new IgnoredFoldersModal(
-					app,
-					plugin.settings.ignoredFolders,
-					plugin.i18n,
-					async (folders) => {
-						plugin.settings.ignoredFolders = folders;
-						await plugin.saveSettings();
-						refreshDisplay();
-						plugin.refreshView();
-					}
-				);
-				modal.open();
-			});
-			return button;
-		});
+	const ignoredFoldersRenderer = new ButtonSettingRenderer(plugin);
+	ignoredFoldersRenderer.render(contentEl, {
+		name: t.settings.ignoredFolders.name,
+		description: ignoredFoldersDesc,
+		buttonText: t.settings.ignoredFolders.manageButton || "Manage",
+		onClick: () => {
+			const modal = new IgnoredFoldersModal(
+				app,
+				plugin.settings.ignoredFolders,
+				plugin.i18n,
+				async (folders) => {
+					plugin.settings.ignoredFolders = folders;
+					await plugin.saveSettings();
+					refreshDisplay();
+					plugin.refreshView();
+				}
+			);
+			modal.open();
+		},
+	});
 }
 
 /**
@@ -147,8 +147,7 @@ function getIgnoredFoldersDescription(plugin: PluginLike): DocumentFragment {
 	if (plugin.settings.ignoredFolders.length > 0) {
 		fragment.appendChild(document.createElement("br"));
 
-		for (let i = 0; i < plugin.settings.ignoredFolders.length; i++) {
-			const folder = plugin.settings.ignoredFolders[i];
+		for (const folder of plugin.settings.ignoredFolders) {
 			const line = document.createElement("div");
 			line.addClass("calendarz-settings-folder-item");
 			line.textContent = `• ${folder}`;

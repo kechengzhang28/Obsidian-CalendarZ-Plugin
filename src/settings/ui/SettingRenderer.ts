@@ -23,6 +23,22 @@ export interface SettingConfig<T> {
 }
 
 /**
+ * Options for button setting renderer
+ */
+export interface ButtonConfig {
+	/** Display name of the button setting */
+	name: string;
+	/** Description text */
+	description: string | DocumentFragment;
+	/** Button text */
+	buttonText: string;
+	/** Handler called when the button is clicked */
+	onClick: () => void | Promise<void>;
+	/** Whether this is a call-to-action button */
+	cta?: boolean;
+}
+
+/**
  * Wraps an onChange handler to support both sync and async handlers
  */
 async function handleChange<T>(handler: OnChangeHandler<T>, value: T): Promise<void> {
@@ -211,6 +227,30 @@ export class SliderSettingRenderer extends SettingRenderer<number> {
 				.setDynamicTooltip()
 				.onChange((value) => this.onChange(config, value))
 		);
+	}
+}
+
+/**
+ * Button setting renderer
+ * Renders a setting with a button control
+ */
+export class ButtonSettingRenderer {
+	constructor(private plugin: PluginLike) {}
+
+	/**
+	 * Renders the button setting
+	 */
+	render(container: HTMLElement, config: ButtonConfig): void {
+		const setting = new Setting(container)
+			.setName(config.name)
+			.setDesc(config.description);
+
+		setting.addButton(button => {
+			button.setButtonText(config.buttonText);
+			if (config.cta) button.setCta();
+			button.onClick(() => void config.onClick());
+			return button;
+		});
 	}
 }
 
