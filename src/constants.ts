@@ -61,6 +61,7 @@ export const CSS_VARS = {
 /** HTML attribute names */
 export const ATTRS = {
 	DATA_COUNT: "data-count",
+	DATA_DATE: "data-date",
 	ARIA_LABEL: "aria-label",
 	ARIA_HIDDEN: "aria-hidden",
 } as const;

@@ -184,6 +184,11 @@ export class DaysGrid {
 		const dayEl = daysGrid.createDiv({ cls: classes });
 		dayEl.textContent = day.toString();
 
+		// Add data-date attribute for reliable date identification
+		if (date) {
+			dayEl.setAttribute(ATTRS.DATA_DATE, formatDate(date));
+		}
+
 		// Add click handler if provided and date is available
 		if (this.onDayClick && date) {
 			dayEl.addEventListener("click", () => {

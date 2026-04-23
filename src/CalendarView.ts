@@ -8,7 +8,7 @@ import { ConfirmModal } from "./ui/ConfirmModal";
 import { CalendarZSettings } from "./settings/index";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/GetNotes";
 import { createDailyNote, findDailyNote } from "./utils/createNote";
-import { CSS_CLASSES } from "./constants";
+import { CSS_CLASSES, ATTRS } from "./constants";
 import CalendarZ from "./main";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
@@ -85,27 +85,56 @@ export class CalendarZView extends ItemView {
 	 * Refreshes only the statistics data without re-rendering the entire calendar.
 	 */
 	async refreshStatsOnly(): Promise<void> {
-		// 简化逻辑：直接重新渲染整个日历
 		if (this.settings.displayMode !== "none") {
 			void this.renderCalendar();
 		}
 	}
 
-
-
-
-
 	/**
 	 * Updates the "today" highlight on the calendar.
+	 * Only updates the CSS classes for today instead of re-rendering the entire calendar to avoid flickering.
 	 */
 	async updateTodayHighlight(): Promise<void> {
 		const today = dayjs();
 		const current = dayjs(this.currentDate);
 
+		// If month changed, update current date and re-render
 		if (today.year() !== current.year() || today.month() !== current.month()) {
 			this.currentDate = new Date();
+			await this.renderCalendar();
+			return;
 		}
-		await this.renderCalendar();
+
+		// Only update today highlight without re-rendering
+		this.updateTodayHighlightOnly();
+	}
+
+	/**
+	 * Updates only the today highlight classes
+	 * without re-rendering the entire calendar,
+	 * inorder to prevent flickering.
+	 */
+	private updateTodayHighlightOnly(): void {
+		const today = dayjs();
+		const todayStr = today.format("YYYY-MM-DD");
+
+		// Find all day elements
+		const dayElements = this.contentEl.querySelectorAll(`.${CSS_CLASSES.DAY}`);
+
+		dayElements.forEach((dayEl) => {
+			const dateStr = dayEl.getAttribute(ATTRS.DATA_DATE);
+			const isToday = dateStr === todayStr;
+
+			if (isToday) {
+				dayEl.addClass(CSS_CLASSES.DAY_TODAY);
+				if (this.settings.displayMode !== "heatmap") {
+					dayEl.addClass(CSS_CLASSES.DAY_TODAY_THEMED);
+				}
+			} else {
+				dayEl.removeClass(CSS_CLASSES.DAY_TODAY);
+				dayEl.removeClass(CSS_CLASSES.DAY_TODAY_THEMED);
+			}
+		});
 	}
 
 	/**

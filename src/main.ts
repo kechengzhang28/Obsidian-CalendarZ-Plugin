@@ -27,8 +27,8 @@ export default class CalendarZ extends Plugin {
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
 		this.registerFileEvents();
 
-		// Update "today" highlight every 60 seconds
-		this.registerInterval(window.setInterval(() => this.updateTodayHighlight(), 60000));
+		// Update "today" highlight every 1 seconds
+		this.registerInterval(window.setInterval(() => this.updateTodayHighlight(), 1000));
 	}
 
 	/**
