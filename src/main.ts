@@ -45,9 +45,73 @@ export default class CalendarZ extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
+
+		// Register file event listeners to refresh heatmap when notes change
+		this.registerFileEvents();
+
+		// Register interval to update "today" highlight every 60 seconds
+		this.registerInterval(
+			window.setInterval(() => {
+				this.updateTodayHighlight();
+			}, 60000)
+		);
 	}
 
 	onunload() {
+	}
+
+	/**
+	 * Registers file system event listeners to refresh the calendar view
+	 * when notes are created, deleted, or renamed.
+	 */
+	registerFileEvents(): void {
+		// Refresh when a file is created
+		this.registerEvent(
+			this.app.vault.on("create", () => {
+				this.refreshCalendarView();
+			})
+		);
+
+		// Refresh when a file is deleted
+		this.registerEvent(
+			this.app.vault.on("delete", () => {
+				this.refreshCalendarView();
+			})
+		);
+
+		// Refresh when a file is renamed
+		this.registerEvent(
+			this.app.vault.on("rename", () => {
+				this.refreshCalendarView();
+			})
+		);
+	}
+
+	/**
+	 * Refreshes only the calendar view content without reloading settings.
+	 * Used for updating heatmap when files change.
+	 */
+	refreshCalendarView(): void {
+		const leaves = this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE);
+		leaves.forEach(leaf => {
+			if (leaf.view instanceof CalendarZView) {
+				void leaf.view.refreshHeatmapOnly();
+			}
+		});
+	}
+
+	/**
+	 * Updates the "today" highlight on all calendar views.
+	 * Called periodically to ensure correct day is highlighted when date changes.
+	 * If crossed into a new month, re-renders the calendar.
+	 */
+	updateTodayHighlight(): void {
+		const leaves = this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE);
+		leaves.forEach(leaf => {
+			if (leaf.view instanceof CalendarZView) {
+				void leaf.view.updateTodayHighlight();
+			}
+		});
 	}
 
 	async loadSettings() {

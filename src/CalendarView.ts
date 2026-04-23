@@ -161,6 +161,101 @@ export class CalendarZView extends ItemView {
 	}
 
 	/**
+	 * Refreshes only the heatmap data without re-rendering the entire calendar.
+	 * This avoids flickering when only note counts have changed.
+	 */
+	async refreshHeatmapOnly(): Promise<void> {
+		if (!this.showHeatmap) return;
+
+		const dateCounts = await this.getDateCounts();
+		const dateCountsMap = new Map<string, number>();
+		for (const item of dateCounts) {
+			dateCountsMap.set(item.date, item.count);
+		}
+
+		// Find the days grid and update heatmap styling on each day cell
+		const daysGrid = this.contentEl.querySelector(".calendarz-days");
+		if (!daysGrid) return;
+
+		const dayElements = daysGrid.querySelectorAll(".calendarz-day:not(.calendarz-day-other-month)");
+		const current = dayjs(this.currentDate);
+		const year = current.year();
+		const month = current.month();
+
+		// Calculate max count for normalization
+		let maxCount = 0;
+		for (const count of dateCountsMap.values()) {
+			if (count > maxCount) maxCount = count;
+		}
+
+		dayElements.forEach((dayEl) => {
+			const dayText = dayEl.textContent;
+			if (!dayText) return;
+
+			const day = parseInt(dayText, 10);
+			if (isNaN(day)) return;
+
+			const dateStr = dayjs(new Date(year, month, day)).format("YYYY-MM-DD");
+			const count = dateCountsMap.get(dateStr) || 0;
+
+			// Remove existing heatmap classes and styles
+			dayEl.removeClass("calendarz-day-heatmap");
+			(dayEl as HTMLElement).style.removeProperty("--heatmap-opacity");
+			dayEl.removeAttribute("data-count");
+			dayEl.removeAttribute("aria-label");
+
+			// Apply new heatmap styling if count > 0
+			if (count > 0) {
+				dayEl.addClass("calendarz-day-heatmap");
+				const intensity = maxCount > 0 ? count / maxCount : 0;
+				const opacity = 0.25 + intensity * 0.75;
+				(dayEl as HTMLElement).style.setProperty("--heatmap-opacity", opacity.toFixed(2));
+				dayEl.setAttribute("data-count", count.toString());
+				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+			}
+		});
+	}
+
+	/**
+	 * Updates the "today" highlight on the calendar.
+	 * Call this periodically to ensure the correct day is highlighted when date changes.
+	 * If the date has crossed into a new month, re-renders the entire calendar.
+	 */
+	async updateTodayHighlight(): Promise<void> {
+		const today = dayjs();
+		const current = dayjs(this.currentDate);
+
+		// Check if we've crossed into a new month
+		if (today.year() !== current.year() || today.month() !== current.month()) {
+			// Update current date to today and re-render the entire calendar
+			this.currentDate = new Date();
+			await this.renderCalendar();
+			return;
+		}
+
+		// Same month, just update the highlight
+		const daysGrid = this.contentEl.querySelector(".calendarz-days");
+		if (!daysGrid) return;
+
+		const todayDay = today.date();
+		const dayElements = daysGrid.querySelectorAll(".calendarz-day:not(.calendarz-day-other-month)");
+
+		dayElements.forEach((dayEl) => {
+			const dayText = dayEl.textContent;
+			if (!dayText) return;
+
+			const day = parseInt(dayText, 10);
+			if (isNaN(day)) return;
+
+			if (day === todayDay) {
+				dayEl.addClass("calendarz-day-today");
+			} else {
+				dayEl.removeClass("calendarz-day-today");
+			}
+		});
+	}
+
+	/**
 	 * Renders the complete calendar UI.
 	 * Creates header, weekdays row, and days grid with optional heatmap.
 	 */
