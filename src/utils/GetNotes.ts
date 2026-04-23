@@ -1,23 +1,8 @@
 import {App, parseYaml, TFile} from "obsidian";
 import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import {DateCount} from "../ui/DaysGrid";
 import {DATE_FORMAT} from "../constants";
-
-dayjs.extend(customParseFormat);
-
-/**
- * Common date formats to try when parsing date strings
- * Tried in order until a valid date is found
- */
-const DATE_FORMATS = [
-	"YYYY-MM-DD",
-	"YYYY/MM/DD",
-	"DD-MM-YYYY",
-	"DD/MM/YYYY",
-	"MM-DD-YYYY",
-	"MM/DD/YYYY"
-];
+import {parseDateFromFilename, parseYamlDate} from "./date";
 
 /**
  * Checks if a file path should be ignored based on the ignore list
@@ -31,48 +16,6 @@ function isPathIgnored(filePath: string, ignoredFolders: string[]): boolean {
 		const normalizedFolder = folder.replace(/\\/g, "/").replace(/\/$/, "");
 		return normalizedPath === normalizedFolder || normalizedPath.startsWith(normalizedFolder + "/");
 	});
-}
-
-/**
- * Parses a date string using multiple common formats
- * @param dateStr - Date string to parse
- * @returns Parsed Date or null if invalid
- */
-function parseDateString(dateStr: string): Date | null {
-	if (!dateStr) return null;
-
-	for (const format of DATE_FORMATS) {
-		const parsed = dayjs(dateStr, format, true);
-		if (parsed.isValid()) return parsed.toDate();
-	}
-
-	const isoParsed = dayjs(dateStr);
-	return isoParsed.isValid() ? isoParsed.toDate() : null;
-}
-
-/**
- * Extracts a date from a filename using a format pattern
- * @param filename - Filename to parse (without extension)
- * @param format - Date format pattern (e.g., "YYYY-MM-DD")
- * @returns Parsed Date or null if not found
- */
-function extractDateFromFilename(filename: string, format: string): Date | null {
-	const pattern = format
-		.replace(/YYYY/g, "(\\d{4})")
-		.replace(/MM/g, "(\\d{2})")
-		.replace(/DD/g, "(\\d{2})")
-		.replace(/[-/.]/g, "[-/.]");
-
-	const regex = new RegExp(`^.*${pattern}.*$`);
-	const match = filename.match(regex);
-
-	if (!match) return null;
-
-	const year = parseInt(match[1] ?? "0", 10);
-	const month = parseInt(match[2] ?? "0", 10);
-	const day = parseInt(match[3] ?? "0", 10);
-	const date = dayjs(`${year}-${month}-${day}`, "YYYY-M-D", true);
-	return date.isValid() ? date.toDate() : null;
 }
 
 /**
@@ -93,29 +36,6 @@ function extractYamlFrontmatter(content: string): Record<string, unknown> | null
 	} catch {
 		return null;
 	}
-}
-
-/**
- * Parses a date value from YAML frontmatter
- * @param value - YAML value to parse
- * @returns Parsed Date or null
- */
-function parseYamlDate(value: unknown): Date | null {
-	if (value instanceof Date) return value;
-	if (typeof value === "string") return parseDateString(value);
-	if (typeof value === "number") return dayjs(value).toDate();
-
-	if (value && typeof value === "object") {
-		const obj = value as Record<string, unknown>;
-		if ("year" in obj && "month" in obj && "day" in obj) {
-			const year = String(obj.year);
-			const month = String(obj.month);
-			const day = String(obj.day);
-			const date = dayjs(`${year}-${month}-${day}`, "YYYY-M-D");
-			return date.isValid() ? date.toDate() : null;
-		}
-	}
-	return null;
 }
 
 /**
@@ -166,7 +86,6 @@ async function extractDateFromYaml(
 
 		return parseYamlDate(dateValue);
 	} catch (error) {
-		// Log error for debugging but don't throw
 		console.warn(`Failed to read file ${file.path}:`, error);
 		return null;
 	}
@@ -187,7 +106,7 @@ export function getNotesCountByFilenameDate(
 	return countNotesByDate(
 		app.vault.getFiles(),
 		file => isPathIgnored(file.path, ignoredFolders),
-		file => extractDateFromFilename(file.name.replace(/\.[^/.]+$/, ""), filenameDateFormat)
+		file => parseDateFromFilename(file.name.replace(/\.[^/.]+$/, ""), filenameDateFormat)
 	);
 }
 

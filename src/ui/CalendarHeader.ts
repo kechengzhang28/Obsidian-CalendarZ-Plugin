@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { I18n } from "../i18n";
-import { TitleFormat } from "../settings/index";
+import { TitleFormat, MonthFormat } from "../settings/index";
 import { Component } from "../core/Component";
 import { IconButton } from "./components/Button";
 import { formatMonth } from "../utils/date";
@@ -18,7 +18,7 @@ export interface CalendarHeaderConfig {
 	/** i18n strings */
 	i18n: I18n;
 	/** Month format (numeric, short, long) */
-	monthFormat: string;
+	monthFormat: MonthFormat;
 	/** Language code */
 	language: string;
 	/** Title format (yearMonth or monthYear) */
@@ -59,25 +59,10 @@ export class CalendarHeader extends Component {
 	 * @param container - Parent element to render into
 	 */
 	render(container: HTMLElement): void {
-		const current = dayjs(this.currentDate);
-
 		this.headerEl = container.createDiv({ cls: "calendarz-header" });
 
-		// Month/Year display
 		const monthYearContainer = this.headerEl.createDiv({ cls: "calendarz-month-year" });
-		const yearText = current.year().toString();
-		const monthText = formatMonth(
-			this.currentDate,
-			this.config.language,
-			this.config.monthFormat as "numeric" | "short" | "long"
-		);
-
-		const [firstText, secondText] = this.config.titleFormat === "yearMonth"
-			? [yearText, monthText]
-			: [monthText, yearText];
-
-		monthYearContainer.createEl("span", { cls: "calendarz-month", text: firstText });
-		monthYearContainer.createEl("span", { cls: "calendarz-year", text: secondText });
+		this.renderMonthYear(monthYearContainer);
 
 		// Navigation buttons using IconButton component
 		this.prevBtn = new IconButton("prev", () => this.config.callbacks.onPrevMonth());
@@ -109,26 +94,32 @@ export class CalendarHeader extends Component {
 		if (!this.headerEl) return;
 
 		this.currentDate = currentDate;
-		const current = dayjs(currentDate);
 
-		// Clear and re-render month/year display
 		const monthYearContainer = this.headerEl.querySelector(".calendarz-month-year");
 		if (monthYearContainer) {
 			monthYearContainer.empty();
-
-			const yearText = current.year().toString();
-			const monthText = formatMonth(
-				currentDate,
-				this.config.language,
-				this.config.monthFormat as "numeric" | "short" | "long"
-			);
-
-			const [firstText, secondText] = this.config.titleFormat === "yearMonth"
-				? [yearText, monthText]
-				: [monthText, yearText];
-
-			monthYearContainer.createEl("span", { cls: "calendarz-month", text: firstText });
-			monthYearContainer.createEl("span", { cls: "calendarz-year", text: secondText });
+			this.renderMonthYear(monthYearContainer as HTMLElement);
 		}
+	}
+
+	/**
+	 * Renders month/year text into the given container
+	 * @param container - Element to render into
+	 */
+	private renderMonthYear(container: HTMLElement): void {
+		const current = dayjs(this.currentDate);
+		const yearText = current.year().toString();
+		const monthText = formatMonth(
+			this.currentDate,
+			this.config.language,
+			this.config.monthFormat
+		);
+
+		const [firstText, secondText] = this.config.titleFormat === "yearMonth"
+			? [yearText, monthText]
+			: [monthText, yearText];
+
+		container.createEl("span", { cls: "calendarz-month", text: firstText });
+		container.createEl("span", { cls: "calendarz-year", text: secondText });
 	}
 }

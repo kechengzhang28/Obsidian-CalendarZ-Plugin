@@ -37,7 +37,7 @@ export function renderStatisticsSettings(
 		[DISPLAY_MODE.DOTS]: t.settings.displayMode.options.dots,
 		[DISPLAY_MODE.HEATMAP]: t.settings.displayMode.options.heatmap,
 	});
-	const handleDisplayModeChange = createSettingHandlerWithRefresh<DisplayMode>(
+	const handleDisplayModeChange = createSettingHandlerWithRefresh(
 		plugin,
 		refreshDisplay,
 		"displayMode"
@@ -80,7 +80,7 @@ export function renderStatisticsSettings(
 		[DATE_SOURCE.YAML]: t.settings.dateSource.options.yaml,
 		[DATE_SOURCE.FILENAME]: t.settings.dateSource.options.filename,
 	});
-	const handleDateSourceChange = createSettingHandlerWithRefresh<DateSource>(
+	const handleDateSourceChange = createSettingHandlerWithRefresh(
 		plugin,
 		refreshDisplay,
 		"dateSource"

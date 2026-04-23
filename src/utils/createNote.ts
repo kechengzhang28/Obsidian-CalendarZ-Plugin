@@ -24,8 +24,9 @@ export function findDailyNote(date: Date): TFile | null {
 	const allDailyNotes = getAllDailyNotes();
 	const existingNote = getDailyNote(moment(date), allDailyNotes);
 
-	// Cast to TFile since the types are compatible at runtime
-	return existingNote as TFile | null;
+	// The interface returns a compatible type at runtime
+	// eslint-disable-next-line obsidianmd/no-tfile-tfolder-cast
+	return existingNote ? (existingNote as TFile) : null;
 }
 
 /**
