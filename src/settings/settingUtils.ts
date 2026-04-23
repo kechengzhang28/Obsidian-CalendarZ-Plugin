@@ -53,34 +53,4 @@ export function createSettingHandler<K extends keyof PluginLike["settings"]>(
 	};
 }
 
-/**
- * @deprecated Use createSettingHandler({ plugin, settingKey }) instead
- */
-export function createTypedSettingHandler<K extends keyof PluginLike["settings"]>(
-	plugin: PluginLike,
-	settingKey: K
-): (value: PluginLike["settings"][K]) => Promise<void> {
-	return createSettingHandler({ plugin, settingKey });
-}
 
-/**
- * @deprecated Use createSettingHandler({ plugin, settingKey, refreshDisplay }) instead
- */
-export function createSettingHandlerWithRefresh<K extends keyof PluginLike["settings"]>(
-	plugin: PluginLike,
-	refreshDisplay: () => void,
-	settingKey: K
-): (value: PluginLike["settings"][K]) => Promise<void> {
-	return createSettingHandler({ plugin, settingKey, refreshDisplay });
-}
-
-/**
- * @deprecated Use createSettingHandler({ plugin, settingKey, transform }) instead
- */
-export function createSettingHandlerWithTransform<K extends keyof PluginLike["settings"]>(
-	plugin: PluginLike,
-	settingKey: K,
-	transform: (value: PluginLike["settings"][K]) => PluginLike["settings"][K]
-): (value: PluginLike["settings"][K]) => Promise<void> {
-	return createSettingHandler({ plugin, settingKey, transform });
-}

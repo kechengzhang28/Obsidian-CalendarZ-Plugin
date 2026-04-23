@@ -23,12 +23,19 @@ export interface SettingConfig<T> {
 }
 
 /**
+ * Wraps an onChange handler to support both sync and async handlers
+ */
+async function handleChange<T>(handler: OnChangeHandler<T>, value: T): Promise<void> {
+	await handler(value);
+}
+
+/**
  * Base class for setting renderers
  * Provides common functionality for rendering settings in the Obsidian settings panel
- * 
+ *
  * Subclasses should implement render() to create specific setting types
  * (dropdowns, toggles, sliders, etc.)
- * 
+ *
  * @example
  * ```typescript
  * class CustomSettingRenderer extends SettingRenderer<string> {
@@ -36,9 +43,7 @@ export interface SettingConfig<T> {
  *     this.createBaseSetting(container, config)
  *       .addText(text => text
  *         .setValue(config.value)
- *         .onChange(async (value) => {
- *           await config.onChange(value);
- *         }));
+ *         .onChange((value) => this.onChange(config, value)));
  *   }
  * }
  * ```
@@ -69,6 +74,15 @@ export abstract class SettingRenderer<T> {
 		return new Setting(container)
 			.setName(config.name)
 			.setDesc(config.description);
+	}
+
+	/**
+	 * Standardized onChange wrapper that handles both sync and async handlers
+	 * @param config - Setting configuration
+	 * @param value - New value
+	 */
+	protected onChange(config: SettingConfig<T>, value: T): void {
+		void handleChange(config.onChange, value);
 	}
 }
 
@@ -113,9 +127,7 @@ export class DropdownSettingRenderer<T extends string> extends SettingRenderer<T
 			}
 			return dropdown
 				.setValue(config.value)
-				.onChange(async (value) => {
-					await config.onChange(value as T);
-				});
+				.onChange((value) => this.onChange(config, value as T));
 		});
 	}
 }
@@ -132,9 +144,7 @@ export class ToggleSettingRenderer extends SettingRenderer<boolean> {
 		this.createBaseSetting(container, config).addToggle(toggle =>
 			toggle
 				.setValue(config.value)
-				.onChange(async (value) => {
-					await config.onChange(value);
-				})
+				.onChange((value) => this.onChange(config, value))
 		);
 	}
 }
@@ -164,9 +174,7 @@ export class TextSettingRenderer extends SettingRenderer<string> {
 			text
 				.setPlaceholder(this.placeholder)
 				.setValue(config.value)
-				.onChange(async (value) => {
-					await config.onChange(value);
-				})
+				.onChange((value) => this.onChange(config, value))
 		);
 	}
 }
@@ -201,9 +209,7 @@ export class SliderSettingRenderer extends SettingRenderer<number> {
 				.setLimits(this.min, this.max, this.step)
 				.setValue(config.value)
 				.setDynamicTooltip()
-				.onChange(async (value) => {
-					await config.onChange(value);
-				})
+				.onChange((value) => this.onChange(config, value))
 		);
 	}
 }
