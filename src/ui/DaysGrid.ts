@@ -71,6 +71,12 @@ export class DaysGrid {
 
 			this.cleanupDayDisplay(dayEl as HTMLElement);
 
+			// Re-apply today highlight classes
+			dayEl.toggleClass(CSS_CLASSES.DAY_TODAY, isToday);
+			if (this.displayMode !== "heatmap") {
+				dayEl.toggleClass(CSS_CLASSES.DAY_TODAY_THEMED, isToday);
+			}
+
 			if (this.strategy) {
 				const config: DayDisplayConfig = { count, isToday, isBeforeToday: isBeforeTodayFlag };
 				const context: DisplayContext = { maxCount, dotThreshold: this.dotThreshold, dateStr };
@@ -163,6 +169,9 @@ export class DaysGrid {
 
 		if (isTodayFlag) {
 			dayEl.addClass(CSS_CLASSES.DAY_TODAY);
+			if (this.displayMode !== "heatmap") {
+				dayEl.addClass(CSS_CLASSES.DAY_TODAY_THEMED);
+			}
 		}
 
 		if (this.strategy) {

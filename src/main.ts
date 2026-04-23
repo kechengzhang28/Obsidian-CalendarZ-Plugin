@@ -27,7 +27,7 @@ export default class CalendarZ extends Plugin {
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
 		this.registerFileEvents();
 
-		this.registerInterval(window.setInterval(() => this.updateTodayHighlight(), 1000));
+		this.registerInterval(window.setInterval(() => this.forEachView(v => void v.refreshStatsOnly()), 1000));
 	}
 
 	private registerFileEvents(): void {
