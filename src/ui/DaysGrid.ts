@@ -76,6 +76,9 @@ export class DaysGrid {
 			const prevDay = prevMonthLastDay - i;
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
 			dayEl.textContent = prevDay.toString();
+			if (this.displayMode === "dots"){
+				dayEl.createDiv({ cls: "calendarz-dots-container" });
+			}
 		}
 
 		// Render days of current month
@@ -118,7 +121,8 @@ export class DaysGrid {
 
 			// Add today indicator dot for heatmap mode
 			if (isToday && this.displayMode === "heatmap") {
-				const todayIndicator = dayEl.createDiv({ cls: "calendarz-today-indicator" });
+				const todayIndicator = dayEl.createDiv({ cls: "calendarz-dots-container" });
+				todayIndicator.createDiv({ cls: "calendarz-dot today" });
 				todayIndicator.setAttribute("aria-hidden", "true");
 			}
 		}
@@ -131,6 +135,9 @@ export class DaysGrid {
 		for (let day = 1; day <= nextMonthDays; day++) {
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
 			dayEl.textContent = day.toString();
+			if (this.displayMode === "dots"){
+				dayEl.createDiv({ cls: "calendarz-dots-container" });
+			}
 		}
 	}
 
