@@ -17,5 +17,5 @@
 
 export * from "./date";
 export * from "./path";
-export * from "./GetNotes";
+export * from "./getNotes";
 export * from "./createNote";

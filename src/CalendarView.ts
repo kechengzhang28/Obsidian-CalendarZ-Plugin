@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { mount, unmount } from "svelte";
 import type { CalendarZSettings } from "./settings/types";
 import type { I18n } from "./i18n";
-import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/GetNotes";
+import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/getNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
 import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
 import Calendar from "./components/Calendar.svelte";
