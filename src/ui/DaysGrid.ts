@@ -2,30 +2,56 @@ import dayjs from "dayjs";
 import { WeekStart } from "../settings";
 
 /**
+ * Interface representing the count of notes for a specific date
+ */
+export interface DateCount {
+	/** Date string in YYYY-MM-DD format */
+	date: string;
+	/** Number of notes for this date */
+	count: number;
+}
+
+/**
  * Renders the days grid for the calendar.
  * Displays days of the current month, plus padding days from previous/next months.
+ * Supports heatmap visualization when enabled.
  */
 export class DaysGrid {
 	/** Container element for the grid */
 	private container: HTMLElement;
 	/** Week start preference (sunday or monday) */
 	private weekStart: WeekStart;
+	/** Whether to show heatmap on date cells */
+	private showHeatmap: boolean;
+	/** Map storing note counts keyed by date string */
+	private dateCounts: Map<string, number> = new Map();
 
 	/**
 	 * Creates a new DaysGrid instance.
 	 * @param container - Parent container element
 	 * @param weekStart - Week start day preference
+	 * @param showHeatmap - Whether to show heatmap visualization
 	 */
-	constructor(container: HTMLElement, weekStart: WeekStart) {
+	constructor(container: HTMLElement, weekStart: WeekStart, showHeatmap: boolean) {
 		this.container = container;
 		this.weekStart = weekStart;
+		this.showHeatmap = showHeatmap;
 	}
 
 	/**
 	 * Renders the days grid for the specified month.
 	 * @param currentDate - The date representing the month to display
+	 * @param dateCounts - Array of date-count pairs for heatmap (optional)
 	 */
-	render(currentDate: Date): void {
+	render(currentDate: Date, dateCounts?: DateCount[]): void {
+		// Clear previous data and populate the date counts map
+		this.dateCounts.clear();
+		if (dateCounts) {
+			for (const item of dateCounts) {
+				this.dateCounts.set(item.date, item.count);
+			}
+		}
+
 		const daysGrid = this.container.createDiv({ cls: "calendarz-days" });
 
 		const current = dayjs(currentDate);
@@ -38,6 +64,7 @@ export class DaysGrid {
 		const startingDayOfWeek = this.getAdjustedDayOfWeek(firstDay.day());
 
 		const today = dayjs();
+		const maxCount = this.getMaxCount();
 
 		// Render padding days from previous month
 		const prevMonthLastDay = dayjs(new Date(year, month, 0)).date();
@@ -49,12 +76,27 @@ export class DaysGrid {
 
 		// Render days of current month
 		for (let day = 1; day <= daysInMonth; day++) {
-			const date = new Date(year, month, day);
+			const date = dayjs(new Date(year, month, day));
+			const dateStr = date.format("YYYY-MM-DD");
+			const count = this.dateCounts.get(dateStr) || 0;
+
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day" });
 			dayEl.textContent = day.toString();
 
-			if (this.isSameDate(dayjs(date), today)) {
+			// Check if today
+			if (this.isSameDate(date, today)) {
 				dayEl.addClass("calendarz-day-today");
+			}
+
+			// Apply heatmap styling if enabled
+			if (this.showHeatmap && count > 0) {
+				dayEl.addClass("calendarz-day-heatmap");
+				const intensity = maxCount > 0 ? count / maxCount : 0;
+				const opacity = 0.25 + intensity * 0.75;
+				// Use CSS custom property for opacity, applied to pseudo-element background
+				dayEl.style.setProperty("--heatmap-opacity", opacity.toFixed(2));
+				dayEl.setAttribute("data-count", count.toString());
+				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
 			}
 		}
 
@@ -67,6 +109,21 @@ export class DaysGrid {
 			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
 			dayEl.textContent = day.toString();
 		}
+	}
+
+	/**
+	 * Finds the maximum note count in the current dataset
+	 * Used for normalizing opacity levels
+	 * @returns The highest note count value
+	 */
+	private getMaxCount(): number {
+		let max = 0;
+		for (const count of this.dateCounts.values()) {
+			if (count > max) {
+				max = count;
+			}
+		}
+		return max;
 	}
 
 	/**

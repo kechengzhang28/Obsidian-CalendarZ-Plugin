@@ -3,8 +3,7 @@ import dayjs from "dayjs";
 import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
-import {DaysGrid} from "./ui/DaysGrid";
-import {HeatMap, DateCount} from "./ui/HeatMap";
+import {DaysGrid, DateCount} from "./ui/DaysGrid";
 import {TitleFormat, WeekStart, DateSource} from "./settings";
 import {getNotesCountByYamlDate, getNotesCountByFilenameDate} from "./utils/GetNotes";
 
@@ -13,7 +12,7 @@ export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
 /**
  * Main calendar view component for the CalendarZ plugin.
- * Renders a monthly calendar with heatmap visualization of note activity.
+ * Renders a monthly calendar with optional heatmap visualization of note activity.
  */
 export class CalendarZView extends ItemView {
 	/** Currently displayed month */
@@ -38,6 +37,8 @@ export class CalendarZView extends ItemView {
 	private dateSource: DateSource;
 	/** Date format pattern for filename extraction */
 	private filenameDateFormat: string;
+	/** Whether to show heatmap on date cells */
+	private showHeatmap: boolean;
 
 	/**
 	 * Creates a new CalendarZView instance.
@@ -51,6 +52,7 @@ export class CalendarZView extends ItemView {
 	 * @param ignoredFolders - Folders to exclude
 	 * @param dateSource - Source of date data
 	 * @param filenameDateFormat - Filename date format pattern
+	 * @param showHeatmap - Whether to show heatmap visualization
 	 */
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -62,7 +64,8 @@ export class CalendarZView extends ItemView {
 		dateFieldName: string = "date",
 		ignoredFolders: string[] = [],
 		dateSource: DateSource = "yaml",
-		filenameDateFormat: string = "YYYY-MM-DD"
+		filenameDateFormat: string = "YYYY-MM-DD",
+		showHeatmap: boolean = true
 	) {
 		super(leaf);
 		this.i18n = i18n;
@@ -74,6 +77,7 @@ export class CalendarZView extends ItemView {
 		this.ignoredFolders = ignoredFolders;
 		this.dateSource = dateSource;
 		this.filenameDateFormat = filenameDateFormat;
+		this.showHeatmap = showHeatmap;
 	}
 
 	/** Returns the unique view type identifier */
@@ -136,6 +140,11 @@ export class CalendarZView extends ItemView {
 		this.filenameDateFormat = filenameDateFormat;
 	}
 
+	/** Updates the show heatmap setting */
+	setShowHeatmap(showHeatmap: boolean): void {
+		this.showHeatmap = showHeatmap;
+	}
+
 	/** Called when the view is opened */
 	async onOpen(): Promise<void> {
 		await this.renderCalendar();
@@ -153,7 +162,7 @@ export class CalendarZView extends ItemView {
 
 	/**
 	 * Renders the complete calendar UI.
-	 * Creates header, weekdays row, days grid, and heatmap components.
+	 * Creates header, weekdays row, and days grid with optional heatmap.
 	 */
 	private async renderCalendar(): Promise<void> {
 		this.contentEl.empty();
@@ -186,12 +195,14 @@ export class CalendarZView extends ItemView {
 		const weekdaysRow = new WeekdaysRow(this.contentEl, this.i18n, this.weekStart);
 		weekdaysRow.render();
 
-		const daysGrid = new DaysGrid(this.contentEl, this.weekStart);
-		daysGrid.render(this.currentDate);
+		// Get date counts for heatmap if enabled
+		let dateCounts: DateCount[] = [];
+		if (this.showHeatmap) {
+			dateCounts = await this.getDateCounts();
+		}
 
-		const heatMap = new HeatMap(this.contentEl, this.weekStart);
-		const dateCounts = await this.getDateCounts();
-		heatMap.render(this.currentDate, dateCounts);
+		const daysGrid = new DaysGrid(this.contentEl, this.weekStart, this.showHeatmap);
+		daysGrid.render(this.currentDate, dateCounts);
 	}
 
 	/**

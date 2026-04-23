@@ -33,6 +33,8 @@ export interface CalendarZSettings {
 	dateSource: DateSource;
 	/** Date format pattern for filename extraction (e.g., "YYYY-MM-DD") */
 	filenameDateFormat: string;
+	/** Whether to show heatmap on date cells */
+	showHeatmap: boolean;
 }
 
 /** Default settings values */
@@ -44,7 +46,8 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	ignoredFolders: [],
 	dateFieldName: "date",
 	dateSource: "yaml",
-	filenameDateFormat: "YYYY-MM-DD"
+	filenameDateFormat: "YYYY-MM-DD",
+	showHeatmap: true
 };
 
 /**
@@ -130,6 +133,18 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.weekStart)
 				.onChange(async (value) => {
 					this.plugin.settings.weekStart = value as WeekStart;
+					await this.plugin.saveSettings();
+					this.plugin.refreshView();
+				}));
+
+		// Show heatmap setting
+		new Setting(containerEl)
+			.setName(t.settings.showHeatmap.name)
+			.setDesc(t.settings.showHeatmap.description)
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.showHeatmap)
+				.onChange(async (value) => {
+					this.plugin.settings.showHeatmap = value;
 					await this.plugin.saveSettings();
 					this.plugin.refreshView();
 				}));

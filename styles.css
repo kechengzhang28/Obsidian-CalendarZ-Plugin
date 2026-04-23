@@ -1,7 +1,7 @@
 /* CalendarZ Plugin Styles */
 
 .calendarz-container {
-	padding: 16px  !important;
+	padding: 16px !important;
 	user-select: none;
 }
 
@@ -85,6 +85,8 @@
 	border-radius: 4px;
 	transition: all 0.15s ease;
 	color: var(--text-normal);
+	background-color: transparent;
+	position: relative;
 }
 
 .calendarz-day:hover {
@@ -113,43 +115,33 @@
 	opacity: 0.6;
 }
 
+/* Heatmap Styles - integrated into date cells */
+.calendarz-day-heatmap {
+	color: var(--text-on-accent);
+}
+
+.calendarz-day-heatmap::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--interactive-accent);
+	opacity: var(--heatmap-opacity, 1);
+	border-radius: 4px;
+	z-index: -1;
+}
+
+.calendarz-day-heatmap:hover::before {
+	filter: brightness(1.1);
+}
+
 /* Dark theme adjustments */
 .theme-dark .calendarz-day {
 	color: var(--text-normal);
 }
 
-/* HeatMap Styles */
-.calendarz-heatmap {
-	display: grid;
-	grid-template-columns: repeat(7, 1fr);
-	gap: 2px;
-	margin-top: 12px;
-}
-
-.calendarz-heatmap-day {
-	aspect-ratio: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 13px;
-	border-radius: 4px;
-	transition: all 0.15s ease;
-	color: var(--text-normal);
-	background-color: var(--interactive-accent);
-}
-
-.calendarz-heatmap-day-other-month {
-	background-color: var(--background-modifier-border-hover);
-	opacity: 0.5;
-	cursor: default;
-}
-
-/* Dark theme heatmap adjustments */
-.theme-dark .calendarz-heatmap-day {
-	background-color: var(--interactive-accent);
-}
-
-.theme-dark .calendarz-heatmap-day-other-month {
-	background-color: var(--background-modifier-border-hover);
-	opacity: 0.5;
+.theme-dark .calendarz-day-heatmap {
+	color: var(--text-on-accent);
 }

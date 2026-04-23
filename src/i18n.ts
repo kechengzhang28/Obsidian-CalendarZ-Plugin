@@ -81,6 +81,11 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
+		/** Show heatmap setting strings */
+		showHeatmap: {
+			name: string;
+			description: string;
+		};
 	};
 	/** Command names */
 	commands: {

@@ -57,6 +57,10 @@
     "filenameDateFormat": {
       "name": "文件名日期格式",
       "description": "从文件名中提取日期的格式模式（如：YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD）"
+    },
+    "showHeatmap": {
+      "name": "显示热力图",
+      "description": "在日期格子上以彩色背景显示笔记活动强度"
     }
   },
   "commands": {

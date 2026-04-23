@@ -57,6 +57,10 @@
     "filenameDateFormat": {
       "name": "Filename Date Format",
       "description": "The format pattern to extract date from filename (e.g., YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD)"
+    },
+    "showHeatmap": {
+      "name": "Show Heatmap",
+      "description": "Display note activity intensity as colored background on date cells"
     }
   },
   "commands": {

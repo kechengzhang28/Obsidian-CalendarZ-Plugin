@@ -1,7 +1,7 @@
 import {App, parseYaml} from "obsidian";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import {DateCount} from "../ui/HeatMap";
+import {DateCount} from "../ui/DaysGrid";
 
 // Extend dayjs with custom parse format plugin for flexible date parsing
 dayjs.extend(customParseFormat);
