@@ -1,4 +1,4 @@
-import {App, Plugin, WorkspaceLeaf} from 'obsidian';
+import {Plugin, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, CalendarZSettings, CalendarZSettingTab} from "./settings";
 import {CALENDARZ_VIEW_TYPE, CalendarZView} from "./CalendarView";
 import {I18n, loadI18n} from "./i18n";
@@ -24,7 +24,7 @@ export default class CalendarZ extends Plugin {
 
 		// Command to open calendar view
 		this.addCommand({
-			id: 'open-calendarz-view',
+			id: 'open-calendar-view',
 			name: this.i18n.commands.openCalendar,
 			callback: async () => {
 				await this.activateView();
@@ -36,7 +36,6 @@ export default class CalendarZ extends Plugin {
 	}
 
 	onunload() {
-		this.app.workspace.detachLeavesOfType(CALENDARZ_VIEW_TYPE);
 	}
 
 	async loadSettings() {
@@ -62,7 +61,7 @@ export default class CalendarZ extends Plugin {
 				leaf.view.setWeekStart(this.settings.weekStart);
 				leaf.view.setDateFieldName(this.settings.dateFieldName);
 				leaf.view.setIgnoredFolders(this.settings.ignoredFolders);
-				leaf.view.refresh();
+				void leaf.view.refresh();
 			}
 		});
 	}
@@ -74,7 +73,7 @@ export default class CalendarZ extends Plugin {
 		const existingLeaf = workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)[0];
 
 		if (existingLeaf) {
-			workspace.revealLeaf(existingLeaf);
+			void workspace.revealLeaf(existingLeaf);
 			return;
 		}
 
@@ -89,6 +88,6 @@ export default class CalendarZ extends Plugin {
 		});
 
 		// Reveal the leaf
-		workspace.revealLeaf(leaf);
+		void workspace.revealLeaf(leaf);
 	}
 }

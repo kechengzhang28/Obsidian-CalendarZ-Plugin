@@ -1,4 +1,4 @@
-import {App, TFile, TFolder, parseYaml, CachedMetadata} from "obsidian";
+import {App, parseYaml} from "obsidian";
 
 export interface NoteInfo {
 	path: string;
@@ -172,6 +172,7 @@ function extractYamlFrontmatter(content: string): Record<string, unknown> | null
 	if (!match || !match[1]) return null;
 
 	try {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		return parseYaml(match[1]) || {};
 	} catch {
 		return null;

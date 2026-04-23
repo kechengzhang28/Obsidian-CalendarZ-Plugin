@@ -49,14 +49,14 @@ export class CalendarHeader {
 		}
 
 		const prevBtn = header.createEl("button", { cls: "calendarz-nav-btn" });
-		prevBtn.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='15 18 9 12 15 6'></polyline></svg>";
+		prevBtn.appendChild(this.createSvgIcon("prev"));
 		prevBtn.addEventListener("click", () => this.callbacks.onPrevMonth());
 
 		const todayBtn = header.createEl("button", { cls: "calendarz-today-btn", text: `${this.i18n.calendar.today}` });
 		todayBtn.addEventListener("click", () => this.callbacks.onToday());
 
 		const nextBtn = header.createEl("button", { cls: "calendarz-nav-btn" });
-		nextBtn.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='9 18 15 12 9 6'></polyline></svg>";
+		nextBtn.appendChild(this.createSvgIcon("next"));
 		nextBtn.addEventListener("click", () => this.callbacks.onNextMonth());
 	}
 
@@ -64,6 +64,27 @@ export class CalendarHeader {
 		if (this.language === "zh-CN" && this.monthFormat === "numeric") {
 			return (date.getMonth() + 1).toString();
 		}
-		return date.toLocaleString(this.language, { month: this.monthFormat as any });
+		return date.toLocaleString(this.language, { month: this.monthFormat as "numeric" | "short" | "long" | undefined });
+	}
+
+	private createSvgIcon(direction: "prev" | "next"): SVGSVGElement {
+		const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		svg.setAttribute("width", "16");
+		svg.setAttribute("height", "16");
+		svg.setAttribute("viewBox", "0 0 24 24");
+		svg.setAttribute("fill", "none");
+		svg.setAttribute("stroke", "currentColor");
+		svg.setAttribute("stroke-width", "2");
+		svg.setAttribute("stroke-linecap", "round");
+		svg.setAttribute("stroke-linejoin", "round");
+
+		const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+		if (direction === "prev") {
+			polyline.setAttribute("points", "15 18 9 12 15 6");
+		} else {
+			polyline.setAttribute("points", "9 18 15 12 9 6");
+		}
+		svg.appendChild(polyline);
+		return svg;
 	}
 }

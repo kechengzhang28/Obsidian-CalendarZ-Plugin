@@ -98,16 +98,18 @@ export class CalendarZSettingTab extends PluginSettingTab {
 			.setName(t.settings.dateFieldName.name)
 			.setDesc(t.settings.dateFieldName.description)
 			.addText(text => text
-				.setPlaceholder("date")
+				.setPlaceholder("Date")
 				.setValue(this.plugin.settings.dateFieldName)
-				.onChange(async (value) => {
-					this.plugin.settings.dateFieldName = value.trim() || "date";
-					await this.plugin.saveSettings();
-					this.plugin.refreshView();
+				.onChange((value) => {
+					void (async () => {
+						this.plugin.settings.dateFieldName = value.trim() || "date";
+						await this.plugin.saveSettings();
+						this.plugin.refreshView();
+					})();
 				}));
 
 		// Ignored folders setting
-		const ignoredFoldersSetting = new Setting(containerEl)
+		new Setting(containerEl)
 			.setName(t.settings.ignoredFolders.name)
 			.setDesc(t.settings.ignoredFolders.description);
 
@@ -125,16 +127,18 @@ export class CalendarZSettingTab extends PluginSettingTab {
 			})
 			.addButton(button => {
 				button.setButtonText(t.settings.ignoredFolders.addButton);
-				button.onClick(async () => {
-					const input = containerEl.querySelector(".calendarz-folder-input") as HTMLInputElement;
-					const folderPath = input.value.trim();
-					if (folderPath && !this.plugin.settings.ignoredFolders.includes(folderPath)) {
-						this.plugin.settings.ignoredFolders.push(folderPath);
-						await this.plugin.saveSettings();
-						input.value = "";
-						this.renderIgnoredFoldersList(foldersContainer);
-						this.plugin.refreshView();
-					}
+				button.onClick(() => {
+					void (async () => {
+						const input = containerEl.querySelector(".calendarz-folder-input") as HTMLInputElement;
+						const folderPath = input.value.trim();
+						if (folderPath && !this.plugin.settings.ignoredFolders.includes(folderPath)) {
+							this.plugin.settings.ignoredFolders.push(folderPath);
+							await this.plugin.saveSettings();
+							input.value = "";
+							this.renderIgnoredFoldersList(foldersContainer);
+							this.plugin.refreshView();
+						}
+					})();
 				});
 				return button;
 			});
@@ -161,11 +165,13 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				text: t.settings.ignoredFolders.removeButton,
 				cls: "calendarz-remove-folder-btn"
 			});
-			removeBtn.addEventListener("click", async () => {
-				this.plugin.settings.ignoredFolders = this.plugin.settings.ignoredFolders.filter(f => f !== folder);
-				await this.plugin.saveSettings();
-				this.renderIgnoredFoldersList(container);
-				this.plugin.refreshView();
+			removeBtn.addEventListener("click", () => {
+				void (async () => {
+					this.plugin.settings.ignoredFolders = this.plugin.settings.ignoredFolders.filter(f => f !== folder);
+					await this.plugin.saveSettings();
+					this.renderIgnoredFoldersList(container);
+					this.plugin.refreshView();
+				})();
 			});
 		}
 	}

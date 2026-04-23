@@ -4,7 +4,63 @@ import {Language} from "./settings";
 import enUS from "./locales/en-US.json";
 import zhCN from "./locales/zh-CN.json";
 
-export type I18n = typeof enUS;
+// Define the I18n interface based on the locale structure
+export interface I18n {
+	calendar: {
+		today: string;
+		weekdays: string[];
+		viewTitle: string;
+	};
+	settings: {
+		language: {
+			name: string;
+			description: string;
+		};
+		monthFormat: {
+			name: string;
+			description: string;
+			options: {
+				numeric: string;
+				short: string;
+				long: string;
+			};
+		};
+		titleFormat: {
+			name: string;
+			description: string;
+			options: {
+				yearMonth: string;
+				monthYear: string;
+			};
+		};
+		weekStart: {
+			name: string;
+			description: string;
+			options: {
+				sunday: string;
+				monday: string;
+			};
+		};
+		ignoredFolders: {
+			name: string;
+			description: string;
+			addButton: string;
+			removeButton: string;
+			placeholder: string;
+			empty: string;
+		};
+		dateFieldName: {
+			name: string;
+			description: string;
+		};
+	};
+	commands: {
+		openCalendar: string;
+	};
+	ribbon: {
+		tooltip: string;
+	};
+}
 
 const locales: Record<Language, I18n> = {
 	"en-US": enUS as I18n,
@@ -16,5 +72,5 @@ export function loadI18n(language: Language): I18n {
 }
 
 export function interpolate(template: string, vars: Record<string, string | number>): string {
-	return template.replace(/\{\{(\w+)\}\}/g, (_, key) => String(vars[key] ?? ""));
+	return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => String(vars[key] ?? ""));
 }

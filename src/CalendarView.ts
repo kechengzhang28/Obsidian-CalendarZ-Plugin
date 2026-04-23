@@ -1,4 +1,4 @@
-import {App, ItemView, WorkspaceLeaf} from "obsidian";
+import {ItemView, WorkspaceLeaf} from "obsidian";
 import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
@@ -81,7 +81,7 @@ export class CalendarZView extends ItemView {
 	}
 
 	async onOpen(): Promise<void> {
-		this.renderCalendar();
+		await this.renderCalendar();
 	}
 
 	async onClose(): Promise<void> {
@@ -140,6 +140,8 @@ export class CalendarZView extends ItemView {
 		const month = String(date.getMonth() + 1).padStart(2, "0");
 		const day = String(date.getDate()).padStart(2, "0");
 		const dateStr = `${year}-${month}-${day}`;
+		// TODO: Implement date selection functionality
+		console.warn("Selected date:", dateStr);
 	}
 
 	private async getDateCounts(): Promise<DateCount[]> {
