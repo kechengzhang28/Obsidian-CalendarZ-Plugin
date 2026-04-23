@@ -8,7 +8,7 @@ import {
 	SliderSettingRenderer,
 	TextSettingRenderer,
 } from "../ui/SettingRenderer";
-import { createTypedSettingHandler, createSettingHandlerWithRefresh, createSettingHandlerWithTransform } from "../settingUtils";
+import { createSettingHandler } from "../settingUtils";
 import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE } from "../../constants";
 
 /**
@@ -37,11 +37,11 @@ export function renderStatisticsSettings(
 		[DISPLAY_MODE.DOTS]: t.settings.displayMode.options.dots,
 		[DISPLAY_MODE.HEATMAP]: t.settings.displayMode.options.heatmap,
 	});
-	const handleDisplayModeChange = createSettingHandlerWithRefresh(
+	const handleDisplayModeChange = createSettingHandler({
 		plugin,
+		settingKey: "displayMode",
 		refreshDisplay,
-		"displayMode"
-	);
+	});
 	displayModeRenderer.render(contentEl, {
 		name: t.settings.displayMode.name,
 		description: t.settings.displayMode.description,
@@ -52,7 +52,7 @@ export function renderStatisticsSettings(
 	// Dot threshold setting (only shown when displayMode is dots)
 	if (plugin.settings.displayMode === DISPLAY_MODE.DOTS) {
 		const sliderRenderer = new SliderSettingRenderer(1, 10, 1, plugin);
-		const handleDotThresholdChange = createTypedSettingHandler(plugin, "dotThreshold");
+		const handleDotThresholdChange = createSettingHandler({ plugin, settingKey: "dotThreshold" });
 		sliderRenderer.render(contentEl, {
 			name: t.settings.dotThreshold.name,
 			description: t.settings.dotThreshold.description,
@@ -63,11 +63,11 @@ export function renderStatisticsSettings(
 
 	// Date field name setting (for YAML source)
 	const textRenderer = new TextSettingRenderer(plugin, DEFAULTS.DATE_FORMAT_PLACEHOLDER);
-	const handleDateFieldNameChange = createSettingHandlerWithTransform(
+	const handleDateFieldNameChange = createSettingHandler({
 		plugin,
-		"dateFieldName",
-		(value) => value.trim() || DEFAULTS.DATE_FIELD_NAME
-	);
+		settingKey: "dateFieldName",
+		transform: (value) => value.trim() || DEFAULTS.DATE_FIELD_NAME,
+	});
 	textRenderer.render(contentEl, {
 		name: t.settings.dateFieldName.name,
 		description: t.settings.dateFieldName.description,
@@ -80,11 +80,11 @@ export function renderStatisticsSettings(
 		[DATE_SOURCE.YAML]: t.settings.dateSource.options.yaml,
 		[DATE_SOURCE.FILENAME]: t.settings.dateSource.options.filename,
 	});
-	const handleDateSourceChange = createSettingHandlerWithRefresh(
+	const handleDateSourceChange = createSettingHandler({
 		plugin,
+		settingKey: "dateSource",
 		refreshDisplay,
-		"dateSource"
-	);
+	});
 	dateSourceRenderer.render(contentEl, {
 		name: t.settings.dateSource.name,
 		description: t.settings.dateSource.description,
@@ -95,11 +95,11 @@ export function renderStatisticsSettings(
 	// Filename date format setting (only shown when dateSource is filename)
 	if (plugin.settings.dateSource === DATE_SOURCE.FILENAME) {
 		const filenameFormatRenderer = new TextSettingRenderer(plugin, DEFAULTS.FILENAME_FORMAT_PLACEHOLDER);
-		const handleFilenameFormatChange = createSettingHandlerWithTransform(
+		const handleFilenameFormatChange = createSettingHandler({
 			plugin,
-			"filenameDateFormat",
-			(value) => value.trim() || DEFAULTS.FILENAME_DATE_FORMAT
-		);
+			settingKey: "filenameDateFormat",
+			transform: (value) => value.trim() || DEFAULTS.FILENAME_DATE_FORMAT,
+		});
 		filenameFormatRenderer.render(contentEl, {
 			name: t.settings.filenameDateFormat.name,
 			description: t.settings.filenameDateFormat.description,

@@ -2,6 +2,7 @@ import { Setting } from "obsidian";
 import type { PluginLike } from "../../types";
 import type { Language } from "../types";
 import { SettingGroup } from "../ui/SettingGroup";
+import { createSettingHandler } from "../settingUtils";
 
 /**
  * Renders language settings.
@@ -22,6 +23,15 @@ export function renderLanguageSettings(
 	const t = plugin.i18n;
 
 	// Language setting with special handling (needs to reload i18n)
+	const handleLanguageChange = createSettingHandler({
+		plugin,
+		settingKey: "language",
+		postSave: () => {
+			plugin.loadI18n();
+			refreshDisplay();
+		},
+	});
+
 	new Setting(contentEl)
 		.setName(t.settings.language.name)
 		.setDesc(t.settings.language.description)
@@ -30,11 +40,7 @@ export function renderLanguageSettings(
 			.addOption("zh-CN", "中文")
 			.setValue(plugin.settings.language)
 			.onChange(async (value) => {
-				plugin.settings.language = value as Language;
-				await plugin.saveSettings();
-				plugin.loadI18n();
-				refreshDisplay();
-				plugin.refreshView();
+				await handleLanguageChange(value as Language);
 			}));
 
 	// Open calendar button

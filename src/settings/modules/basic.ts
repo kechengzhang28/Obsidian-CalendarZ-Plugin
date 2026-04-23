@@ -2,7 +2,7 @@ import type { PluginLike } from "../../types";
 import type { MonthFormat, TitleFormat, WeekStart } from "../types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { DropdownSettingRenderer } from "../ui/SettingRenderer";
-import { createTypedSettingHandler } from "../settingUtils";
+import { createSettingHandler } from "../settingUtils";
 
 /**
  * Renders basic settings (month format, title format, week start).
@@ -23,7 +23,7 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike
 		short: t.settings.monthFormat.options.short,
 		long: t.settings.monthFormat.options.long,
 	});
-	const handleMonthFormatChange = createTypedSettingHandler(plugin, "monthFormat");
+	const handleMonthFormatChange = createSettingHandler({ plugin, settingKey: "monthFormat" });
 	monthFormatRenderer.render(contentEl, {
 		name: t.settings.monthFormat.name,
 		description: t.settings.monthFormat.description,
@@ -36,7 +36,7 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike
 		yearMonth: t.settings.titleFormat.options.yearMonth,
 		monthYear: t.settings.titleFormat.options.monthYear,
 	});
-	const handleTitleFormatChange = createTypedSettingHandler(plugin, "titleFormat");
+	const handleTitleFormatChange = createSettingHandler({ plugin, settingKey: "titleFormat" });
 	titleFormatRenderer.render(contentEl, {
 		name: t.settings.titleFormat.name,
 		description: t.settings.titleFormat.description,
@@ -49,7 +49,7 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike
 		sunday: t.settings.weekStart.options.sunday,
 		monday: t.settings.weekStart.options.monday,
 	});
-	const handleWeekStartChange = createTypedSettingHandler(plugin, "weekStart");
+	const handleWeekStartChange = createSettingHandler({ plugin, settingKey: "weekStart" });
 	weekStartRenderer.render(contentEl, {
 		name: t.settings.weekStart.name,
 		description: t.settings.weekStart.description,

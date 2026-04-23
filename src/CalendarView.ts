@@ -62,14 +62,7 @@ export class CalendarZView extends ItemView {
 
 	async refreshStatsOnly(): Promise<void> {
 		if (this.settings.displayMode === DISPLAY_MODE.NONE) return;
-
-		const dateCounts = await this.fetchDateCounts();
-		if (this.calendarComponent) {
-			// Re-mount with updated dateCounts
-			void this.renderCalendar(dateCounts);
-		} else {
-			void this.renderCalendar();
-		}
+		void this.renderCalendar(await this.fetchDateCounts());
 	}
 
 	async updateTodayHighlight(): Promise<void> {
@@ -78,15 +71,9 @@ export class CalendarZView extends ItemView {
 
 		if (today.year() !== current.year() || today.month() !== current.month()) {
 			this.currentDate = new Date();
-			await this.renderCalendar();
-			return;
 		}
 
-		// Svelte handles reactivity, just re-render with same data
-		const dateCounts = this.settings.displayMode !== DISPLAY_MODE.NONE
-			? await this.fetchDateCounts()
-			: [];
-		void this.renderCalendar(dateCounts);
+		void this.renderCalendar();
 	}
 
 	private async renderCalendar(preloadedDateCounts?: DateCount[]): Promise<void> {
@@ -97,11 +84,7 @@ export class CalendarZView extends ItemView {
 		}
 		this.contentEl.empty();
 
-		const dateCounts = preloadedDateCounts ?? (
-			this.settings.displayMode !== DISPLAY_MODE.NONE
-				? await this.fetchDateCounts()
-				: []
-		);
+		const dateCounts = preloadedDateCounts ?? await this.getDateCountsOrEmpty();
 
 		this.calendarComponent = mount(Calendar, {
 			target: this.contentEl,
@@ -151,6 +134,11 @@ export class CalendarZView extends ItemView {
 
 	private async createDailyNote(date: Date): Promise<void> {
 		await openOrCreateDailyNote(this.deps.app, this.deps.i18n, date);
+	}
+
+	private async getDateCountsOrEmpty(): Promise<DateCount[]> {
+		if (this.settings.displayMode === DISPLAY_MODE.NONE) return [];
+		return this.fetchDateCounts();
 	}
 
 	private async fetchDateCounts(): Promise<DateCount[]> {
