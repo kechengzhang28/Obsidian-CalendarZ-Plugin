@@ -1,23 +1,41 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
 import CalendarZ from "./main";
 
+/** Supported display languages */
 export type Language = "en-US" | "zh-CN";
+/** Month display format options */
 export type MonthFormat = "numeric" | "short" | "long";
+/** Header title format options */
 export type TitleFormat = "yearMonth" | "monthYear";
+/** Week start day options */
 export type WeekStart = "sunday" | "monday";
+/** Date source options for extracting dates from notes */
 export type DateSource = "yaml" | "filename";
 
+/**
+ * Plugin settings interface.
+ * Contains all user-configurable options for the CalendarZ plugin.
+ */
 export interface CalendarZSettings {
+	/** Display language */
 	language: Language;
+	/** Month display format */
 	monthFormat: MonthFormat;
+	/** Header title format */
 	titleFormat: TitleFormat;
+	/** Week start day */
 	weekStart: WeekStart;
+	/** List of folder paths to ignore when counting notes */
 	ignoredFolders: string[];
+	/** YAML frontmatter field name for date extraction */
 	dateFieldName: string;
+	/** Source of date data (YAML frontmatter or filename) */
 	dateSource: DateSource;
+	/** Date format pattern for filename extraction (e.g., "YYYY-MM-DD") */
 	filenameDateFormat: string;
 }
 
+/** Default settings values */
 export const DEFAULT_SETTINGS: CalendarZSettings = {
 	language: "en-US",
 	monthFormat: "numeric",
@@ -29,14 +47,27 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	filenameDateFormat: "YYYY-MM-DD"
 };
 
+/**
+ * Settings tab for the CalendarZ plugin.
+ * Provides UI for configuring all plugin settings.
+ */
 export class CalendarZSettingTab extends PluginSettingTab {
+	/** Reference to the main plugin instance */
 	plugin: CalendarZ;
 
+	/**
+	 * Creates a new settings tab instance.
+	 * @param app - Obsidian App instance
+	 * @param plugin - CalendarZ plugin instance
+	 */
 	constructor(app: App, plugin: CalendarZ) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Renders the settings UI.
+	 */
 	display(): void {
 		const {containerEl} = this;
 
@@ -44,6 +75,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 
 		const t = this.plugin.i18n;
 
+		// Language setting
 		new Setting(containerEl)
 			.setName(t.settings.language.name)
 			.setDesc(t.settings.language.description)
@@ -59,6 +91,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					this.plugin.refreshView();
 				}));
 
+		// Month format setting
 		new Setting(containerEl)
 			.setName(t.settings.monthFormat.name)
 			.setDesc(t.settings.monthFormat.description)
@@ -73,6 +106,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					this.plugin.refreshView();
 				}));
 
+		// Title format setting
 		new Setting(containerEl)
 			.setName(t.settings.titleFormat.name)
 			.setDesc(t.settings.titleFormat.description)
@@ -86,6 +120,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					this.plugin.refreshView();
 				}));
 
+		// Week start setting
 		new Setting(containerEl)
 			.setName(t.settings.weekStart.name)
 			.setDesc(t.settings.weekStart.description)
@@ -99,6 +134,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					this.plugin.refreshView();
 				}));
 
+		// Date field name setting (for YAML source)
 		new Setting(containerEl)
 			.setName(t.settings.dateFieldName.name)
 			.setDesc(t.settings.dateFieldName.description)
@@ -145,7 +181,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					}));
 		}
 
-		// Ignored folders setting
+		// Ignored folders setting header
 		new Setting(containerEl)
 			.setName(t.settings.ignoredFolders.name)
 			.setDesc(t.settings.ignoredFolders.description);
@@ -181,6 +217,10 @@ export class CalendarZSettingTab extends PluginSettingTab {
 			});
 	}
 
+	/**
+	 * Renders the list of ignored folders with remove buttons.
+	 * @param container - Container element for the list
+	 */
 	private renderIgnoredFoldersList(container: HTMLElement): void {
 		container.empty();
 		const t = this.plugin.i18n;

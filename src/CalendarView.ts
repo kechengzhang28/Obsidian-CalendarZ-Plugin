@@ -8,21 +8,50 @@ import {HeatMap, DateCount} from "./ui/HeatMap";
 import {TitleFormat, WeekStart, DateSource} from "./settings";
 import {getNotesCountByYamlDate, getNotesCountByFilenameDate} from "./utils/GetNotes";
 
+/** Unique identifier for the CalendarZ view type */
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
+/**
+ * Main calendar view component for the CalendarZ plugin.
+ * Renders a monthly calendar with heatmap visualization of note activity.
+ */
 export class CalendarZView extends ItemView {
+	/** Currently displayed month */
 	private currentDate: Date = new Date();
+	/** User-selected date */
 	private selectedDate: Date = new Date();
+	/** Internationalization strings */
 	private i18n: I18n;
+	/** Month display format preference */
 	private monthFormat: string;
+	/** Display language locale */
 	private language: string;
+	/** Title format preference (yearMonth or monthYear) */
 	private titleFormat: TitleFormat;
+	/** Week start preference (sunday or monday) */
 	private weekStart: WeekStart;
+	/** YAML field name for date extraction */
 	private dateFieldName: string;
+	/** List of folder paths to ignore */
 	private ignoredFolders: string[];
+	/** Source of date data (yaml or filename) */
 	private dateSource: DateSource;
+	/** Date format pattern for filename extraction */
 	private filenameDateFormat: string;
 
+	/**
+	 * Creates a new CalendarZView instance.
+	 * @param leaf - Obsidian workspace leaf
+	 * @param i18n - Internationalization strings
+	 * @param monthFormat - Month display format
+	 * @param language - Display language
+	 * @param titleFormat - Title format preference
+	 * @param weekStart - Week start day preference
+	 * @param dateFieldName - YAML field name for dates
+	 * @param ignoredFolders - Folders to exclude
+	 * @param dateSource - Source of date data
+	 * @param filenameDateFormat - Filename date format pattern
+	 */
 	constructor(
 		leaf: WorkspaceLeaf,
 		i18n: I18n,
@@ -47,66 +76,85 @@ export class CalendarZView extends ItemView {
 		this.filenameDateFormat = filenameDateFormat;
 	}
 
+	/** Returns the unique view type identifier */
 	getViewType(): string {
 		return CALENDARZ_VIEW_TYPE;
 	}
 
+	/** Returns the display text for the view tab */
 	getDisplayText(): string {
 		return this.i18n.calendar.viewTitle;
 	}
 
+	/** Returns the icon name for the view */
 	getIcon(): string {
 		return "calendar";
 	}
 
+	/** Updates the i18n instance */
 	setI18n(i18n: I18n): void {
 		this.i18n = i18n;
 	}
 
+	/** Updates the month format setting */
 	setMonthFormat(monthFormat: string): void {
 		this.monthFormat = monthFormat;
 	}
 
+	/** Updates the display language */
 	setLanguage(language: string): void {
 		this.language = language;
 	}
 
+	/** Updates the title format setting */
 	setTitleFormat(titleFormat: TitleFormat): void {
 		this.titleFormat = titleFormat;
 	}
 
+	/** Updates the week start setting */
 	setWeekStart(weekStart: WeekStart): void {
 		this.weekStart = weekStart;
 	}
 
+	/** Updates the YAML date field name */
 	setDateFieldName(dateFieldName: string): void {
 		this.dateFieldName = dateFieldName;
 	}
 
+	/** Updates the ignored folders list */
 	setIgnoredFolders(ignoredFolders: string[]): void {
 		this.ignoredFolders = ignoredFolders;
 	}
 
+	/** Updates the date source setting */
 	setDateSource(dateSource: DateSource): void {
 		this.dateSource = dateSource;
 	}
 
+	/** Updates the filename date format pattern */
 	setFilenameDateFormat(filenameDateFormat: string): void {
 		this.filenameDateFormat = filenameDateFormat;
 	}
 
+	/** Called when the view is opened */
 	async onOpen(): Promise<void> {
 		await this.renderCalendar();
 	}
 
+	/** Called when the view is closed */
 	async onClose(): Promise<void> {
 		this.contentEl.empty();
 	}
 
+	/** Refreshes the calendar display */
 	refresh(): void {
 		void this.renderCalendar();
 	}
 
+	/**
+	 * Renders the complete calendar UI.
+	 * Creates header, weekdays row, days grid, and heatmap components.
+	 */
 	private async renderCalendar(): Promise<void> {
 		this.contentEl.empty();
 		this.contentEl.addClass("calendarz-container");
@@ -138,11 +186,7 @@ export class CalendarZView extends ItemView {
 		const weekdaysRow = new WeekdaysRow(this.contentEl, this.i18n, this.weekStart);
 		weekdaysRow.render();
 
-		const daysGrid = new DaysGrid(this.contentEl, this.weekStart, {
-			onDateSelect: (date: Date) => {
-				this.onDateSelected(date);
-			}
-		});
+		const daysGrid = new DaysGrid(this.contentEl, this.weekStart);
 		daysGrid.render(this.currentDate);
 
 		const heatMap = new HeatMap(this.contentEl, this.weekStart);
@@ -150,12 +194,10 @@ export class CalendarZView extends ItemView {
 		heatMap.render(this.currentDate, dateCounts);
 	}
 
-	private onDateSelected(date: Date): void {
-		const dateStr = dayjs(date).format("YYYY-MM-DD");
-		// TODO: Implement date selection functionality
-		console.warn("Selected date:", dateStr);
-	}
-
+	/**
+	 * Retrieves date counts based on the configured date source.
+	 * @returns Array of date counts for the heatmap
+	 */
 	private async getDateCounts(): Promise<DateCount[]> {
 		switch (this.dateSource) {
 			case "yaml":

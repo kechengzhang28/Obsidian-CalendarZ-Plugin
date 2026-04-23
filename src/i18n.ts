@@ -4,18 +4,28 @@ import {Language} from "./settings";
 import enUS from "./locales/en-US.json";
 import zhCN from "./locales/zh-CN.json";
 
-// Define the I18n interface based on the locale structure
+/**
+ * Internationalization interface defining all translatable strings.
+ * This interface matches the structure of locale JSON files.
+ */
 export interface I18n {
+	/** Calendar-related strings */
 	calendar: {
+		/** Label for the today button */
 		today: string;
+		/** Array of weekday names starting from Sunday */
 		weekdays: string[];
+		/** Title displayed in the view tab */
 		viewTitle: string;
 	};
+	/** Settings panel strings */
 	settings: {
+		/** Language setting strings */
 		language: {
 			name: string;
 			description: string;
 		};
+		/** Month format setting strings */
 		monthFormat: {
 			name: string;
 			description: string;
@@ -25,6 +35,7 @@ export interface I18n {
 				long: string;
 			};
 		};
+		/** Title format setting strings */
 		titleFormat: {
 			name: string;
 			description: string;
@@ -33,6 +44,7 @@ export interface I18n {
 				monthYear: string;
 			};
 		};
+		/** Week start setting strings */
 		weekStart: {
 			name: string;
 			description: string;
@@ -41,6 +53,7 @@ export interface I18n {
 				monday: string;
 			};
 		};
+		/** Ignored folders setting strings */
 		ignoredFolders: {
 			name: string;
 			description: string;
@@ -49,10 +62,12 @@ export interface I18n {
 			placeholder: string;
 			empty: string;
 		};
+		/** Date field name setting strings */
 		dateFieldName: {
 			name: string;
 			description: string;
 		};
+		/** Date source setting strings */
 		dateSource: {
 			name: string;
 			description: string;
@@ -61,28 +76,47 @@ export interface I18n {
 				filename: string;
 			};
 		};
+		/** Filename date format setting strings */
 		filenameDateFormat: {
 			name: string;
 			description: string;
 		};
 	};
+	/** Command names */
 	commands: {
+		/** Name of the open calendar command */
 		openCalendar: string;
 	};
+	/** Ribbon icon tooltip */
 	ribbon: {
+		/** Tooltip text for the ribbon icon */
 		tooltip: string;
 	};
 }
 
+/** Map of language codes to their locale data */
 const locales: Record<Language, I18n> = {
 	"en-US": enUS as I18n,
 	"zh-CN": zhCN as I18n,
 };
 
+/**
+ * Loads the i18n strings for the specified language.
+ * Falls back to English if the language is not available.
+ * @param language - Language code to load
+ * @returns I18n object containing all translatable strings
+ */
 export function loadI18n(language: Language): I18n {
 	return locales[language] || locales["en-US"];
 }
 
+/**
+ * Interpolates variables into a template string.
+ * Replaces {{key}} placeholders with values from the vars object.
+ * @param template - Template string with {{key}} placeholders
+ * @param vars - Object containing variable values
+ * @returns Interpolated string
+ */
 export function interpolate(template: string, vars: Record<string, string | number>): string {
 	return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => String(vars[key] ?? ""));
 }
