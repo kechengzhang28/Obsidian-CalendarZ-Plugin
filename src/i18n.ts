@@ -18,6 +18,13 @@ export interface I18n {
 		/** Title displayed in the view tab */
 		viewTitle: string;
 	};
+	/** Settings section titles */
+	sectionTitles: {
+		/** Basic settings section title */
+		basic: string;
+		/** Statistics settings section title */
+		statistics: string;
+	};
 	/** Settings panel strings */
 	settings: {
 		/** Language setting strings */

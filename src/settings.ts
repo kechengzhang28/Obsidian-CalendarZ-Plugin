@@ -83,8 +83,10 @@ export class CalendarZSettingTab extends PluginSettingTab {
 
 		const t = this.plugin.i18n;
 
+		const langSettings = containerEl.createDiv({ cls: "setting-group" })
+		const langSettingsContent = langSettings.createDiv({ cls: "setting-items" })
 		// Language setting
-		new Setting(containerEl)
+		new Setting(langSettingsContent)
 			.setName(t.settings.language.name)
 			.setDesc(t.settings.language.description)
 			.addDropdown(dropdown => dropdown
@@ -99,8 +101,14 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					this.plugin.refreshView();
 				}));
 
+
+		const basicSettings = containerEl.createDiv({ cls: "setting-group" })
+		new Setting(basicSettings).setClass('setting-item-heading').setName(t.sectionTitles.basic);
+
+		const basicSettingsContent = basicSettings.createDiv({ cls: "setting-items" });
+
 		// Month format setting
-		new Setting(containerEl)
+		new Setting(basicSettingsContent)
 			.setName(t.settings.monthFormat.name)
 			.setDesc(t.settings.monthFormat.description)
 			.addDropdown(dropdown => dropdown
@@ -115,7 +123,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				}));
 
 		// Title format setting
-		new Setting(containerEl)
+		new Setting(basicSettingsContent)
 			.setName(t.settings.titleFormat.name)
 			.setDesc(t.settings.titleFormat.description)
 			.addDropdown(dropdown => dropdown
@@ -129,7 +137,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				}));
 
 		// Week start setting
-		new Setting(containerEl)
+		new Setting(basicSettingsContent)
 			.setName(t.settings.weekStart.name)
 			.setDesc(t.settings.weekStart.description)
 			.addDropdown(dropdown => dropdown
@@ -142,8 +150,13 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					this.plugin.refreshView();
 				}));
 
+		const statSetting = containerEl.createDiv({ cls: "setting-group" })
+		new Setting(statSetting).setClass('setting-item-heading').setName(t.sectionTitles.statistics);
+
+		const statSettingContent = statSetting.createDiv({ cls: "setting-items" });
+
 		// Display mode setting
-		new Setting(containerEl)
+		new Setting(statSettingContent)
 			.setName(t.settings.displayMode.name)
 			.setDesc(t.settings.displayMode.description)
 			.addDropdown(dropdown => dropdown
@@ -154,12 +167,13 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.displayMode = value as DisplayMode;
 					await this.plugin.saveSettings();
+					this.display();
 					this.plugin.refreshView();
 				}));
 
 		// Dot threshold setting (only shown when displayMode is "dots")
 		if (this.plugin.settings.displayMode === "dots") {
-			new Setting(containerEl)
+			new Setting(statSettingContent)
 				.setName(t.settings.dotThreshold.name)
 				.setDesc(t.settings.dotThreshold.description)
 				.addSlider(slider => slider
@@ -174,7 +188,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 		}
 
 		// Date field name setting (for YAML source)
-		new Setting(containerEl)
+		new Setting(statSettingContent)
 			.setName(t.settings.dateFieldName.name)
 			.setDesc(t.settings.dateFieldName.description)
 			.addText(text => text
@@ -189,7 +203,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				}));
 
 		// Date source setting
-		new Setting(containerEl)
+		new Setting(statSettingContent)
 			.setName(t.settings.dateSource.name)
 			.setDesc(t.settings.dateSource.description)
 			.addDropdown(dropdown => dropdown
@@ -199,12 +213,13 @@ export class CalendarZSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.dateSource = value as DateSource;
 					await this.plugin.saveSettings();
+					this.display();
 					this.plugin.refreshView();
 				}));
 
 		// Filename date format setting (only shown when dateSource is "filename")
 		if (this.plugin.settings.dateSource === "filename") {
-			new Setting(containerEl)
+			new Setting(statSettingContent)
 				.setName(t.settings.filenameDateFormat.name)
 				.setDesc(t.settings.filenameDateFormat.description)
 				.addText(text => text
@@ -221,22 +236,9 @@ export class CalendarZSettingTab extends PluginSettingTab {
 		}
 
 		// Ignored folders setting header
-		new Setting(containerEl)
+		new Setting(statSettingContent)
 			.setName(t.settings.ignoredFolders.name)
-			.setDesc(t.settings.ignoredFolders.description);
-
-		// Display current ignored folders
-		const foldersContainer = containerEl.createDiv("calendarz-ignored-folders");
-		this.renderIgnoredFoldersList(foldersContainer);
-
-		// Add new folder input
-		new Setting(containerEl)
-			.setName(t.settings.ignoredFolders.addButton)
-			.addText(text => {
-				text.setPlaceholder(t.settings.ignoredFolders.placeholder);
-				text.inputEl.addClass("calendarz-folder-input");
-				return text;
-			})
+			.setDesc(t.settings.ignoredFolders.description)
 			.addButton(button => {
 				button.setButtonText(t.settings.ignoredFolders.addButton);
 				button.onClick(() => {
@@ -247,7 +249,6 @@ export class CalendarZSettingTab extends PluginSettingTab {
 							this.plugin.settings.ignoredFolders.push(folderPath);
 							await this.plugin.saveSettings();
 							input.value = "";
-							this.renderIgnoredFoldersList(foldersContainer);
 							this.plugin.refreshView();
 						}
 					})();

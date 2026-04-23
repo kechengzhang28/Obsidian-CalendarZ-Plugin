@@ -4,6 +4,10 @@
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     "viewTitle": "CalendarZ"
   },
+  "sectionTitles": {
+    "basic": "Basic",
+    "statistics": "Statistics"
+  },
   "settings": {
     "language": {
       "name": "Language",
