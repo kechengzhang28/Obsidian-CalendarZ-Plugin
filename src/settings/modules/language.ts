@@ -1,6 +1,7 @@
-import {Setting} from "obsidian";
+import { Setting } from "obsidian";
 import CalendarZ from "../../main";
-import {Language} from "../types";
+import { Language } from "../types";
+import { SettingGroup } from "../../ui/components/SettingGroup";
 
 /**
  * Renders language settings.
@@ -13,11 +14,14 @@ export function renderLanguageSettings(
 	plugin: CalendarZ,
 	refreshDisplay: () => void
 ): void {
-	const langSettings = containerEl.createDiv({cls: "setting-group"});
-	const langSettingsContent = langSettings.createDiv({cls: "setting-items"});
+	const group = new SettingGroup({ title: "" });
+	group.render(containerEl);
+	const contentEl = group.getContentEl();
+	if (!contentEl) return;
+
 	const t = plugin.i18n;
 
-	new Setting(langSettingsContent)
+	new Setting(contentEl)
 		.setName(t.settings.language.name)
 		.setDesc(t.settings.language.description)
 		.addDropdown(dropdown => dropdown

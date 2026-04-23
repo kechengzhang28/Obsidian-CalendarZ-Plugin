@@ -7,11 +7,15 @@ import {
 	getYearMonth,
 	getDaysInMonth,
 	getPreviousMonthLastDay,
-	calculateHeatmapOpacity,
-	calculateDotCount,
 	calculatePaddingDays,
-} from "../utils/dateUtils";
-import { CSS_CLASSES, CSS_VARS, ATTRS, DOTS, GRID } from "../constants";
+} from "../utils/date";
+import { CSS_CLASSES, ATTRS, GRID } from "../constants";
+import {
+	DisplayStrategy,
+	DisplayStrategyFactory,
+	DayDisplayConfig,
+	DisplayContext,
+} from "../display";
 
 export type DayClickHandler = (date: Date) => void;
 
@@ -20,16 +24,11 @@ export interface DateCount {
 	count: number;
 }
 
-interface DayConfig {
-	count: number;
-	isToday: boolean;
-	isBeforeToday: boolean;
-}
-
 export class DaysGrid {
 	private dateCounts = new Map<string, number>();
 	private gridEl: HTMLElement | null = null;
 	private currentDate: Date = new Date();
+	private strategy: DisplayStrategy | null = null;
 
 	constructor(
 		private container: HTMLElement,
@@ -37,7 +36,9 @@ export class DaysGrid {
 		private displayMode: DisplayMode,
 		private dotThreshold: number,
 		private onDayClick?: DayClickHandler
-	) {}
+	) {
+		this.updateStrategy();
+	}
 
 	render(currentDate: Date, dateCounts?: DateCount[]): void {
 		this.dateCounts = new Map(dateCounts?.map(d => [d.date, d.count]));
@@ -65,43 +66,39 @@ export class DaysGrid {
 
 			const date = dayjs(dateStr);
 			const count = this.dateCounts.get(dateStr) || 0;
-			const todayFlag = isSameDay(date, today);
-			const beforeTodayFlag = isBeforeToday(date);
+			const isToday = isSameDay(date, today);
+			const isBeforeTodayFlag = isBeforeToday(date);
 
-			const config: DayConfig = { count, isToday: todayFlag, isBeforeToday: beforeTodayFlag };
-			this.updateDayDisplay(dayEl as HTMLElement, date, config, maxCount);
+			this.cleanupDayDisplay(dayEl as HTMLElement);
+
+			if (this.strategy) {
+				const config: DayDisplayConfig = { count, isToday, isBeforeToday: isBeforeTodayFlag };
+				const context: DisplayContext = { maxCount, dotThreshold: this.dotThreshold, dateStr };
+				this.strategy.apply(dayEl as HTMLElement, config, context);
+			}
 		});
 	}
 
-	private updateDayDisplay(
-		dayEl: HTMLElement,
-		date: dayjs.Dayjs,
-		config: DayConfig,
-		maxCount: number
-	): void {
-		const dateStr = formatDate(date);
+	setDisplayMode(mode: DisplayMode): void {
+		this.displayMode = mode;
+		this.updateStrategy();
+	}
 
-		// Clear existing display mode content
-		dayEl.removeClass(CSS_CLASSES.DAY_HEATMAP);
-		dayEl.style.removeProperty(CSS_VARS.HEATMAP_OPACITY);
-		dayEl.removeAttribute(ATTRS.DATA_COUNT);
-		dayEl.querySelectorAll(`.${CSS_CLASSES.DOTS_CONTAINER}`).forEach(el => el.remove());
+	setDotThreshold(threshold: number): void {
+		this.dotThreshold = threshold;
+	}
 
-		// Re-apply display mode
-		switch (this.displayMode) {
-			case "heatmap":
-				this.applyHeatmap(dayEl, config, maxCount, dateStr);
-				break;
-			case "dots":
-				this.applyDots(dayEl, config, dateStr);
-				break;
-		}
-
-		// Update aria-label
-		if (config.count > 0 || config.isBeforeToday) {
-			dayEl.setAttribute(ATTRS.ARIA_LABEL, `${dateStr}: ${config.count} notes`);
+	private updateStrategy(): void {
+		if (this.displayMode === "none") {
+			this.strategy = null;
 		} else {
-			dayEl.removeAttribute(ATTRS.ARIA_LABEL);
+			this.strategy = DisplayStrategyFactory.get(this.displayMode) || null;
+		}
+	}
+
+	private cleanupDayDisplay(dayEl: HTMLElement): void {
+		if (this.strategy) {
+			this.strategy.cleanup(dayEl);
 		}
 	}
 
@@ -148,11 +145,9 @@ export class DaysGrid {
 		today: dayjs.Dayjs,
 		maxCount: number
 	): void {
-		const config: DayConfig = {
-			count: this.dateCounts.get(formatDate(date)) || 0,
-			isToday: isSameDay(date, today),
-			isBeforeToday: isBeforeToday(date),
-		};
+		const count = this.dateCounts.get(formatDate(date)) || 0;
+		const isTodayFlag = isSameDay(date, today);
+		const isBeforeTodayFlag = isBeforeToday(date);
 
 		const classes = isOtherMonth
 			? `${CSS_CLASSES.DAY} ${CSS_CLASSES.DAY_OTHER_MONTH}`
@@ -166,75 +161,15 @@ export class DaysGrid {
 			dayEl.addEventListener("click", () => this.onDayClick!(date.toDate()));
 		}
 
-		if (config.isToday) {
+		if (isTodayFlag) {
 			dayEl.addClass(CSS_CLASSES.DAY_TODAY);
 		}
 
-		this.applyDisplayMode(dayEl, date, config, maxCount);
-	}
-
-	private applyDisplayMode(
-		dayEl: HTMLElement,
-		date: dayjs.Dayjs,
-		config: DayConfig,
-		maxCount: number
-	): void {
-		const dateStr = formatDate(date);
-
-		switch (this.displayMode) {
-			case "heatmap":
-				this.applyHeatmap(dayEl, config, maxCount, dateStr);
-				break;
-			case "dots":
-				this.applyDots(dayEl, config, dateStr);
-				break;
+		if (this.strategy) {
+			const config: DayDisplayConfig = { count, isToday: isTodayFlag, isBeforeToday: isBeforeTodayFlag };
+			const context: DisplayContext = { maxCount, dotThreshold: this.dotThreshold, dateStr: formatDate(date) };
+			this.strategy.apply(dayEl, config, context);
 		}
-
-		if (config.isToday && this.displayMode !== "heatmap") {
-			dayEl.addClass(CSS_CLASSES.DAY_TODAY_THEMED);
-		}
-	}
-
-	private applyHeatmap(dayEl: HTMLElement, config: DayConfig, maxCount: number, dateStr: string): void {
-		if (config.count === 0) {
-			if (config.isToday) {
-				this.addTodayIndicator(dayEl);
-			}
-			return;
-		}
-
-		dayEl.addClass(CSS_CLASSES.DAY_HEATMAP);
-		const opacity = calculateHeatmapOpacity(config.count, maxCount);
-		dayEl.style.setProperty(CSS_VARS.HEATMAP_OPACITY, opacity.toFixed(2));
-		dayEl.setAttribute(ATTRS.DATA_COUNT, String(config.count));
-		dayEl.setAttribute(ATTRS.ARIA_LABEL, `${dateStr}: ${config.count} notes`);
-
-		if (config.isToday) {
-			this.addTodayIndicator(dayEl);
-		}
-	}
-
-	private applyDots(dayEl: HTMLElement, config: DayConfig, dateStr: string): void {
-		const container = dayEl.createDiv({ cls: CSS_CLASSES.DOTS_CONTAINER });
-
-		if (config.count > 0) {
-			const numDots = calculateDotCount(config.count, this.dotThreshold, DOTS.MAX_DOTS);
-			for (let i = 0; i < numDots; i++) {
-				container.createDiv({ cls: CSS_CLASSES.DOT });
-			}
-		} else if (config.isBeforeToday) {
-			container.createDiv({ cls: `${CSS_CLASSES.DOT} ${CSS_CLASSES.DOT_GRAY}` });
-		}
-
-		if (config.count > 0 || config.isBeforeToday) {
-			dayEl.setAttribute(ATTRS.ARIA_LABEL, `${dateStr}: ${config.count} notes`);
-		}
-	}
-
-	private addTodayIndicator(dayEl: HTMLElement): void {
-		const indicator = dayEl.createDiv({ cls: CSS_CLASSES.DOTS_CONTAINER });
-		indicator.createDiv({ cls: `${CSS_CLASSES.DOT} ${CSS_CLASSES.DOT_TODAY}` });
-		indicator.setAttribute(ATTRS.ARIA_HIDDEN, "true");
 	}
 
 	private getMaxCount(): number {

@@ -5,3 +5,4 @@ export * from "./modules/language";
 export * from "./modules/basic";
 export * from "./modules/statistics";
 export * from "./modules/click";
+export * from "./ui/index";

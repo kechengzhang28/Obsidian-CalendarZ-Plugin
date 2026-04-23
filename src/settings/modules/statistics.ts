@@ -1,7 +1,13 @@
-import {App, Setting} from "obsidian";
+import { App, Setting } from "obsidian";
 import CalendarZ from "../../main";
-import {IgnoredFoldersModal} from "../../ui/IgnoredFoldersModal";
-import {DateSource, DisplayMode} from "../types";
+import { IgnoredFoldersModal } from "../../ui/IgnoredFoldersModal";
+import { DateSource, DisplayMode } from "../types";
+import { SettingGroup } from "../../ui/components/SettingGroup";
+import {
+	DropdownSettingRenderer,
+	SliderSettingRenderer,
+	TextSettingRenderer,
+} from "../ui/SettingRenderer";
 
 /**
  * Renders statistics settings (display mode, dot threshold, date source, etc.).
@@ -17,95 +23,93 @@ export function renderStatisticsSettings(
 	refreshDisplay: () => void
 ): void {
 	const t = plugin.i18n;
-	const statSetting = containerEl.createDiv({cls: "setting-group"});
 
-	new Setting(statSetting).setClass("setting-item-heading").setName(t.sectionTitles.statistics);
-
-	const statSettingContent = statSetting.createDiv({cls: "setting-items"});
+	const group = new SettingGroup({ title: t.sectionTitles.statistics });
+	group.render(containerEl);
+	const contentEl = group.getContentEl();
+	if (!contentEl) return;
 
 	// Display mode setting
-	new Setting(statSettingContent)
-		.setName(t.settings.displayMode.name)
-		.setDesc(t.settings.displayMode.description)
-		.addDropdown(dropdown => dropdown
-			.addOption("none", t.settings.displayMode.options.none)
-			.addOption("dots", t.settings.displayMode.options.dots)
-			.addOption("heatmap", t.settings.displayMode.options.heatmap)
-			.setValue(plugin.settings.displayMode)
-			.onChange(async (value) => {
-				plugin.settings.displayMode = value as DisplayMode;
-				await plugin.saveSettings();
-				refreshDisplay();
-				plugin.refreshView();
-			}));
+	const displayModeRenderer = new DropdownSettingRenderer<DisplayMode>(plugin, {
+		none: t.settings.displayMode.options.none,
+		dots: t.settings.displayMode.options.dots,
+		heatmap: t.settings.displayMode.options.heatmap,
+	});
+	displayModeRenderer.render(contentEl, {
+		name: t.settings.displayMode.name,
+		description: t.settings.displayMode.description,
+		value: plugin.settings.displayMode,
+		onChange: async (value) => {
+			plugin.settings.displayMode = value;
+			await plugin.saveSettings();
+			refreshDisplay();
+			plugin.refreshView();
+		},
+	});
 
 	// Dot threshold setting (only shown when displayMode is "dots")
 	if (plugin.settings.displayMode === "dots") {
-		new Setting(statSettingContent)
-			.setName(t.settings.dotThreshold.name)
-			.setDesc(t.settings.dotThreshold.description)
-			.addSlider(slider => slider
-				.setLimits(1, 10, 1)
-				.setValue(plugin.settings.dotThreshold)
-				.setDynamicTooltip()
-				.onChange(async (value) => {
-					plugin.settings.dotThreshold = value;
-					await plugin.saveSettings();
-					plugin.refreshView();
-				}));
+		const sliderRenderer = new SliderSettingRenderer(1, 10, 1);
+		sliderRenderer.render(contentEl, {
+			name: t.settings.dotThreshold.name,
+			description: t.settings.dotThreshold.description,
+			value: plugin.settings.dotThreshold,
+			onChange: async (value) => {
+				plugin.settings.dotThreshold = value;
+				await plugin.saveSettings();
+				plugin.refreshView();
+			},
+		});
 	}
 
 	// Date field name setting (for YAML source)
-	new Setting(statSettingContent)
-		.setName(t.settings.dateFieldName.name)
-		.setDesc(t.settings.dateFieldName.description)
-		.addText(text => text
-			.setPlaceholder("Date")
-			.setValue(plugin.settings.dateFieldName)
-			.onChange((value) => {
-				void (async () => {
-					plugin.settings.dateFieldName = value.trim() || "date";
-					await plugin.saveSettings();
-					plugin.refreshView();
-				})();
-			}));
+	const textRenderer = new TextSettingRenderer("date");
+	textRenderer.render(contentEl, {
+		name: t.settings.dateFieldName.name,
+		description: t.settings.dateFieldName.description,
+		value: plugin.settings.dateFieldName,
+		onChange: async (value) => {
+			plugin.settings.dateFieldName = value.trim() || "date";
+			await plugin.saveSettings();
+			plugin.refreshView();
+		},
+	});
 
 	// Date source setting
-	new Setting(statSettingContent)
-		.setName(t.settings.dateSource.name)
-		.setDesc(t.settings.dateSource.description)
-		.addDropdown(dropdown => dropdown
-			.addOption("yaml", t.settings.dateSource.options.yaml)
-			.addOption("filename", t.settings.dateSource.options.filename)
-			.setValue(plugin.settings.dateSource)
-			.onChange(async (value) => {
-				plugin.settings.dateSource = value as DateSource;
-				await plugin.saveSettings();
-				refreshDisplay();
-				plugin.refreshView();
-			}));
+	const dateSourceRenderer = new DropdownSettingRenderer<DateSource>(plugin, {
+		yaml: t.settings.dateSource.options.yaml,
+		filename: t.settings.dateSource.options.filename,
+	});
+	dateSourceRenderer.render(contentEl, {
+		name: t.settings.dateSource.name,
+		description: t.settings.dateSource.description,
+		value: plugin.settings.dateSource,
+		onChange: async (value) => {
+			plugin.settings.dateSource = value;
+			await plugin.saveSettings();
+			refreshDisplay();
+			plugin.refreshView();
+		},
+	});
 
 	// Filename date format setting (only shown when dateSource is "filename")
 	if (plugin.settings.dateSource === "filename") {
-		new Setting(statSettingContent)
-			.setName(t.settings.filenameDateFormat.name)
-			.setDesc(t.settings.filenameDateFormat.description)
-			.addText(text => text
-				// eslint-disable-next-line obsidianmd/ui/sentence-case
-				.setPlaceholder("YYYY-MM-DD")
-				.setValue(plugin.settings.filenameDateFormat)
-				.onChange((value) => {
-					void (async () => {
-						plugin.settings.filenameDateFormat = value.trim() || "YYYY-MM-DD";
-						await plugin.saveSettings();
-						plugin.refreshView();
-					})();
-				}));
+		const filenameFormatRenderer = new TextSettingRenderer("YYYY-MM-DD");
+		filenameFormatRenderer.render(contentEl, {
+			name: t.settings.filenameDateFormat.name,
+			description: t.settings.filenameDateFormat.description,
+			value: plugin.settings.filenameDateFormat,
+			onChange: async (value) => {
+				plugin.settings.filenameDateFormat = value.trim() || "YYYY-MM-DD";
+				await plugin.saveSettings();
+				plugin.refreshView();
+			},
+		});
 	}
 
 	// Ignored folders setting
 	const ignoredFoldersDesc = getIgnoredFoldersDescription(plugin);
-	new Setting(statSettingContent)
+	new Setting(contentEl)
 		.setName(t.settings.ignoredFolders.name)
 		.setDesc(ignoredFoldersDesc)
 		.addButton(button => {
