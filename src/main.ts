@@ -25,7 +25,8 @@ export default class CalendarZ extends Plugin {
 				this.settings.ignoredFolders,
 				this.settings.dateSource,
 				this.settings.filenameDateFormat,
-				this.settings.showHeatmap
+				this.settings.displayMode,
+				this.settings.dotThreshold
 			)
 		);
 
@@ -89,13 +90,13 @@ export default class CalendarZ extends Plugin {
 
 	/**
 	 * Refreshes only the calendar view content without reloading settings.
-	 * Used for updating heatmap when files change.
+	 * Used for updating statistics display when files change.
 	 */
 	refreshCalendarView(): void {
 		const leaves = this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE);
 		leaves.forEach(leaf => {
 			if (leaf.view instanceof CalendarZView) {
-				void leaf.view.refreshHeatmapOnly();
+				void leaf.view.refreshStatsOnly();
 			}
 		});
 	}
@@ -139,7 +140,8 @@ export default class CalendarZ extends Plugin {
 				leaf.view.setIgnoredFolders(this.settings.ignoredFolders);
 				leaf.view.setDateSource(this.settings.dateSource);
 				leaf.view.setFilenameDateFormat(this.settings.filenameDateFormat);
-				leaf.view.setShowHeatmap(this.settings.showHeatmap);
+				leaf.view.setDisplayMode(this.settings.displayMode);
+				leaf.view.setDotThreshold(this.settings.dotThreshold);
 				void leaf.view.refresh();
 			}
 		});

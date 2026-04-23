@@ -5,6 +5,24 @@
 	user-select: none;
 }
 
+/* Day cell with dots - adjust layout */
+.calendarz-day {
+	aspect-ratio: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
+	cursor: pointer;
+	border-radius: 4px;
+	transition: all 0.15s ease;
+	color: var(--text-normal);
+	background-color: transparent;
+	position: relative;
+	padding: 2px;
+	gap: 1px;
+}
+
 .calendarz-header {
 	display: flex;
 	align-items: center;
@@ -75,19 +93,7 @@
 	gap: 2px;
 }
 
-.calendarz-day {
-	aspect-ratio: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 13px;
-	cursor: pointer;
-	border-radius: 4px;
-	transition: all 0.15s ease;
-	color: var(--text-normal);
-	background-color: transparent;
-	position: relative;
-}
+
 
 .calendarz-day:hover {
 	background-color: var(--background-modifier-hover);
@@ -107,6 +113,11 @@
 
 .calendarz-day-today:hover {
 	background-color: var(--background-modifier-hover);
+}
+
+/* Today with theme color (for non-heatmap modes) */
+.calendarz-day-today-themed {
+	color: var(--interactive-accent);
 }
 
 .calendarz-day-other-month {
@@ -134,4 +145,33 @@
 
 .calendarz-day-heatmap:hover::before {
 	filter: brightness(1.1);
+}
+
+/* Today indicator dot for heatmap mode */
+.calendarz-today-indicator {
+	position: absolute;
+	bottom: 3px;
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background-color: var(--text-normal);
+}
+
+/* Dots container for dots mode */
+.calendarz-dots-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 2px;
+	max-width: 24px;
+	margin-top: 1px;
+}
+
+/* Individual dot */
+.calendarz-dot {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background-color: var(--interactive-accent);
+	flex-shrink: 0;
 }

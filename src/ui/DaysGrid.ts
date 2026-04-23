@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { WeekStart } from "../settings";
+import { WeekStart, DisplayMode } from "../settings";
 
 /**
  * Interface representing the count of notes for a specific date
@@ -14,15 +14,17 @@ export interface DateCount {
 /**
  * Renders the days grid for the calendar.
  * Displays days of the current month, plus padding days from previous/next months.
- * Supports heatmap visualization when enabled.
+ * Supports heatmap visualization and dots display modes.
  */
 export class DaysGrid {
 	/** Container element for the grid */
 	private container: HTMLElement;
 	/** Week start preference (sunday or monday) */
 	private weekStart: WeekStart;
-	/** Whether to show heatmap on date cells */
-	private showHeatmap: boolean;
+	/** Display mode for note statistics */
+	private displayMode: DisplayMode;
+	/** Number of notes each dot represents (for dots mode) */
+	private dotThreshold: number;
 	/** Map storing note counts keyed by date string */
 	private dateCounts: Map<string, number> = new Map();
 
@@ -30,12 +32,14 @@ export class DaysGrid {
 	 * Creates a new DaysGrid instance.
 	 * @param container - Parent container element
 	 * @param weekStart - Week start day preference
-	 * @param showHeatmap - Whether to show heatmap visualization
+	 * @param displayMode - Display mode for note statistics
+	 * @param dotThreshold - Number of notes each dot represents
 	 */
-	constructor(container: HTMLElement, weekStart: WeekStart, showHeatmap: boolean) {
+	constructor(container: HTMLElement, weekStart: WeekStart, displayMode: DisplayMode, dotThreshold: number = 1) {
 		this.container = container;
 		this.weekStart = weekStart;
-		this.showHeatmap = showHeatmap;
+		this.displayMode = displayMode;
+		this.dotThreshold = dotThreshold;
 	}
 
 	/**
@@ -84,19 +88,36 @@ export class DaysGrid {
 			dayEl.textContent = day.toString();
 
 			// Check if today
-			if (this.isSameDate(date, today)) {
+			const isToday = this.isSameDate(date, today);
+			if (isToday) {
 				dayEl.addClass("calendarz-day-today");
 			}
 
-			// Apply heatmap styling if enabled
-			if (this.showHeatmap && count > 0) {
+			// Apply display mode specific styling
+			if (this.displayMode === "heatmap" && count > 0) {
 				dayEl.addClass("calendarz-day-heatmap");
 				const intensity = maxCount > 0 ? count / maxCount : 0;
 				const opacity = 0.25 + intensity * 0.75;
-				// Use CSS custom property for opacity, applied to pseudo-element background
 				dayEl.style.setProperty("--heatmap-opacity", opacity.toFixed(2));
 				dayEl.setAttribute("data-count", count.toString());
 				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+			}
+
+			// Add dots for dots mode
+			if (this.displayMode === "dots" && count > 0) {
+				this.renderDots(dayEl, count);
+				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+			}
+
+			// For non-heatmap modes, apply theme color to today's date
+			if (isToday && this.displayMode !== "heatmap") {
+				dayEl.addClass("calendarz-day-today-themed");
+			}
+
+			// Add today indicator dot for heatmap mode
+			if (isToday && this.displayMode === "heatmap") {
+				const todayIndicator = dayEl.createDiv({ cls: "calendarz-today-indicator" });
+				todayIndicator.setAttribute("aria-hidden", "true");
 			}
 		}
 
@@ -124,6 +145,21 @@ export class DaysGrid {
 			}
 		}
 		return max;
+	}
+
+	/**
+	 * Renders dots below the date to represent note count.
+	 * Maximum 4 dots, each representing dotThreshold notes.
+	 * @param dayEl - The day element to add dots to
+	 * @param count - Number of notes for this date
+	 */
+	private renderDots(dayEl: HTMLElement, count: number): void {
+		const dotsContainer = dayEl.createDiv({ cls: "calendarz-dots-container" });
+		const numDots = Math.min(4, Math.ceil(count / this.dotThreshold));
+
+		for (let i = 0; i < numDots; i++) {
+			dotsContainer.createDiv({ cls: "calendarz-dot" });
+		}
 	}
 
 	/**

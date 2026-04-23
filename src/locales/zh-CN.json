@@ -58,9 +58,18 @@
       "name": "文件名日期格式",
       "description": "从文件名中提取日期的格式模式（如：YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD）"
     },
-    "showHeatmap": {
-      "name": "显示热力图",
-      "description": "在日期格子上以彩色背景显示笔记活动强度"
+    "displayMode": {
+      "name": "显示模式",
+      "description": "选择在日历上显示笔记统计的方式",
+      "options": {
+        "heatmap": "热力图",
+        "dots": "点",
+        "none": "无"
+      }
+    },
+    "dotThreshold": {
+      "name": "每点代表笔记数",
+      "description": "每个点代表的笔记数量（1-10）"
     }
   },
   "commands": {

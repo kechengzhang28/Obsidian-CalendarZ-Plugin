@@ -4,7 +4,7 @@ import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
 import {DaysGrid, DateCount} from "./ui/DaysGrid";
-import {TitleFormat, WeekStart, DateSource} from "./settings";
+import {TitleFormat, WeekStart, DateSource, DisplayMode} from "./settings";
 import {getNotesCountByYamlDate, getNotesCountByFilenameDate} from "./utils/GetNotes";
 
 /** Unique identifier for the CalendarZ view type */
@@ -37,8 +37,10 @@ export class CalendarZView extends ItemView {
 	private dateSource: DateSource;
 	/** Date format pattern for filename extraction */
 	private filenameDateFormat: string;
-	/** Whether to show heatmap on date cells */
-	private showHeatmap: boolean;
+	/** Display mode for note statistics */
+	private displayMode: DisplayMode;
+	/** Number of notes each dot represents (for dots mode) */
+	private dotThreshold: number;
 
 	/**
 	 * Creates a new CalendarZView instance.
@@ -52,7 +54,8 @@ export class CalendarZView extends ItemView {
 	 * @param ignoredFolders - Folders to exclude
 	 * @param dateSource - Source of date data
 	 * @param filenameDateFormat - Filename date format pattern
-	 * @param showHeatmap - Whether to show heatmap visualization
+	 * @param displayMode - Display mode for note statistics
+	 * @param dotThreshold - Number of notes each dot represents
 	 */
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -65,7 +68,8 @@ export class CalendarZView extends ItemView {
 		ignoredFolders: string[] = [],
 		dateSource: DateSource = "yaml",
 		filenameDateFormat: string = "YYYY-MM-DD",
-		showHeatmap: boolean = true
+		displayMode: DisplayMode = "heatmap",
+		dotThreshold: number = 1
 	) {
 		super(leaf);
 		this.i18n = i18n;
@@ -77,7 +81,8 @@ export class CalendarZView extends ItemView {
 		this.ignoredFolders = ignoredFolders;
 		this.dateSource = dateSource;
 		this.filenameDateFormat = filenameDateFormat;
-		this.showHeatmap = showHeatmap;
+		this.displayMode = displayMode;
+		this.dotThreshold = dotThreshold;
 	}
 
 	/** Returns the unique view type identifier */
@@ -140,9 +145,14 @@ export class CalendarZView extends ItemView {
 		this.filenameDateFormat = filenameDateFormat;
 	}
 
-	/** Updates the show heatmap setting */
-	setShowHeatmap(showHeatmap: boolean): void {
-		this.showHeatmap = showHeatmap;
+	/** Updates the display mode setting */
+	setDisplayMode(displayMode: DisplayMode): void {
+		this.displayMode = displayMode;
+	}
+
+	/** Updates the dot threshold setting */
+	setDotThreshold(dotThreshold: number): void {
+		this.dotThreshold = dotThreshold;
 	}
 
 	/** Called when the view is opened */
@@ -161,11 +171,11 @@ export class CalendarZView extends ItemView {
 	}
 
 	/**
-	 * Refreshes only the heatmap data without re-rendering the entire calendar.
+	 * Refreshes only the statistics data without re-rendering the entire calendar.
 	 * This avoids flickering when only note counts have changed.
 	 */
-	async refreshHeatmapOnly(): Promise<void> {
-		if (!this.showHeatmap) return;
+	async refreshStatsOnly(): Promise<void> {
+		if (this.displayMode === "none") return;
 
 		const dateCounts = await this.getDateCounts();
 		const dateCountsMap = new Map<string, number>();
@@ -173,7 +183,7 @@ export class CalendarZView extends ItemView {
 			dateCountsMap.set(item.date, item.count);
 		}
 
-		// Find the days grid and update heatmap styling on each day cell
+		// Find the days grid and update styling on each day cell
 		const daysGrid = this.contentEl.querySelector(".calendarz-days");
 		if (!daysGrid) return;
 
@@ -204,8 +214,14 @@ export class CalendarZView extends ItemView {
 			dayEl.removeAttribute("data-count");
 			dayEl.removeAttribute("aria-label");
 
-			// Apply new heatmap styling if count > 0
-			if (count > 0) {
+			// Remove existing dots
+			const existingDots = dayEl.querySelector(".calendarz-dots-container");
+			if (existingDots) {
+				existingDots.remove();
+			}
+
+			// Apply heatmap styling if in heatmap mode
+			if (this.displayMode === "heatmap" && count > 0) {
 				dayEl.addClass("calendarz-day-heatmap");
 				const intensity = maxCount > 0 ? count / maxCount : 0;
 				const opacity = 0.25 + intensity * 0.75;
@@ -213,7 +229,28 @@ export class CalendarZView extends ItemView {
 				dayEl.setAttribute("data-count", count.toString());
 				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
 			}
+
+			// Add dots for dots mode
+			if (this.displayMode === "dots" && count > 0) {
+				this.renderDots(dayEl as HTMLElement, count);
+				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
+			}
 		});
+	}
+
+	/**
+	 * Renders dots below the date to represent note count.
+	 * Maximum 4 dots, each representing dotThreshold notes.
+	 * @param dayEl - The day element to add dots to
+	 * @param count - Number of notes for this date
+	 */
+	private renderDots(dayEl: HTMLElement, count: number): void {
+		const dotsContainer = dayEl.createDiv({ cls: "calendarz-dots-container" });
+		const numDots = Math.min(4, Math.ceil(count / this.dotThreshold));
+
+		for (let i = 0; i < numDots; i++) {
+			dotsContainer.createDiv({ cls: "calendarz-dot" });
+		}
 	}
 
 	/**
@@ -290,13 +327,13 @@ export class CalendarZView extends ItemView {
 		const weekdaysRow = new WeekdaysRow(this.contentEl, this.i18n, this.weekStart);
 		weekdaysRow.render();
 
-		// Get date counts for heatmap if enabled
+		// Get date counts if display mode is not "none"
 		let dateCounts: DateCount[] = [];
-		if (this.showHeatmap) {
+		if (this.displayMode !== "none") {
 			dateCounts = await this.getDateCounts();
 		}
 
-		const daysGrid = new DaysGrid(this.contentEl, this.weekStart, this.showHeatmap);
+		const daysGrid = new DaysGrid(this.contentEl, this.weekStart, this.displayMode, this.dotThreshold);
 		daysGrid.render(this.currentDate, dateCounts);
 	}
 

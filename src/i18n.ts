@@ -81,8 +81,18 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
-		/** Show heatmap setting strings */
-		showHeatmap: {
+		/** Display mode setting strings */
+		displayMode: {
+			name: string;
+			description: string;
+			options: {
+				heatmap: string;
+				dots: string;
+				none: string;
+			};
+		};
+		/** Dot threshold setting strings */
+		dotThreshold: {
 			name: string;
 			description: string;
 		};

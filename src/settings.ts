@@ -11,6 +11,8 @@ export type TitleFormat = "yearMonth" | "monthYear";
 export type WeekStart = "sunday" | "monday";
 /** Date source options for extracting dates from notes */
 export type DateSource = "yaml" | "filename";
+/** Display mode options for note statistics */
+export type DisplayMode = "heatmap" | "dots" | "none";
 
 /**
  * Plugin settings interface.
@@ -33,8 +35,10 @@ export interface CalendarZSettings {
 	dateSource: DateSource;
 	/** Date format pattern for filename extraction (e.g., "YYYY-MM-DD") */
 	filenameDateFormat: string;
-	/** Whether to show heatmap on date cells */
-	showHeatmap: boolean;
+	/** Display mode for note statistics: heatmap, dots, or none */
+	displayMode: DisplayMode;
+	/** Number of notes each dot represents (for dots mode) */
+	dotThreshold: number;
 }
 
 /** Default settings values */
@@ -47,7 +51,8 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	dateFieldName: "date",
 	dateSource: "yaml",
 	filenameDateFormat: "YYYY-MM-DD",
-	showHeatmap: true
+	displayMode: "none",
+	dotThreshold: 1
 };
 
 /**
@@ -137,17 +142,36 @@ export class CalendarZSettingTab extends PluginSettingTab {
 					this.plugin.refreshView();
 				}));
 
-		// Show heatmap setting
+		// Display mode setting
 		new Setting(containerEl)
-			.setName(t.settings.showHeatmap.name)
-			.setDesc(t.settings.showHeatmap.description)
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.showHeatmap)
+			.setName(t.settings.displayMode.name)
+			.setDesc(t.settings.displayMode.description)
+			.addDropdown(dropdown => dropdown
+				.addOption("heatmap", t.settings.displayMode.options.heatmap)
+				.addOption("dots", t.settings.displayMode.options.dots)
+				.addOption("none", t.settings.displayMode.options.none)
+				.setValue(this.plugin.settings.displayMode)
 				.onChange(async (value) => {
-					this.plugin.settings.showHeatmap = value;
+					this.plugin.settings.displayMode = value as DisplayMode;
 					await this.plugin.saveSettings();
 					this.plugin.refreshView();
 				}));
+
+		// Dot threshold setting (only shown when displayMode is "dots")
+		if (this.plugin.settings.displayMode === "dots") {
+			new Setting(containerEl)
+				.setName(t.settings.dotThreshold.name)
+				.setDesc(t.settings.dotThreshold.description)
+				.addSlider(slider => slider
+					.setLimits(1, 10, 1)
+					.setValue(this.plugin.settings.dotThreshold)
+					.setDynamicTooltip()
+					.onChange(async (value) => {
+						this.plugin.settings.dotThreshold = value;
+						await this.plugin.saveSettings();
+						this.plugin.refreshView();
+					}));
+		}
 
 		// Date field name setting (for YAML source)
 		new Setting(containerEl)
