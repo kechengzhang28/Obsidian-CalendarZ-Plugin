@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { WeekStart, DisplayMode } from "../settings";
+import { WeekStart, DisplayMode } from "../settings/index";
 
 /**
  * Interface representing the count of notes for a specific date

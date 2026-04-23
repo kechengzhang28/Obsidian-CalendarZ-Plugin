@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { I18n } from "../i18n";
-import { TitleFormat } from "../settings";
+import { TitleFormat } from "../settings/index";
 
 /** Callback functions for calendar header navigation */
 export interface CalendarHeaderCallbacks {

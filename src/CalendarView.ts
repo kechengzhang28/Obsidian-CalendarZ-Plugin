@@ -4,7 +4,7 @@ import {I18n} from "./i18n";
 import {CalendarHeader} from "./ui/CalendarHeader";
 import {WeekdaysRow} from "./ui/WeekdaysRow";
 import {DaysGrid, DateCount} from "./ui/DaysGrid";
-import {TitleFormat, WeekStart, DateSource, DisplayMode} from "./settings";
+import {TitleFormat, WeekStart, DateSource, DisplayMode} from "./settings/index";
 import {getNotesCountByYamlDate, getNotesCountByFilenameDate} from "./utils/GetNotes";
 
 /** Unique identifier for the CalendarZ view type */

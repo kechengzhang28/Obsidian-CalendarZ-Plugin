@@ -1,4 +1,4 @@
-import {Language} from "./settings";
+import {Language} from "./settings/index";
 
 // Import locale files
 import enUS from "./locales/en-US.json";
