@@ -1,5 +1,19 @@
 import dayjs from "dayjs";
-import { WeekStart, DisplayMode } from "../settings/index";
+import { WeekStart, DisplayMode } from "../settings/types";
+import {
+	formatDate,
+	isSameDay,
+	isBeforeToday,
+	getYearMonth,
+	getDaysInMonth,
+	getPreviousMonthLastDay,
+	calculateHeatmapOpacity,
+	calculateDotCount,
+	calculatePaddingDays,
+	calculateNextMonthDays,
+	getAdjacentMonth,
+} from "../utils/dateUtils";
+import { CSS_CLASSES, CSS_VARS, ATTRS, DOTS } from "../constants";
 
 /**
  * Interface representing the count of notes for a specific date
@@ -11,31 +25,31 @@ export interface DateCount {
 	count: number;
 }
 
+/** Configuration for rendering dots */
+interface DotsConfig {
+	count: number;
+	isToday: boolean;
+	isBeforeToday: boolean;
+}
+
 /**
  * Renders the days grid for the calendar.
  * Displays days of the current month, plus padding days from previous/next months.
  * Supports heatmap visualization and dots display modes.
  */
 export class DaysGrid {
-	/** Container element for the grid */
 	private container: HTMLElement;
-	/** Week start preference (sunday or monday) */
 	private weekStart: WeekStart;
-	/** Display mode for note statistics */
 	private displayMode: DisplayMode;
-	/** Number of notes each dot represents (for dots mode) */
 	private dotThreshold: number;
-	/** Map storing note counts keyed by date string */
 	private dateCounts: Map<string, number> = new Map();
 
-	/**
-	 * Creates a new DaysGrid instance.
-	 * @param container - Parent container element
-	 * @param weekStart - Week start day preference
-	 * @param displayMode - Display mode for note statistics
-	 * @param dotThreshold - Number of notes each dot represents
-	 */
-	constructor(container: HTMLElement, weekStart: WeekStart, displayMode: DisplayMode, dotThreshold: number = 1) {
+	constructor(
+		container: HTMLElement,
+		weekStart: WeekStart,
+		displayMode: DisplayMode,
+		dotThreshold: number = 1
+	) {
 		this.container = container;
 		this.weekStart = weekStart;
 		this.displayMode = displayMode;
@@ -48,179 +62,237 @@ export class DaysGrid {
 	 * @param dateCounts - Array of date-count pairs for heatmap (optional)
 	 */
 	render(currentDate: Date, dateCounts?: DateCount[]): void {
-		// Clear previous data and populate the date counts map
-		this.dateCounts.clear();
-		if (dateCounts) {
-			for (const item of dateCounts) {
-				this.dateCounts.set(item.date, item.count);
-			}
-		}
+		this.initializeDateCounts(dateCounts);
 
-		const daysGrid = this.container.createDiv({ cls: "calendarz-days" });
-
-		const current = dayjs(currentDate);
-		const year = current.year();
-		const month = current.month();
-
-		const firstDay = dayjs(new Date(year, month, 1));
-		const lastDay = dayjs(new Date(year, month + 1, 0));
-		const daysInMonth = lastDay.date();
-		const startingDayOfWeek = this.getAdjustedDayOfWeek(firstDay.day());
-
-		const today = dayjs();
+		const daysGrid = this.container.createDiv({ cls: CSS_CLASSES.DAYS });
+		const { year, month } = getYearMonth(currentDate);
+		const daysInMonth = getDaysInMonth(year, month);
+		const paddingDays = calculatePaddingDays(year, month, this.weekStart);
 		const maxCount = this.getMaxCount();
+		const today = dayjs();
 
-		// Render padding days from previous month
-		const prevMonthLastDay = dayjs(new Date(year, month, 0)).date();
-		const prevMonth = month === 0 ? 11 : month - 1;
-		const prevYear = month === 0 ? year - 1 : year;
-		for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-			const prevDay = prevMonthLastDay - i;
-			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
-			dayEl.textContent = prevDay.toString();
+		this.renderPreviousMonthDays(daysGrid, year, month, paddingDays, today);
+		this.renderCurrentMonthDays(daysGrid, year, month, daysInMonth, paddingDays, maxCount, today);
+		this.renderNextMonthDays(daysGrid, year, month, paddingDays, daysInMonth, today);
+	}
 
-			// Add dots for dots mode
-			if (this.displayMode === "dots") {
-				const date = dayjs(new Date(prevYear, prevMonth, prevDay));
-				const dateStr = date.format("YYYY-MM-DD");
-				const count = this.dateCounts.get(dateStr) || 0;
-				const isToday = this.isSameDate(date, today);
-				const isBeforeToday = date.isBefore(today, "day");
-				this.renderDots(dayEl, count, isToday, isBeforeToday);
-			}
+	/**
+	 * Initializes the date counts map from array.
+	 */
+	private initializeDateCounts(dateCounts?: DateCount[]): void {
+		this.dateCounts.clear();
+		if (!dateCounts) return;
+
+		for (const item of dateCounts) {
+			this.dateCounts.set(item.date, item.count);
 		}
+	}
 
-		// Render days of current month
-		for (let day = 1; day <= daysInMonth; day++) {
-			const date = dayjs(new Date(year, month, day));
-			const dateStr = date.format("YYYY-MM-DD");
-			const count = this.dateCounts.get(dateStr) || 0;
+	/**
+	 * Renders padding days from the previous month.
+	 */
+	private renderPreviousMonthDays(
+		daysGrid: HTMLElement,
+		year: number,
+		month: number,
+		paddingDays: number,
+		today: dayjs.Dayjs
+	): void {
+		if (paddingDays === 0) return;
 
-			const dayEl = daysGrid.createDiv({ cls: "calendarz-day" });
-			dayEl.textContent = day.toString();
+		const prevMonthLastDay = getPreviousMonthLastDay(year, month);
+		const { year: prevYear, month: prevMonth } = getAdjacentMonth(year, month, -1);
 
-			// Check if today
-			const isToday = this.isSameDate(date, today);
-			const isBeforeToday = date.isBefore(today, "day");
-			if (isToday) {
-				dayEl.addClass("calendarz-day-today");
-			}
+		for (let i = paddingDays - 1; i >= 0; i--) {
+			const day = prevMonthLastDay - i;
+			const dayEl = this.createDayElement(daysGrid, day, true);
 
-			// Apply display mode specific styling
-			if (this.displayMode === "heatmap" && count > 0) {
-				dayEl.addClass("calendarz-day-heatmap");
-				const intensity = maxCount > 0 ? count / maxCount : 0;
-				const opacity = 0.25 + intensity * 0.75;
-				dayEl.style.setProperty("--heatmap-opacity", opacity.toFixed(2));
-				dayEl.setAttribute("data-count", count.toString());
-				dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
-			}
-
-			// Add dots for dots mode
 			if (this.displayMode === "dots") {
-				this.renderDots(dayEl, count, isToday, isBeforeToday);
-				if (count > 0 || isBeforeToday) {
-					dayEl.setAttribute("aria-label", `${dateStr}: ${count} notes`);
-				}
-			}
-
-			// For non-heatmap modes, apply theme color to today's date
-			if (isToday && this.displayMode !== "heatmap") {
-				dayEl.addClass("calendarz-day-today-themed");
-			}
-
-			// Add today indicator dot for heatmap mode
-			if (isToday && this.displayMode === "heatmap") {
-				const todayIndicator = dayEl.createDiv({ cls: "calendarz-dots-container" });
-				todayIndicator.createDiv({ cls: "calendarz-dot today" });
-				todayIndicator.setAttribute("aria-hidden", "true");
-			}
-		}
-
-		// Render padding days from next month (to fill 6 rows)
-		const totalCells = 42;
-		const currentCells = startingDayOfWeek + daysInMonth;
-		const nextMonthDays = totalCells - currentCells;
-		const nextMonth = month === 11 ? 0 : month + 1;
-		const nextYear = month === 11 ? year + 1 : year;
-
-		for (let day = 1; day <= nextMonthDays; day++) {
-			const dayEl = daysGrid.createDiv({ cls: "calendarz-day calendarz-day-other-month" });
-			dayEl.textContent = day.toString();
-
-			// Add dots for dots mode
-			if (this.displayMode === "dots") {
-				const date = dayjs(new Date(nextYear, nextMonth, day));
-				const dateStr = date.format("YYYY-MM-DD");
-				const count = this.dateCounts.get(dateStr) || 0;
-				const isToday = this.isSameDate(date, today);
-				const isBeforeToday = date.isBefore(today, "day");
-				this.renderDots(dayEl, count, isToday, isBeforeToday);
+				const date = dayjs(new Date(prevYear, prevMonth, day));
+				this.renderDotsIfNeeded(dayEl, date, today);
 			}
 		}
 	}
 
 	/**
-	 * Finds the maximum note count in the current dataset
-	 * Used for normalizing opacity levels
-	 * @returns The highest note count value
+	 * Renders days of the current month.
 	 */
-	private getMaxCount(): number {
-		let max = 0;
-		for (const count of this.dateCounts.values()) {
-			if (count > max) {
-				max = count;
+	private renderCurrentMonthDays(
+		daysGrid: HTMLElement,
+		year: number,
+		month: number,
+		daysInMonth: number,
+		paddingDays: number,
+		maxCount: number,
+		today: dayjs.Dayjs
+	): void {
+		for (let day = 1; day <= daysInMonth; day++) {
+			const date = dayjs(new Date(year, month, day));
+			const dayEl = this.createDayElement(daysGrid, day, false);
+
+			const config = this.createDayConfig(date, today);
+
+			if (config.isToday) {
+				dayEl.addClass(CSS_CLASSES.DAY_TODAY);
+			}
+
+			this.applyDisplayMode(dayEl, date, config, maxCount);
+		}
+	}
+
+	/**
+	 * Renders padding days from the next month.
+	 */
+	private renderNextMonthDays(
+		daysGrid: HTMLElement,
+		year: number,
+		month: number,
+		paddingDays: number,
+		daysInMonth: number,
+		today: dayjs.Dayjs
+	): void {
+		const nextMonthDays = calculateNextMonthDays(paddingDays, daysInMonth);
+		if (nextMonthDays <= 0) return;
+
+		const { year: nextYear, month: nextMonth } = getAdjacentMonth(year, month, 1);
+
+		for (let day = 1; day <= nextMonthDays; day++) {
+			const dayEl = this.createDayElement(daysGrid, day, true);
+
+			if (this.displayMode === "dots") {
+				const date = dayjs(new Date(nextYear, nextMonth, day));
+				this.renderDotsIfNeeded(dayEl, date, today);
 			}
 		}
-		return max;
+	}
+
+	/**
+	 * Creates a day element with appropriate classes.
+	 */
+	private createDayElement(daysGrid: HTMLElement, day: number, isOtherMonth: boolean): HTMLElement {
+		const classes = isOtherMonth
+			? `${CSS_CLASSES.DAY} ${CSS_CLASSES.DAY_OTHER_MONTH}`
+			: CSS_CLASSES.DAY;
+		const dayEl = daysGrid.createDiv({ cls: classes });
+		dayEl.textContent = day.toString();
+		return dayEl;
+	}
+
+	/**
+	 * Creates configuration for a day's display state.
+	 */
+	private createDayConfig(date: dayjs.Dayjs, today: dayjs.Dayjs): DotsConfig {
+		return {
+			count: this.getDateCount(date),
+			isToday: isSameDay(date, today),
+			isBeforeToday: isBeforeToday(date),
+		};
+	}
+
+	/**
+	 * Applies display mode specific styling to a day element.
+	 */
+	private applyDisplayMode(
+		dayEl: HTMLElement,
+		date: dayjs.Dayjs,
+		config: DotsConfig,
+		maxCount: number
+	): void {
+		const dateStr = formatDate(date);
+
+		if (this.displayMode === "heatmap") {
+			this.applyHeatmapMode(dayEl, date, config, maxCount, dateStr);
+		} else if (this.displayMode === "dots") {
+			this.applyDotsMode(dayEl, date, config, dateStr);
+		}
+
+		// Apply themed today styling for non-heatmap modes
+		if (config.isToday && this.displayMode !== "heatmap") {
+			dayEl.addClass(CSS_CLASSES.DAY_TODAY_THEMED);
+		}
+	}
+
+	/**
+	 * Applies heatmap mode styling.
+	 */
+	private applyHeatmapMode(
+		dayEl: HTMLElement,
+		date: dayjs.Dayjs,
+		config: DotsConfig,
+		maxCount: number,
+		dateStr: string
+	): void {
+		if (config.count > 0) {
+			dayEl.addClass(CSS_CLASSES.DAY_HEATMAP);
+			const opacity = calculateHeatmapOpacity(config.count, maxCount);
+			dayEl.style.setProperty(CSS_VARS.HEATMAP_OPACITY, opacity.toFixed(2));
+			dayEl.setAttribute(ATTRS.DATA_COUNT, config.count.toString());
+			dayEl.setAttribute(ATTRS.ARIA_LABEL, `${dateStr}: ${config.count} notes`);
+		}
+
+		// Add today indicator dot for heatmap mode
+		if (config.isToday) {
+			const todayIndicator = dayEl.createDiv({ cls: CSS_CLASSES.DOTS_CONTAINER });
+			todayIndicator.createDiv({ cls: `${CSS_CLASSES.DOT} ${CSS_CLASSES.DOT_TODAY}` });
+			todayIndicator.setAttribute(ATTRS.ARIA_HIDDEN, "true");
+		}
+	}
+
+	/**
+	 * Applies dots mode styling.
+	 */
+	private applyDotsMode(dayEl: HTMLElement, date: dayjs.Dayjs, config: DotsConfig, dateStr: string): void {
+		this.renderDots(dayEl, config);
+		if (config.count > 0 || config.isBeforeToday) {
+			dayEl.setAttribute(ATTRS.ARIA_LABEL, `${dateStr}: ${config.count} notes`);
+		}
+	}
+
+	/**
+	 * Renders dots for a day element if in dots mode.
+	 */
+	private renderDotsIfNeeded(dayEl: HTMLElement, date: dayjs.Dayjs, today: dayjs.Dayjs): void {
+		if (this.displayMode !== "dots") return;
+
+		const config: DotsConfig = {
+			count: this.getDateCount(date),
+			isToday: isSameDay(date, today),
+			isBeforeToday: isBeforeToday(date),
+		};
+		this.renderDots(dayEl, config);
 	}
 
 	/**
 	 * Renders dots below the date to represent note count.
-	 * Maximum 4 dots, each representing dotThreshold notes.
-	 * For dates before today: show dots if notes exist, otherwise show a gray dot.
-	 * For today: show dots only if notes exist.
-	 * @param dayEl - The day element to add dots to
-	 * @param count - Number of notes for this date
-	 * @param isToday - Whether this date is today
-	 * @param isBeforeToday - Whether this date is before today
 	 */
-	private renderDots(dayEl: HTMLElement, count: number, isToday: boolean, isBeforeToday: boolean): void {
-		const dotsContainer = dayEl.createDiv({ cls: "calendarz-dots-container" });
+	private renderDots(dayEl: HTMLElement, config: DotsConfig): void {
+		const dotsContainer = dayEl.createDiv({ cls: CSS_CLASSES.DOTS_CONTAINER });
 
-		if (count > 0) {
-			// Has notes: show colored dots
-			const numDots = Math.min(4, Math.ceil(count / this.dotThreshold));
+		if (config.count > 0) {
+			const numDots = calculateDotCount(config.count, this.dotThreshold, DOTS.MAX_DOTS);
 			for (let i = 0; i < numDots; i++) {
-				dotsContainer.createDiv({ cls: "calendarz-dot" });
+				dotsContainer.createDiv({ cls: CSS_CLASSES.DOT });
 			}
-		} else if (isBeforeToday) {
-			// No notes but before today: show gray dot
-			dotsContainer.createDiv({ cls: "calendarz-dot calendarz-dot-gray" });
+		} else if (config.isBeforeToday) {
+			dotsContainer.createDiv({ cls: `${CSS_CLASSES.DOT} ${CSS_CLASSES.DOT_GRAY}` });
 		}
-		// Today with no notes: show nothing
 	}
 
 	/**
-	 * Checks if two dates represent the same day.
-	 * @param date1 - First date to compare
-	 * @param date2 - Second date to compare
-	 * @returns true if dates are the same day
+	 * Gets the note count for a specific date.
 	 */
-	private isSameDate(date1: dayjs.Dayjs, date2: dayjs.Dayjs): boolean {
-		return date1.isSame(date2, "day");
+	private getDateCount(date: dayjs.Dayjs): number {
+		return this.dateCounts.get(formatDate(date)) || 0;
 	}
 
 	/**
-	 * Adjusts day of week based on week start preference.
-	 * Converts Sunday-based (0-6) to Monday-based (0-6) if needed.
-	 * @param dayOfWeek - Original day of week (0 = Sunday, 6 = Saturday)
-	 * @returns Adjusted day of week (0 = first day based on preference)
+	 * Finds the maximum note count in the current dataset.
 	 */
-	private getAdjustedDayOfWeek(dayOfWeek: number): number {
-		if (this.weekStart === "monday") {
-			return dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+	private getMaxCount(): number {
+		let max = 0;
+		for (const count of this.dateCounts.values()) {
+			if (count > max) max = count;
 		}
-		return dayOfWeek;
+		return max;
 	}
 }
