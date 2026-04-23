@@ -100,13 +100,12 @@
 }
 
 .calendarz-day-today {
-	background-color: var(--interactive-accent);
-	color: var(--text-on-accent);
-	font-weight: 600;
+	color: var(--interactive-accent) !important;
+	font-weight: 700;
 }
 
 .calendarz-day-today:hover {
-	background-color: var(--interactive-accent-hover);
+	background-color: var(--background-modifier-hover);
 }
 
 .calendarz-day-other-month {
@@ -117,10 +116,6 @@
 /* Dark theme adjustments */
 .theme-dark .calendarz-day {
 	color: var(--text-normal);
-}
-
-.theme-dark .calendarz-day-today {
-	background-color: var(--interactive-accent);
 }
 
 /* HeatMap Styles */
