@@ -8,14 +8,14 @@ import { ConfirmModal } from "./ui/ConfirmModal";
 import { TitleFormat, WeekStart, DateSource, DisplayMode } from "./settings/index";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/GetNotes";
 import { formatDate, isSameDay, getYearMonth } from "./utils/dateUtils";
-import { createDailyNote } from "./utils/createNote";
+import { createDailyNote, findDailyNote } from "./utils/createNote";
 import { CSS_CLASSES } from "./constants";
 import CalendarZ from "./main";
 
 /** Unique identifier for the CalendarZ view type */
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
-/** Settings interface for CalendarZView constructor */
+/** Settings interface for CalendarZViewView constructor */
 export interface CalendarZViewSettings {
 	monthFormat: string;
 	language: string;
@@ -372,7 +372,7 @@ export class CalendarZView extends ItemView {
 	 */
 	private async handleDayClick(date: Date): Promise<void> {
 		const dateStr = dayjs(date).format("YYYY-MM-DD");
-		const existingNote = await this.findDailyNote(date);
+		const existingNote = findDailyNote(date);
 
 		if (existingNote) {
 			// Open existing note
@@ -399,32 +399,7 @@ export class CalendarZView extends ItemView {
 		}
 	}
 
-	/**
-	 * Finds an existing daily note for the given date.
-	 */
-	private async findDailyNote(date: Date): Promise<TFile | null> {
-		const dateStr = dayjs(date).format("YYYY-MM-DD");
-		const files = this.app.vault.getMarkdownFiles();
 
-		for (const file of files) {
-			// Check if filename contains the date
-			if (file.basename.includes(dateStr)) {
-				return file;
-			}
-			// Check YAML frontmatter if using yaml date source
-			if (this.settings.dateSource === "yaml") {
-				const cache = this.app.metadataCache.getFileCache(file);
-				if (cache?.frontmatter?.[this.settings.dateFieldName]) {
-					const fileDate = cache.frontmatter[this.settings.dateFieldName];
-					if (fileDate === dateStr) {
-						return file;
-					}
-				}
-			}
-		}
-
-		return null;
-	}
 
 	/**
 	 * Creates or opens a daily note for the given date using the core Daily Notes plugin.

@@ -1,4 +1,4 @@
-import {Notice} from "obsidian";
+import {Notice, TFile} from "obsidian";
 import {
 	createDailyNote as createDailyNoteInterface,
 	appHasDailyNotesPluginLoaded,
@@ -7,6 +7,27 @@ import {
 } from "obsidian-daily-notes-interface";
 import moment from "moment";
 import CalendarZ from "../main";
+
+/**
+ * Finds an existing daily note for the given date using the core Daily Notes plugin.
+ * This strictly follows the Daily Notes plugin's matching method based on filename format.
+ * @param date - The date for which to find the daily note
+ * @returns The existing TFile if found, null otherwise
+ */
+export function findDailyNote(date: Date): TFile | null {
+	// Check if daily notes plugin is enabled
+	if (!appHasDailyNotesPluginLoaded()) {
+		return null;
+	}
+
+	// Use obsidian-daily-notes-interface to find the daily note
+	// This follows the core plugin's matching method (filename format only)
+	const allDailyNotes = getAllDailyNotes();
+	const existingNote = getDailyNote(moment(date), allDailyNotes);
+
+	// Cast to TFile since the types are compatible at runtime
+	return existingNote as TFile | null;
+}
 
 /**
  * Creates or opens a daily note for the given date using the core Daily Notes plugin.
@@ -26,8 +47,7 @@ export async function createDailyNote(plugin: CalendarZ, date: Date): Promise<vo
 		}
 
 		// Get all daily notes and find the note for the specific date
-		const allDailyNotes = getAllDailyNotes();
-		const existingNote = getDailyNote(moment(date), allDailyNotes);
+		const existingNote = findDailyNote(date);
 
 		// If note exists, open it
 		if (existingNote) {
