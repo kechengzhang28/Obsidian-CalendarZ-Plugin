@@ -102,7 +102,6 @@
 }
 
 .calendarz-day-today {
-	color: var(--interactive-accent) !important;
 	font-weight: 700;
 }
 
@@ -117,7 +116,7 @@
 
 /* Heatmap Styles - integrated into date cells */
 .calendarz-day-heatmap {
-	color: var(--text-on-accent);
+	color: var(--text-normal);
 }
 
 .calendarz-day-heatmap::before {
@@ -135,13 +134,4 @@
 
 .calendarz-day-heatmap:hover::before {
 	filter: brightness(1.1);
-}
-
-/* Dark theme adjustments */
-.theme-dark .calendarz-day {
-	color: var(--text-normal);
-}
-
-.theme-dark .calendarz-day-heatmap {
-	color: var(--text-on-accent);
 }
