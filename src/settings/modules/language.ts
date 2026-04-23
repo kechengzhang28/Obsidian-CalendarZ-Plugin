@@ -1,17 +1,17 @@
 import { Setting } from "obsidian";
-import CalendarZ from "../../main";
+import { PluginLike } from "../../types";
 import { Language } from "../types";
 import { SettingGroup } from "../../ui/components/SettingGroup";
 
 /**
  * Renders language settings.
  * @param containerEl - Container element
- * @param plugin - CalendarZ plugin instance
+ * @param plugin - Plugin instance
  * @param refreshDisplay - Callback to refresh the settings display
  */
 export function renderLanguageSettings(
 	containerEl: HTMLElement,
-	plugin: CalendarZ,
+	plugin: PluginLike,
 	refreshDisplay: () => void
 ): void {
 	const group = new SettingGroup({ title: "" });
@@ -21,6 +21,7 @@ export function renderLanguageSettings(
 
 	const t = plugin.i18n;
 
+	// Language setting with special handling (needs to reload i18n)
 	new Setting(contentEl)
 		.setName(t.settings.language.name)
 		.setDesc(t.settings.language.description)
@@ -36,6 +37,7 @@ export function renderLanguageSettings(
 				plugin.refreshView();
 			}));
 
+	// Open calendar button
 	new Setting(contentEl)
 		.setName(t.settings.openCalendar.name)
 		.setDesc(t.settings.openCalendar.description)
@@ -45,6 +47,7 @@ export function renderLanguageSettings(
 				void plugin.activateView();
 			}));
 
+	// Refresh plugin button
 	new Setting(contentEl)
 		.setName(t.settings.refreshPlugin.name)
 		.setDesc(t.settings.refreshPlugin.description)

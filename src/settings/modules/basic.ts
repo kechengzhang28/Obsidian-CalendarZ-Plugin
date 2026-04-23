@@ -1,16 +1,15 @@
-import CalendarZ from "../../main";
+import { PluginLike } from "../../types";
 import { MonthFormat, TitleFormat, WeekStart } from "../types";
 import { SettingGroup } from "../../ui/components/SettingGroup";
-import {
-	DropdownSettingRenderer,
-} from "../ui/SettingRenderer";
+import { DropdownSettingRenderer } from "../ui/SettingRenderer";
+import { createTypedSettingHandler } from "../settingUtils";
 
 /**
  * Renders basic settings (month format, title format, week start).
  * @param containerEl - Container element
- * @param plugin - CalendarZ plugin instance
+ * @param plugin - Plugin instance
  */
-export function renderBasicSettings(containerEl: HTMLElement, plugin: CalendarZ): void {
+export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike): void {
 	const t = plugin.i18n;
 
 	const group = new SettingGroup({ title: t.sectionTitles.basic });
@@ -24,15 +23,12 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: CalendarZ)
 		short: t.settings.monthFormat.options.short,
 		long: t.settings.monthFormat.options.long,
 	});
+	const handleMonthFormatChange = createTypedSettingHandler(plugin, "monthFormat");
 	monthFormatRenderer.render(contentEl, {
 		name: t.settings.monthFormat.name,
 		description: t.settings.monthFormat.description,
 		value: plugin.settings.monthFormat,
-		onChange: async (value) => {
-			plugin.settings.monthFormat = value;
-			await plugin.saveSettings();
-			plugin.refreshView();
-		},
+		onChange: handleMonthFormatChange,
 	});
 
 	// Title format setting
@@ -40,15 +36,12 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: CalendarZ)
 		yearMonth: t.settings.titleFormat.options.yearMonth,
 		monthYear: t.settings.titleFormat.options.monthYear,
 	});
+	const handleTitleFormatChange = createTypedSettingHandler(plugin, "titleFormat");
 	titleFormatRenderer.render(contentEl, {
 		name: t.settings.titleFormat.name,
 		description: t.settings.titleFormat.description,
 		value: plugin.settings.titleFormat,
-		onChange: async (value) => {
-			plugin.settings.titleFormat = value;
-			await plugin.saveSettings();
-			plugin.refreshView();
-		},
+		onChange: handleTitleFormatChange,
 	});
 
 	// Week start setting
@@ -56,14 +49,11 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: CalendarZ)
 		sunday: t.settings.weekStart.options.sunday,
 		monday: t.settings.weekStart.options.monday,
 	});
+	const handleWeekStartChange = createTypedSettingHandler(plugin, "weekStart");
 	weekStartRenderer.render(contentEl, {
 		name: t.settings.weekStart.name,
 		description: t.settings.weekStart.description,
 		value: plugin.settings.weekStart,
-		onChange: async (value) => {
-			plugin.settings.weekStart = value;
-			await plugin.saveSettings();
-			plugin.refreshView();
-		},
+		onChange: handleWeekStartChange,
 	});
 }

@@ -13,7 +13,7 @@ export default class CalendarZ extends Plugin {
 
 		this.registerView(
 			CALENDARZ_VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n, this.settings, this)
+			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this)
 		);
 
 		this.addCommand({
@@ -56,7 +56,7 @@ export default class CalendarZ extends Plugin {
 	}
 
 	refreshView(): void {
-		this.forEachView(v => v.updateSettings(this.i18n, this.settings));
+		this.forEachView(v => v.updateSettings());
 	}
 
 	async activateView(): Promise<void> {

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { WeekStart } from "../../settings/types";
-import { DAY_OF_WEEK, GRID, HEATMAP } from "../../constants";
+import { DAY_OF_WEEK, HEATMAP } from "../../constants";
 
 /**
  * Checks if a date is before today

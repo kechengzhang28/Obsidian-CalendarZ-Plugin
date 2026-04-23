@@ -5,26 +5,36 @@ import { CalendarHeader } from "./ui/CalendarHeader";
 import { WeekdaysRow } from "./ui/WeekdaysRow";
 import { DaysGrid, DateCount } from "./ui/DaysGrid";
 import { ConfirmModal } from "./ui/ConfirmModal";
-import { CalendarZSettings, DEFAULT_SETTINGS } from "./settings/index";
+import { CalendarZSettings } from "./settings/index";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/GetNotes";
-import { createDailyNote, findDailyNote } from "./utils/createNote";
-import { CSS_CLASSES, ATTRS } from "./constants";
+import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
+import { CSS_CLASSES, ATTRS, DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
 import CalendarZ from "./main";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
 export class CalendarZView extends ItemView {
 	private currentDate = new Date();
-	private i18n: I18n;
-	private settings: CalendarZSettings;
 	private plugin: CalendarZ;
 	private daysGrid: DaysGrid | null = null;
 
-	constructor(leaf: WorkspaceLeaf, i18n: I18n, settings: CalendarZSettings, plugin: CalendarZ) {
+	constructor(leaf: WorkspaceLeaf, plugin: CalendarZ) {
 		super(leaf);
-		this.i18n = i18n;
-		this.settings = { ...DEFAULT_SETTINGS, ...settings };
 		this.plugin = plugin;
+	}
+
+	/**
+	 * Gets the plugin settings
+	 */
+	private get settings(): CalendarZSettings {
+		return this.plugin.settings;
+	}
+
+	/**
+	 * Gets the i18n strings
+	 */
+	private get i18n(): I18n {
+		return this.plugin.i18n;
 	}
 
 	getViewType(): string {
@@ -39,9 +49,10 @@ export class CalendarZView extends ItemView {
 		return "calendar";
 	}
 
-	updateSettings(i18n: I18n, settings: CalendarZSettings): void {
-		this.i18n = i18n;
-		this.settings = settings;
+	/**
+	 * Updates the view when settings change
+	 */
+	updateSettings(): void {
 		void this.renderCalendar();
 	}
 
@@ -54,7 +65,7 @@ export class CalendarZView extends ItemView {
 	}
 
 	async refreshStatsOnly(): Promise<void> {
-		if (this.settings.displayMode === "none") return;
+		if (this.settings.displayMode === DISPLAY_MODE.NONE) return;
 
 		const dateCounts = await this.fetchDateCounts();
 		if (this.daysGrid) {
@@ -74,11 +85,11 @@ export class CalendarZView extends ItemView {
 			return;
 		}
 
-		const todayStr = today.format("YYYY-MM-DD");
+		const todayStr = today.format(DATE_FORMAT);
 		this.contentEl.querySelectorAll(`.${CSS_CLASSES.DAY}`).forEach(el => {
 			const isToday = el.getAttribute(ATTRS.DATA_DATE) === todayStr;
 			el.toggleClass(CSS_CLASSES.DAY_TODAY, isToday);
-			if (this.settings.displayMode !== "heatmap") {
+			if (this.settings.displayMode !== DISPLAY_MODE.HEATMAP) {
 				el.toggleClass(CSS_CLASSES.DAY_TODAY_THEMED, isToday);
 			}
 		});
@@ -88,22 +99,23 @@ export class CalendarZView extends ItemView {
 		this.contentEl.empty();
 		this.contentEl.addClass(CSS_CLASSES.CONTAINER);
 
-		new CalendarHeader(
-			this.contentEl,
-			this.i18n,
-			this.settings.monthFormat,
-			this.settings.language,
-			this.settings.titleFormat,
-			{
+		const header = new CalendarHeader({
+			i18n: this.i18n,
+			monthFormat: this.settings.monthFormat,
+			language: this.settings.language,
+			titleFormat: this.settings.titleFormat,
+			callbacks: {
 				onPrevMonth: () => this.navigateMonth(-1),
 				onNextMonth: () => this.navigateMonth(1),
 				onToday: () => this.goToToday(),
-			}
-		).render(this.currentDate);
+			},
+			initialDate: this.currentDate,
+		});
+		header.render(this.contentEl);
 
 		new WeekdaysRow(this.contentEl, this.i18n, this.settings.weekStart).render();
 
-		const dateCounts = this.settings.displayMode !== "none"
+		const dateCounts = this.settings.displayMode !== DISPLAY_MODE.NONE
 			? await this.fetchDateCounts()
 			: [];
 
@@ -136,7 +148,7 @@ export class CalendarZView extends ItemView {
 		}
 
 		if (this.settings.confirmBeforeCreate) {
-			const dateStr = dayjs(date).format("YYYY-MM-DD");
+			const dateStr = dayjs(date).format(DATE_FORMAT);
 			new ConfirmModal(
 				this.app,
 				this.plugin.i18n,
@@ -149,13 +161,13 @@ export class CalendarZView extends ItemView {
 	}
 
 	private async createDailyNote(date: Date): Promise<void> {
-		await createDailyNote(this.plugin, date);
+		await openOrCreateDailyNote(this.app, this.plugin.i18n, date);
 	}
 
 	private async fetchDateCounts(): Promise<DateCount[]> {
 		const { dateSource, ignoredFolders, dateFieldName, filenameDateFormat } = this.settings;
 
-		if (dateSource === "filename") {
+		if (dateSource === DATE_SOURCE.FILENAME) {
 			return getNotesCountByFilenameDate(this.app, ignoredFolders, filenameDateFormat);
 		}
 		return getNotesCountByYamlDate(this.app, ignoredFolders, dateFieldName);

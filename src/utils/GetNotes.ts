@@ -1,4 +1,4 @@
-import {App, parseYaml} from "obsidian";
+import {App, parseYaml, TFile} from "obsidian";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import {DateCount} from "../ui/DaysGrid";
@@ -6,6 +6,10 @@ import {DATE_FORMAT} from "../constants";
 
 dayjs.extend(customParseFormat);
 
+/**
+ * Common date formats to try when parsing date strings
+ * Tried in order until a valid date is found
+ */
 const DATE_FORMATS = [
 	"YYYY-MM-DD",
 	"YYYY/MM/DD",
@@ -15,6 +19,12 @@ const DATE_FORMATS = [
 	"MM/DD/YYYY"
 ];
 
+/**
+ * Checks if a file path should be ignored based on the ignore list
+ * @param filePath - Path to check
+ * @param ignoredFolders - List of folder paths to ignore
+ * @returns True if the path should be ignored
+ */
 function isPathIgnored(filePath: string, ignoredFolders: string[]): boolean {
 	const normalizedPath = filePath.replace(/\\/g, "/");
 	return ignoredFolders.some(folder => {
@@ -23,6 +33,11 @@ function isPathIgnored(filePath: string, ignoredFolders: string[]): boolean {
 	});
 }
 
+/**
+ * Parses a date string using multiple common formats
+ * @param dateStr - Date string to parse
+ * @returns Parsed Date or null if invalid
+ */
 function parseDateString(dateStr: string): Date | null {
 	if (!dateStr) return null;
 
@@ -35,6 +50,12 @@ function parseDateString(dateStr: string): Date | null {
 	return isoParsed.isValid() ? isoParsed.toDate() : null;
 }
 
+/**
+ * Extracts a date from a filename using a format pattern
+ * @param filename - Filename to parse (without extension)
+ * @param format - Date format pattern (e.g., "YYYY-MM-DD")
+ * @returns Parsed Date or null if not found
+ */
 function extractDateFromFilename(filename: string, format: string): Date | null {
 	const pattern = format
 		.replace(/YYYY/g, "(\\d{4})")
@@ -54,6 +75,11 @@ function extractDateFromFilename(filename: string, format: string): Date | null 
 	return date.isValid() ? date.toDate() : null;
 }
 
+/**
+ * Extracts YAML frontmatter from file content
+ * @param content - File content
+ * @returns Parsed frontmatter object or null
+ */
 function extractYamlFrontmatter(content: string): Record<string, unknown> | null {
 	const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
 	if (!match?.[1]) return null;
@@ -69,6 +95,11 @@ function extractYamlFrontmatter(content: string): Record<string, unknown> | null
 	}
 }
 
+/**
+ * Parses a date value from YAML frontmatter
+ * @param value - YAML value to parse
+ * @returns Parsed Date or null
+ */
 function parseYamlDate(value: unknown): Date | null {
 	if (value instanceof Date) return value;
 	if (typeof value === "string") return parseDateString(value);
@@ -87,6 +118,13 @@ function parseYamlDate(value: unknown): Date | null {
 	return null;
 }
 
+/**
+ * Generic function to count notes by date
+ * @param items - Items to process
+ * @param isIgnored - Function to check if item should be ignored
+ * @param extractDate - Function to extract date from item
+ * @returns Array of date counts
+ */
 function countNotesByDate<T>(
 	items: T[],
 	isIgnored: (item: T) => boolean,
@@ -107,6 +145,40 @@ function countNotesByDate<T>(
 	return Array.from(counts.entries()).map(([date, count]) => ({ date, count }));
 }
 
+/**
+ * Extracts date from a file using YAML frontmatter
+ * @param file - Markdown file
+ * @param app - Obsidian app instance
+ * @param dateFieldName - Name of the date field in frontmatter
+ * @returns Promise resolving to Date or null
+ */
+async function extractDateFromYaml(
+	file: TFile,
+	app: App,
+	dateFieldName: string
+): Promise<Date | null> {
+	try {
+		const content = await app.vault.read(file);
+		const frontmatter = extractYamlFrontmatter(content);
+		const dateValue = frontmatter?.[dateFieldName];
+
+		if (!dateValue) return null;
+
+		return parseYamlDate(dateValue);
+	} catch (error) {
+		// Log error for debugging but don't throw
+		console.warn(`Failed to read file ${file.path}:`, error);
+		return null;
+	}
+}
+
+/**
+ * Counts notes by date extracted from filenames
+ * @param app - Obsidian app instance
+ * @param ignoredFolders - List of folder paths to ignore
+ * @param filenameDateFormat - Date format pattern in filenames
+ * @returns Array of date counts
+ */
 export function getNotesCountByFilenameDate(
 	app: App,
 	ignoredFolders: string[],
@@ -119,31 +191,36 @@ export function getNotesCountByFilenameDate(
 	);
 }
 
+/**
+ * Counts notes by date extracted from YAML frontmatter
+ * @param app - Obsidian app instance
+ * @param ignoredFolders - List of folder paths to ignore
+ * @param dateFieldName - Name of the date field in frontmatter
+ * @returns Promise resolving to array of date counts
+ */
 export async function getNotesCountByYamlDate(
 	app: App,
 	ignoredFolders: string[],
 	dateFieldName: string
 ): Promise<DateCount[]> {
 	const files = app.vault.getMarkdownFiles();
+	const datePromises = files.map(async (file) => {
+		if (isPathIgnored(file.path, ignoredFolders)) {
+			return null;
+		}
+
+		const date = await extractDateFromYaml(file, app, dateFieldName);
+		if (!date) return null;
+
+		return dayjs(date).format(DATE_FORMAT);
+	});
+
+	const dates = await Promise.all(datePromises);
 	const counts = new Map<string, number>();
 
-	for (const file of files) {
-		if (isPathIgnored(file.path, ignoredFolders)) continue;
-
-		try {
-			const content = await app.vault.read(file);
-			const frontmatter = extractYamlFrontmatter(content);
-			const dateValue = frontmatter?.[dateFieldName];
-
-			if (!dateValue) continue;
-
-			const date = parseYamlDate(dateValue);
-			if (date) {
-				const dateStr = dayjs(date).format(DATE_FORMAT);
-				counts.set(dateStr, (counts.get(dateStr) || 0) + 1);
-			}
-		} catch {
-			// Skip files that can't be read
+	for (const dateStr of dates) {
+		if (dateStr) {
+			counts.set(dateStr, (counts.get(dateStr) || 0) + 1);
 		}
 	}
 

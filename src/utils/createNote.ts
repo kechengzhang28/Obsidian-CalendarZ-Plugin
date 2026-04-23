@@ -1,11 +1,11 @@
-import {Notice, TFile, moment} from "obsidian";
+import {App, Notice, TFile, moment} from "obsidian";
 import {
 	createDailyNote as createDailyNoteInterface,
 	appHasDailyNotesPluginLoaded,
 	getDailyNote,
 	getAllDailyNotes,
 } from "obsidian-daily-notes-interface";
-import CalendarZ from "../main";
+import {I18n} from "../i18n";
 
 /**
  * Finds an existing daily note for the given date using the core Daily Notes plugin.
@@ -29,14 +29,20 @@ export function findDailyNote(date: Date): TFile | null {
 }
 
 /**
- * Creates or opens a daily note for the given date using the core Daily Notes plugin.
- * If the note already exists, it will be opened. Otherwise, a new note will be created.
- * @param plugin - CalendarZ plugin instance (for accessing i18n)
- * @param date - The date for which to create/open the daily note
- * @returns Promise that resolves when the note is created/opened
+ * Opens an existing daily note or creates a new one for the given date.
+ * Uses the core Daily Notes plugin for creation.
+ * 
+ * @param app - Obsidian App instance
+ * @param i18n - Internationalization strings for notifications
+ * @param date - The date for which to open/create the daily note
+ * @returns Promise that resolves when the note is opened/created
  */
-export async function createDailyNote(plugin: CalendarZ, date: Date): Promise<void> {
-	const t = plugin.i18n;
+export async function openOrCreateDailyNote(
+	app: App,
+	i18n: I18n,
+	date: Date
+): Promise<void> {
+	const t = i18n;
 
 	try {
 		// Check if daily notes plugin is enabled
@@ -50,7 +56,7 @@ export async function createDailyNote(plugin: CalendarZ, date: Date): Promise<vo
 
 		// If note exists, open it
 		if (existingNote) {
-			await plugin.app.workspace.openLinkText(existingNote.path, "", false);
+			await app.workspace.openLinkText(existingNote.path, "", false);
 			return;
 		}
 
@@ -58,10 +64,27 @@ export async function createDailyNote(plugin: CalendarZ, date: Date): Promise<vo
 		// This automatically handles folder, format, and template settings
 		const file = await createDailyNoteInterface(moment(date));
 		if (file) {
-			await plugin.app.workspace.openLinkText(file.path, "", false);
+			await app.workspace.openLinkText(file.path, "", false);
 		}
 	} catch (error) {
 		console.error("Failed to create daily note:", error);
 		new Notice(t.notifications.dailyNotesCreateFailed);
 	}
+}
+
+/**
+ * @deprecated Use openOrCreateDailyNote instead
+ * Creates or opens a daily note for the given date using the core Daily Notes plugin.
+ * If the note already exists, it will be opened. Otherwise, a new note will be created.
+ * @param app - Obsidian App instance
+ * @param i18n - Internationalization strings
+ * @param date - The date for which to create/open the daily note
+ * @returns Promise that resolves when the note is created/opened
+ */
+export async function createDailyNote(
+	app: App,
+	i18n: I18n,
+	date: Date
+): Promise<void> {
+	return openOrCreateDailyNote(app, i18n, date);
 }

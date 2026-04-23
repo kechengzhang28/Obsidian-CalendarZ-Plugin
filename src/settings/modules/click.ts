@@ -1,13 +1,13 @@
-import CalendarZ from "../../main";
+import { PluginLike } from "../../types";
 import { SettingGroup } from "../../ui/components/SettingGroup";
 import { ToggleSettingRenderer } from "../ui/SettingRenderer";
 
 /**
  * Renders click behavior settings.
  * @param containerEl - Container element
- * @param plugin - CalendarZ plugin instance
+ * @param plugin - Plugin instance
  */
-export function renderClickSettings(containerEl: HTMLElement, plugin: CalendarZ): void {
+export function renderClickSettings(containerEl: HTMLElement, plugin: PluginLike): void {
 	const t = plugin.i18n;
 
 	const group = new SettingGroup({ title: t.sectionTitles.click });

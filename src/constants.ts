@@ -65,3 +65,28 @@ export const ATTRS = {
 	ARIA_LABEL: "aria-label",
 	ARIA_HIDDEN: "aria-hidden",
 } as const;
+
+/** Default values for settings */
+export const DEFAULTS = {
+	/** Default date field name for YAML source */
+	DATE_FIELD_NAME: "date",
+	/** Default filename date format */
+	FILENAME_DATE_FORMAT: "YYYY-MM-DD",
+	/** Default date format placeholder for text input */
+	DATE_FORMAT_PLACEHOLDER: "date",
+	/** Default filename format placeholder */
+	FILENAME_FORMAT_PLACEHOLDER: "YYYY-MM-DD",
+} as const;
+
+/** Display mode values */
+export const DISPLAY_MODE = {
+	NONE: "none",
+	DOTS: "dots",
+	HEATMAP: "heatmap",
+} as const;
+
+/** Date source values */
+export const DATE_SOURCE = {
+	YAML: "yaml",
+	FILENAME: "filename",
+} as const;
