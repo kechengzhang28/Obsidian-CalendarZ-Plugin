@@ -182,3 +182,8 @@
 	background-color: var(--interactive-accent);
 	flex-shrink: 0;
 }
+
+/* Settings folder item */
+.calendarz-settings-folder-item {
+	margin-top: 4px;
+}

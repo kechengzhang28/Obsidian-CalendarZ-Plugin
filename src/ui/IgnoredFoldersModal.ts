@@ -128,7 +128,7 @@ export class IgnoredFoldersModal extends Modal {
 			const removeBtn = item.createEl("button", {
 				cls: "calendarz-modal-remove-btn"
 			});
-			removeBtn.innerHTML = "✕";
+			removeBtn.textContent = "✕";
 			removeBtn.setAttribute("aria-label", t.removeButton);
 			removeBtn.addEventListener("click", () => {
 				this.ignoredFolders = this.ignoredFolders.filter(f => f !== folder);

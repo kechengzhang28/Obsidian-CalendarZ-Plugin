@@ -280,7 +280,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 			for (let i = 0; i < this.plugin.settings.ignoredFolders.length; i++) {
 				const folder = this.plugin.settings.ignoredFolders[i];
 				const line = document.createElement("div");
-				line.style.marginTop = "4px";
+				line.addClass("calendarz-settings-folder-item");
 				line.textContent = `• ${folder}`;
 				fragment.appendChild(line);
 			}
