@@ -11,95 +11,60 @@ export default class CalendarZ extends Plugin {
 		await this.loadSettings();
 		this.loadI18n();
 
-		// Register the calendar view
 		this.registerView(
 			CALENDARZ_VIEW_TYPE,
 			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n, this.settings)
 		);
 
-		// Add ribbon icon to open calendar view
-		this.addRibbonIcon('calendar', this.i18n.ribbon.tooltip, async () => {
-			await this.activateView();
-		});
+		this.addRibbonIcon('calendar', this.i18n.ribbon.tooltip, () => this.activateView());
 
-		// Command to open calendar view
 		this.addCommand({
 			id: 'open-calendar-view',
 			name: this.i18n.commands.openCalendar,
-			callback: async () => {
-				await this.activateView();
-			}
+			callback: () => this.activateView()
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
-
-		// Register file event listeners to refresh heatmap when notes change
 		this.registerFileEvents();
 
-		// Register interval to update "today" highlight every 60 seconds
-		this.registerInterval(
-			window.setInterval(() => {
-				this.updateTodayHighlight();
-			}, 60000)
-		);
-	}
-
-	onunload() {
+		// Update "today" highlight every 60 seconds
+		this.registerInterval(window.setInterval(() => this.updateTodayHighlight(), 60000));
 	}
 
 	/**
-	 * Registers file system event listeners to refresh the calendar view
-	 * when notes are created, deleted, or renamed.
+	 * Registers file system event listeners to refresh the calendar view.
 	 */
-	registerFileEvents(): void {
-		// Refresh when a file is created
-		this.registerEvent(
-			this.app.vault.on("create", () => {
-				this.refreshCalendarView();
-			})
-		);
-
-		// Refresh when a file is deleted
-		this.registerEvent(
-			this.app.vault.on("delete", () => {
-				this.refreshCalendarView();
-			})
-		);
-
-		// Refresh when a file is renamed
-		this.registerEvent(
-			this.app.vault.on("rename", () => {
-				this.refreshCalendarView();
-			})
-		);
+	private registerFileEvents(): void {
+		this.registerEvent(this.app.vault.on("create", () => this.refreshCalendarView()));
+		this.registerEvent(this.app.vault.on("delete", () => this.refreshCalendarView()));
+		this.registerEvent(this.app.vault.on("rename", () => this.refreshCalendarView()));
 	}
 
 	/**
 	 * Refreshes only the calendar view content without reloading settings.
-	 * Used for updating statistics display when files change.
 	 */
-	refreshCalendarView(): void {
-		const leaves = this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE);
-		leaves.forEach(leaf => {
-			if (leaf.view instanceof CalendarZView) {
-				void leaf.view.refreshStatsOnly();
-			}
+	private refreshCalendarView(): void {
+		this.getCalendarViews().forEach(view => {
+			void view.refreshStatsOnly();
 		});
 	}
 
 	/**
 	 * Updates the "today" highlight on all calendar views.
-	 * Called periodically to ensure correct day is highlighted when date changes.
-	 * If crossed into a new month, re-renders the calendar.
 	 */
-	updateTodayHighlight(): void {
-		const leaves = this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE);
-		leaves.forEach(leaf => {
-			if (leaf.view instanceof CalendarZView) {
-				void leaf.view.updateTodayHighlight();
-			}
+	private updateTodayHighlight(): void {
+		this.getCalendarViews().forEach(view => {
+			void view.updateTodayHighlight();
 		});
+	}
+
+	/**
+	 * Gets all calendar view instances.
+	 */
+	private getCalendarViews(): CalendarZView[] {
+		return this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)
+			.map(leaf => leaf.view)
+			.filter((view): view is CalendarZView => view instanceof CalendarZView);
 	}
 
 	async loadSettings() {
@@ -115,29 +80,25 @@ export default class CalendarZ extends Plugin {
 	}
 
 	refreshView(): void {
-		const leaves = this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE);
-		leaves.forEach(leaf => {
-			if (leaf.view instanceof CalendarZView) {
-				leaf.view.setI18n(this.i18n);
-				leaf.view.setMonthFormat(this.settings.monthFormat);
-				leaf.view.setLanguage(this.settings.language);
-				leaf.view.setTitleFormat(this.settings.titleFormat);
-				leaf.view.setWeekStart(this.settings.weekStart);
-				leaf.view.setDateFieldName(this.settings.dateFieldName);
-				leaf.view.setIgnoredFolders(this.settings.ignoredFolders);
-				leaf.view.setDateSource(this.settings.dateSource);
-				leaf.view.setFilenameDateFormat(this.settings.filenameDateFormat);
-				leaf.view.setDisplayMode(this.settings.displayMode);
-				leaf.view.setDotThreshold(this.settings.dotThreshold);
-				void leaf.view.refresh();
-			}
+		const settings = this.settings;
+		this.getCalendarViews().forEach(view => {
+			view.setI18n(this.i18n);
+			view.setMonthFormat(settings.monthFormat);
+			view.setLanguage(settings.language);
+			view.setTitleFormat(settings.titleFormat);
+			view.setWeekStart(settings.weekStart);
+			view.setDateFieldName(settings.dateFieldName);
+			view.setIgnoredFolders(settings.ignoredFolders);
+			view.setDateSource(settings.dateSource);
+			view.setFilenameDateFormat(settings.filenameDateFormat);
+			view.setDisplayMode(settings.displayMode);
+			view.setDotThreshold(settings.dotThreshold);
+			void view.refresh();
 		});
 	}
 
 	async activateView(): Promise<void> {
 		const { workspace } = this.app;
-
-		// Check if view already exists
 		const existingLeaf = workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)[0];
 
 		if (existingLeaf) {
@@ -145,17 +106,10 @@ export default class CalendarZ extends Plugin {
 			return;
 		}
 
-		// Create new leaf in right sidebar
 		const leaf = workspace.getRightLeaf(false);
-		if (!leaf) {
-			return;
-		}
-		await leaf.setViewState({
-			type: CALENDARZ_VIEW_TYPE,
-			active: true,
-		});
+		if (!leaf) return;
 
-		// Reveal the leaf
+		await leaf.setViewState({ type: CALENDARZ_VIEW_TYPE, active: true });
 		void workspace.revealLeaf(leaf);
 	}
 }
