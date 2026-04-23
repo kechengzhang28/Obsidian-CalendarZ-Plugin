@@ -3,15 +3,6 @@ import { WeekStart } from "../../settings/types";
 import { DAY_OF_WEEK, GRID, HEATMAP } from "../../constants";
 
 /**
- * Checks if a date is today
- * @param date - Date to check (Date object or dayjs instance)
- * @returns True if the date is today
- */
-export function isToday(date: Date | dayjs.Dayjs): boolean {
-	return dayjs(date).isSame(dayjs(), "day");
-}
-
-/**
  * Checks if a date is before today
  * @param date - Date to check (Date object or dayjs instance)
  * @returns True if the date is in the past
@@ -126,48 +117,4 @@ export function calculatePaddingDays(year: number, month: number, weekStart: Wee
 	return getAdjustedDayOfWeek(firstDayOfWeek, weekStart);
 }
 
-/**
- * Calculates the number of days to show from next month
- * 
- * The calendar grid always shows 42 cells (6 weeks × 7 days).
- * This calculates how many days from the next month are needed
- * to fill the remaining cells.
- * 
- * @param paddingDays - Days from previous month
- * @param daysInMonth - Days in current month
- * @returns Days to show from next month
- */
-export function calculateNextMonthDays(paddingDays: number, daysInMonth: number): number {
-	const currentCells = paddingDays + daysInMonth;
-	return GRID.TOTAL_CELLS - currentCells;
-}
 
-/**
- * Gets adjacent month info
- * 
- * Calculates the year and month for the previous or next month,
- * handling year boundaries.
- * 
- * @param year - Current year
- * @param month - Current month (0-11)
- * @param direction - -1 for previous month, 1 for next month
- * @returns Object with year and month of adjacent month
- */
-export function getAdjacentMonth(
-	year: number,
-	month: number,
-	direction: -1 | 1
-): { year: number; month: number } {
-	let newMonth = month + direction;
-	let newYear = year;
-
-	if (newMonth < 0) {
-		newMonth = 11;
-		newYear--;
-	} else if (newMonth > 11) {
-		newMonth = 0;
-		newYear++;
-	}
-
-	return { year: newYear, month: newMonth };
-}

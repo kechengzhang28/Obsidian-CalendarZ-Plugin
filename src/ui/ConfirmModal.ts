@@ -1,5 +1,5 @@
 import {App, Modal, ButtonComponent} from "obsidian";
-import {I18n, interpolate} from "../i18n";
+import {I18n} from "../i18n";
 
 export class ConfirmModal extends Modal {
 	constructor(
@@ -16,7 +16,7 @@ export class ConfirmModal extends Modal {
 		const t = this.i18n.modal;
 
 		contentEl.createEl("h3", {text: t.confirmTitle});
-		contentEl.createEl("p", {text: interpolate(t.confirmMessage, {date: this.dateStr})});
+		contentEl.createEl("p", {text: t.confirmMessage.replace(/\{\{date\}\}/g, this.dateStr)});
 
 		const buttonContainer = contentEl.createDiv({cls: "modal-button-container"});
 

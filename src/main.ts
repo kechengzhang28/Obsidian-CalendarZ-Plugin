@@ -36,10 +36,6 @@ export default class CalendarZ extends Plugin {
 		this.registerEvent(this.app.vault.on("modify", refresh));
 	}
 
-	private updateTodayHighlight(): void {
-		this.forEachView(v => void v.updateTodayHighlight());
-	}
-
 	private forEachView(callback: (view: CalendarZView) => void): void {
 		this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)
 			.map(leaf => leaf.view)

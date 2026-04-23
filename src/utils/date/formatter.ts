@@ -11,16 +11,6 @@ export function formatDate(date: Date | dayjs.Dayjs): string {
 }
 
 /**
- * Formats a date using a custom format string
- * @param date - Date to format (Date object or dayjs instance)
- * @param format - dayjs format string (e.g., "YYYY-MM-DD", "MMM D, YYYY")
- * @returns Formatted date string
- */
-export function formatDateWithFormat(date: Date | dayjs.Dayjs, format: string): string {
-	return dayjs(date).format(format);
-}
-
-/**
  * Formats a month display based on language and format preferences
  * 
  * Special handling for Chinese locale with numeric format:

@@ -34,14 +34,6 @@ export abstract class Component implements Disposable {
 	abstract render(container: HTMLElement): void;
 
 	/**
-	 * Updates the component with new data/state
-	 * Override in subclasses for dynamic updates without full re-render
-	 */
-	update(): void {
-		// Default: no-op, override in subclasses
-	}
-
-	/**
 	 * Destroys the component and cleans up resources
 	 * Removes all event listeners and clears references
 	 */
@@ -49,79 +41,5 @@ export abstract class Component implements Disposable {
 		this.disposables.dispose();
 		this.container = null;
 		this.isRendered = false;
-	}
-
-	/**
-	 * Gets the component's container element
-	 * @returns The container element or null if not rendered
-	 */
-	getContainer(): HTMLElement | null {
-		return this.container;
-	}
-
-	/**
-	 * Checks if the component has been rendered
-	 * @returns True if render() has been called
-	 */
-	getIsRendered(): boolean {
-		return this.isRendered;
-	}
-}
-
-/**
- * Base class for container components that manage child components
- * Automatically disposes child components when removed or when this container is disposed
- * 
- * @example
- * ```typescript
- * class Panel extends ContainerComponent {
- *   render(container: HTMLElement): void {
- *     this.container = container.createDiv({ cls: 'panel' });
- *     const child = new ChildComponent();
- *     child.render(this.container);
- *     this.addChild(child);
- *   }
- * }
- * ```
- */
-export abstract class ContainerComponent extends Component {
-	/** Child components managed by this container */
-	protected children: Component[] = [];
-
-	/**
-	 * Adds a child component to be managed
-	 * The child will be disposed when this container is disposed
-	 * @param child - Child component to add
-	 */
-	addChild(child: Component): void {
-		this.children.push(child);
-	}
-
-	/**
-	 * Removes a child component and disposes it
-	 * @param child - Child component to remove
-	 */
-	removeChild(child: Component): void {
-		const index = this.children.indexOf(child);
-		if (index !== -1) {
-			child.dispose();
-			this.children.splice(index, 1);
-		}
-	}
-
-	/**
-	 * Removes and disposes all child components
-	 */
-	clearChildren(): void {
-		this.children.forEach(child => child.dispose());
-		this.children = [];
-	}
-
-	/**
-	 * Disposes this component and all its children
-	 */
-	dispose(): void {
-		this.clearChildren();
-		super.dispose();
 	}
 }

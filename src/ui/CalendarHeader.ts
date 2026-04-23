@@ -14,9 +14,6 @@ export interface CalendarHeaderCallbacks {
  * Renders the calendar header with month/year display and navigation buttons.
  */
 export class CalendarHeader {
-	private prevBtn: IconButton | null = null;
-	private nextBtn: IconButton | null = null;
-
 	constructor(
 		private container: HTMLElement,
 		private i18n: I18n,
@@ -46,8 +43,8 @@ export class CalendarHeader {
 		monthYearContainer.createEl("span", { cls: "calendarz-year", text: secondText });
 
 		// Navigation buttons using IconButton component
-		this.prevBtn = new IconButton("prev", () => this.callbacks.onPrevMonth());
-		this.prevBtn.render(header);
+		const prevBtn = new IconButton("prev", () => this.callbacks.onPrevMonth());
+		prevBtn.render(header);
 
 		const todayBtn = header.createEl("button", {
 			cls: "calendarz-today-btn",
@@ -55,15 +52,7 @@ export class CalendarHeader {
 		});
 		todayBtn.addEventListener("click", () => this.callbacks.onToday());
 
-		this.nextBtn = new IconButton("next", () => this.callbacks.onNextMonth());
-		this.nextBtn.render(header);
-	}
-
-	/**
-	 * Cleans up resources
-	 */
-	dispose(): void {
-		this.prevBtn?.dispose();
-		this.nextBtn?.dispose();
+		const nextBtn = new IconButton("next", () => this.callbacks.onNextMonth());
+		nextBtn.render(header);
 	}
 }

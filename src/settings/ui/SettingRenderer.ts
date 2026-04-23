@@ -202,30 +202,4 @@ export class SliderSettingRenderer extends SettingRenderer<number> {
 	}
 }
 
-/**
- * Button setting renderer
- * Renders a setting with an action button
- * Used for settings that trigger an action rather than store a value
- */
-export class ButtonSettingRenderer extends SettingRenderer<void> {
-	/**
-	 * Creates a new button setting renderer
-	 * @param buttonText - Text to display on the button
-	 */
-	constructor(private buttonText: string) {
-		super({} as CalendarZ);
-	}
 
-	/**
-	 * Renders the button setting
-	 */
-	render(container: HTMLElement, config: SettingConfig<void>): void {
-		this.createBaseSetting(container, config).addButton(button =>
-			button
-				.setButtonText(this.buttonText)
-				.onClick(() => {
-					void config.onChange(undefined);
-				})
-		);
-	}
-}

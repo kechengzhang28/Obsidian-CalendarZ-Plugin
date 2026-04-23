@@ -181,13 +181,4 @@ export function loadI18n(language: Language): I18n {
 	return locales[language] || locales["en-US"];
 }
 
-/**
- * Interpolates variables into a template string.
- * Replaces {{key}} placeholders with values from the vars object.
- * @param template - Template string with {{key}} placeholders
- * @param vars - Object containing variable values
- * @returns Interpolated string
- */
-export function interpolate(template: string, vars: Record<string, string | number>): string {
-	return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => String(vars[key] ?? ""));
-}
+

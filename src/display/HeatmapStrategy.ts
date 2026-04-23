@@ -1,6 +1,6 @@
 import { DisplayStrategy, DayDisplayConfig, DisplayContext } from "./DisplayStrategy";
 import { CSS_CLASSES, CSS_VARS, ATTRS } from "../constants";
-import { calculateHeatmapOpacity } from "../utils/dateUtils";
+import { calculateHeatmapOpacity } from "../utils/date";
 
 /**
  * Heatmap display strategy

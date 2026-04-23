@@ -1,6 +1,6 @@
 import { DisplayStrategy, DayDisplayConfig, DisplayContext } from "./DisplayStrategy";
 import { CSS_CLASSES, ATTRS, DOTS } from "../constants";
-import { calculateDotCount } from "../utils/dateUtils";
+import { calculateDotCount } from "../utils/date";
 
 /**
  * Dots display strategy
