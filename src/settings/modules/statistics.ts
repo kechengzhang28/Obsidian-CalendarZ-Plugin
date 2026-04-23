@@ -8,7 +8,7 @@ import {
 	SliderSettingRenderer,
 	TextSettingRenderer,
 } from "../ui/SettingRenderer";
-import { createTypedSettingHandler, createSettingHandlerWithRefresh } from "../settingUtils";
+import { createTypedSettingHandler, createSettingHandlerWithRefresh, createSettingHandlerWithTransform } from "../settingUtils";
 import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE } from "../../constants";
 
 /**
@@ -63,11 +63,11 @@ export function renderStatisticsSettings(
 
 	// Date field name setting (for YAML source)
 	const textRenderer = new TextSettingRenderer(plugin, DEFAULTS.DATE_FORMAT_PLACEHOLDER);
-	const handleDateFieldNameChange = async (value: string) => {
-		plugin.settings.dateFieldName = value.trim() || DEFAULTS.DATE_FIELD_NAME;
-		await plugin.saveSettings();
-		plugin.refreshView();
-	};
+	const handleDateFieldNameChange = createSettingHandlerWithTransform(
+		plugin,
+		"dateFieldName",
+		(value) => value.trim() || DEFAULTS.DATE_FIELD_NAME
+	);
 	textRenderer.render(contentEl, {
 		name: t.settings.dateFieldName.name,
 		description: t.settings.dateFieldName.description,
@@ -95,11 +95,11 @@ export function renderStatisticsSettings(
 	// Filename date format setting (only shown when dateSource is filename)
 	if (plugin.settings.dateSource === DATE_SOURCE.FILENAME) {
 		const filenameFormatRenderer = new TextSettingRenderer(plugin, DEFAULTS.FILENAME_FORMAT_PLACEHOLDER);
-		const handleFilenameFormatChange = async (value: string) => {
-			plugin.settings.filenameDateFormat = value.trim() || DEFAULTS.FILENAME_DATE_FORMAT;
-			await plugin.saveSettings();
-			plugin.refreshView();
-		};
+		const handleFilenameFormatChange = createSettingHandlerWithTransform(
+			plugin,
+			"filenameDateFormat",
+			(value) => value.trim() || DEFAULTS.FILENAME_DATE_FORMAT
+		);
 		filenameFormatRenderer.render(contentEl, {
 			name: t.settings.filenameDateFormat.name,
 			description: t.settings.filenameDateFormat.description,

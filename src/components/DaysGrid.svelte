@@ -9,8 +9,6 @@
 		getDaysInMonth,
 		getPreviousMonthLastDay,
 		calculatePaddingDays,
-		calculateHeatmapOpacity,
-		calculateDotCount,
 	} from "../utils/date";
 	import { CSS_CLASSES, ATTRS, GRID, DOTS, HEATMAP } from "../constants";
 	import type { DateCount } from "./types";
@@ -47,6 +45,17 @@
 		isToday: boolean;
 		isBeforeToday: boolean;
 		dateStr: string;
+	}
+
+	function calculateHeatmapOpacity(count: number, maxCount: number): number {
+		if (maxCount <= 0) return HEATMAP.MIN_OPACITY;
+		const intensity = count / maxCount;
+		return HEATMAP.MIN_OPACITY + intensity * HEATMAP.OPACITY_RANGE;
+	}
+
+	function calculateDotCount(count: number, threshold: number, maxDots: number): number {
+		if (count <= 0) return 0;
+		return Math.min(maxDots, Math.ceil(count / threshold));
 	}
 
 	let cells = $derived.by((): DayCell[] => {

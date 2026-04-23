@@ -1,6 +1,7 @@
 import type { PluginLike } from "../../types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { ToggleSettingRenderer } from "../ui/SettingRenderer";
+import { createTypedSettingHandler } from "../settingUtils";
 
 /**
  * Renders click behavior settings.
@@ -17,14 +18,11 @@ export function renderClickSettings(containerEl: HTMLElement, plugin: PluginLike
 
 	// Confirm before creating daily note setting
 	const toggleRenderer = new ToggleSettingRenderer(plugin);
+	const handleConfirmChange = createTypedSettingHandler(plugin, "confirmBeforeCreate");
 	toggleRenderer.render(contentEl, {
 		name: t.settings.confirmBeforeCreate.name,
 		description: t.settings.confirmBeforeCreate.description,
 		value: plugin.settings.confirmBeforeCreate,
-		onChange: async (value) => {
-			plugin.settings.confirmBeforeCreate = value;
-			await plugin.saveSettings();
-			plugin.refreshView();
-		},
+		onChange: handleConfirmChange,
 	});
 }

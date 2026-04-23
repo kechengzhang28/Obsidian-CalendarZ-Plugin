@@ -142,20 +142,18 @@ export class ToggleSettingRenderer extends SettingRenderer<boolean> {
 /**
  * Text input setting renderer
  * Renders a setting with a text input field
- * 
- * Note: This renderer does not require a plugin instance as it only renders
- * a simple text input with no plugin-specific functionality.
  */
 export class TextSettingRenderer extends SettingRenderer<string> {
 	/**
 	 * Creates a new text setting renderer
+	 * @param plugin - Plugin instance
 	 * @param placeholder - Placeholder text for the input field
 	 */
 	constructor(
-		plugin: PluginLike | null = null,
+		plugin: PluginLike,
 		private placeholder = ""
 	) {
-		super(plugin ?? {} as PluginLike);
+		super(plugin);
 	}
 
 	/**
@@ -176,9 +174,6 @@ export class TextSettingRenderer extends SettingRenderer<string> {
 /**
  * Slider setting renderer
  * Renders a setting with a numeric slider control
- * 
- * Note: This renderer does not require a plugin instance as it only renders
- * a simple slider with no plugin-specific functionality.
  */
 export class SliderSettingRenderer extends SettingRenderer<number> {
 	/**
@@ -186,15 +181,15 @@ export class SliderSettingRenderer extends SettingRenderer<number> {
 	 * @param min - Minimum value
 	 * @param max - Maximum value
 	 * @param step - Step increment
-	 * @param plugin - Optional plugin instance
+	 * @param plugin - Plugin instance
 	 */
 	constructor(
 		private min: number,
 		private max: number,
 		private step: number,
-		plugin: PluginLike | null = null
+		plugin: PluginLike
 	) {
-		super(plugin ?? {} as PluginLike);
+		super(plugin);
 	}
 
 	/**
