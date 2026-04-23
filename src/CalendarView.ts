@@ -18,6 +18,7 @@ export class CalendarZView extends ItemView {
 	private i18n: I18n;
 	private settings: CalendarZSettings;
 	private plugin: CalendarZ;
+	private daysGrid: DaysGrid | null = null;
 
 	constructor(leaf: WorkspaceLeaf, i18n: I18n, settings: CalendarZSettings, plugin: CalendarZ) {
 		super(leaf);
@@ -52,8 +53,13 @@ export class CalendarZView extends ItemView {
 		this.contentEl.empty();
 	}
 
-	refreshStatsOnly(): void {
-		if (this.settings.displayMode !== "none") {
+	async refreshStatsOnly(): Promise<void> {
+		if (this.settings.displayMode === "none") return;
+
+		const dateCounts = await this.fetchDateCounts();
+		if (this.daysGrid) {
+			this.daysGrid.updateDisplay(dateCounts);
+		} else {
 			void this.renderCalendar();
 		}
 	}
@@ -101,13 +107,14 @@ export class CalendarZView extends ItemView {
 			? await this.fetchDateCounts()
 			: [];
 
-		new DaysGrid(
+		this.daysGrid = new DaysGrid(
 			this.contentEl,
 			this.settings.weekStart,
 			this.settings.displayMode,
 			this.settings.dotThreshold,
 			(date) => void this.handleDayClick(date)
-		).render(this.currentDate, dateCounts);
+		);
+		this.daysGrid.render(this.currentDate, dateCounts);
 	}
 
 	private navigateMonth(direction: -1 | 1): void {

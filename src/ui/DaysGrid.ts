@@ -28,6 +28,8 @@ interface DayConfig {
 
 export class DaysGrid {
 	private dateCounts = new Map<string, number>();
+	private gridEl: HTMLElement | null = null;
+	private currentDate: Date = new Date();
 
 	constructor(
 		private container: HTMLElement,
@@ -39,14 +41,68 @@ export class DaysGrid {
 
 	render(currentDate: Date, dateCounts?: DateCount[]): void {
 		this.dateCounts = new Map(dateCounts?.map(d => [d.date, d.count]));
+		this.currentDate = currentDate;
 
-		const grid = this.container.createDiv({ cls: CSS_CLASSES.DAYS });
+		this.gridEl = this.container.createDiv({ cls: CSS_CLASSES.DAYS });
 		const { year, month } = getYearMonth(currentDate);
 		const daysInMonth = getDaysInMonth(year, month);
 		const paddingDays = calculatePaddingDays(year, month, this.weekStart);
 		const today = dayjs();
 
-		this.renderMonthDays(grid, year, month, paddingDays, daysInMonth, today);
+		this.renderMonthDays(this.gridEl, year, month, paddingDays, daysInMonth, today);
+	}
+
+	updateDisplay(dateCounts: DateCount[]): void {
+		this.dateCounts = new Map(dateCounts.map(d => [d.date, d.count]));
+		if (!this.gridEl) return;
+
+		const maxCount = this.getMaxCount();
+		const today = dayjs();
+
+		this.gridEl.querySelectorAll(`.${CSS_CLASSES.DAY}`).forEach(dayEl => {
+			const dateStr = dayEl.getAttribute(ATTRS.DATA_DATE);
+			if (!dateStr) return;
+
+			const date = dayjs(dateStr);
+			const count = this.dateCounts.get(dateStr) || 0;
+			const todayFlag = isSameDay(date, today);
+			const beforeTodayFlag = isBeforeToday(date);
+
+			const config: DayConfig = { count, isToday: todayFlag, isBeforeToday: beforeTodayFlag };
+			this.updateDayDisplay(dayEl as HTMLElement, date, config, maxCount);
+		});
+	}
+
+	private updateDayDisplay(
+		dayEl: HTMLElement,
+		date: dayjs.Dayjs,
+		config: DayConfig,
+		maxCount: number
+	): void {
+		const dateStr = formatDate(date);
+
+		// Clear existing display mode content
+		dayEl.removeClass(CSS_CLASSES.DAY_HEATMAP);
+		dayEl.style.removeProperty(CSS_VARS.HEATMAP_OPACITY);
+		dayEl.removeAttribute(ATTRS.DATA_COUNT);
+		dayEl.querySelectorAll(`.${CSS_CLASSES.DOTS_CONTAINER}`).forEach(el => el.remove());
+
+		// Re-apply display mode
+		switch (this.displayMode) {
+			case "heatmap":
+				this.applyHeatmap(dayEl, config, maxCount, dateStr);
+				break;
+			case "dots":
+				this.applyDots(dayEl, config, dateStr);
+				break;
+		}
+
+		// Update aria-label
+		if (config.count > 0 || config.isBeforeToday) {
+			dayEl.setAttribute(ATTRS.ARIA_LABEL, `${dateStr}: ${config.count} notes`);
+		} else {
+			dayEl.removeAttribute(ATTRS.ARIA_LABEL);
+		}
 	}
 
 	private renderMonthDays(

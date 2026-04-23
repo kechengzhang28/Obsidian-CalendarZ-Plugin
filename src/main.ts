@@ -35,6 +35,7 @@ export default class CalendarZ extends Plugin {
 		this.registerEvent(this.app.vault.on("create", refresh));
 		this.registerEvent(this.app.vault.on("delete", refresh));
 		this.registerEvent(this.app.vault.on("rename", refresh));
+		this.registerEvent(this.app.vault.on("modify", refresh));
 	}
 
 	private updateTodayHighlight(): void {
