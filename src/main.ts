@@ -16,55 +16,36 @@ export default class CalendarZ extends Plugin {
 			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.i18n, this.settings, this)
 		);
 
-		this.addRibbonIcon('calendar', this.i18n.ribbon.tooltip, () => this.activateView());
+		this.addRibbonIcon('calendar', this.i18n.ribbon.tooltip, () => void this.activateView());
 
 		this.addCommand({
 			id: 'open-calendar-view',
 			name: this.i18n.commands.openCalendar,
-			callback: () => this.activateView()
+			callback: () => void this.activateView()
 		});
 
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
 		this.registerFileEvents();
 
-		// Update "today" highlight every 1 seconds
 		this.registerInterval(window.setInterval(() => this.updateTodayHighlight(), 1000));
 	}
 
-	/**
-	 * Registers file system event listeners to refresh the calendar view.
-	 */
 	private registerFileEvents(): void {
-		this.registerEvent(this.app.vault.on("create", () => this.refreshCalendarView()));
-		this.registerEvent(this.app.vault.on("delete", () => this.refreshCalendarView()));
-		this.registerEvent(this.app.vault.on("rename", () => this.refreshCalendarView()));
+		const refresh = () => this.forEachView(v => void v.refreshStatsOnly());
+		this.registerEvent(this.app.vault.on("create", refresh));
+		this.registerEvent(this.app.vault.on("delete", refresh));
+		this.registerEvent(this.app.vault.on("rename", refresh));
 	}
 
-	/**
-	 * Refreshes only the calendar view content without reloading settings.
-	 */
-	private refreshCalendarView(): void {
-		this.getCalendarViews().forEach(view => {
-			void view.refreshStatsOnly();
-		});
-	}
-
-	/**
-	 * Updates the "today" highlight on all calendar views.
-	 */
 	private updateTodayHighlight(): void {
-		this.getCalendarViews().forEach(view => {
-			void view.updateTodayHighlight();
-		});
+		this.forEachView(v => void v.updateTodayHighlight());
 	}
 
-	/**
-	 * Gets all calendar view instances.
-	 */
-	private getCalendarViews(): CalendarZView[] {
-		return this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)
+	private forEachView(callback: (view: CalendarZView) => void): void {
+		this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)
 			.map(leaf => leaf.view)
-			.filter((view): view is CalendarZView => view instanceof CalendarZView);
+			.filter((view): view is CalendarZView => view instanceof CalendarZView)
+			.forEach(callback);
 	}
 
 	async loadSettings() {
@@ -80,22 +61,7 @@ export default class CalendarZ extends Plugin {
 	}
 
 	refreshView(): void {
-		const settings = this.settings;
-		this.getCalendarViews().forEach(view => {
-			view.setI18n(this.i18n);
-			view.setMonthFormat(settings.monthFormat);
-			view.setLanguage(settings.language);
-			view.setTitleFormat(settings.titleFormat);
-			view.setWeekStart(settings.weekStart);
-			view.setDateFieldName(settings.dateFieldName);
-			view.setIgnoredFolders(settings.ignoredFolders);
-			view.setDateSource(settings.dateSource);
-			view.setFilenameDateFormat(settings.filenameDateFormat);
-			view.setDisplayMode(settings.displayMode);
-			view.setDotThreshold(settings.dotThreshold);
-			view.setConfirmBeforeCreate(settings.confirmBeforeCreate);
-			void view.refresh();
-		});
+		this.forEachView(v => v.updateSettings(this.i18n, this.settings));
 	}
 
 	async activateView(): Promise<void> {
