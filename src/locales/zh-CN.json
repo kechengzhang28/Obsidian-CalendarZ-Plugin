@@ -43,7 +43,7 @@
       "description": "设置要忽略的文件夹路径，这些文件夹中的笔记将不会被统计",
       "addButton": "添加",
       "removeButton": "删除",
-      "placeholder": "输入文件夹路径（如：Templates, Archive）",
+      "placeholder": "输入文件夹路径",
       "empty": "暂无忽略的文件夹",
       "manageButton": "管理",
       "currentlyIgnored": "当前已忽略",

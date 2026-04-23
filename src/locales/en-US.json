@@ -43,7 +43,7 @@
       "description": "Set folder paths to ignore. Notes in these folders will not be counted",
       "addButton": "Add",
       "removeButton": "Remove",
-      "placeholder": "Enter folder path (e.g., Templates, Archive)",
+      "placeholder": "Enter folder path",
       "empty": "No ignored folders",
       "manageButton": "Manage",
       "currentlyIgnored": "Currently ignored",
