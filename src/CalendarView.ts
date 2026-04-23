@@ -1,28 +1,35 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, WorkspaceLeaf, App } from "obsidian";
 import dayjs from "dayjs";
 import { mount, unmount } from "svelte";
-import type { CalendarZSettings } from "./settings/index";
+import type { CalendarZSettings } from "./settings/types";
+import type { I18n } from "./i18n";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/GetNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
 import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
-import CalendarZ from "./main";
 import Calendar from "./components/Calendar.svelte";
 import type { DateCount } from "./components/types";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
+export interface CalendarZViewDeps {
+	settings: CalendarZSettings;
+	i18n: I18n;
+	app: App;
+	refreshView(): void;
+}
+
 export class CalendarZView extends ItemView {
 	private currentDate = new Date();
-	private plugin: CalendarZ;
+	private deps: CalendarZViewDeps;
 	private calendarComponent: ReturnType<typeof mount> | null = null;
 
-	constructor(leaf: WorkspaceLeaf, plugin: CalendarZ) {
+	constructor(leaf: WorkspaceLeaf, deps: CalendarZViewDeps) {
 		super(leaf);
-		this.plugin = plugin;
+		this.deps = deps;
 	}
 
 	private get settings(): CalendarZSettings {
-		return this.plugin.settings;
+		return this.deps.settings;
 	}
 
 	getViewType(): string {
@@ -30,7 +37,7 @@ export class CalendarZView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return this.plugin.i18n.calendar.viewTitle;
+		return this.deps.i18n.calendar.viewTitle;
 	}
 
 	getIcon(): string {
@@ -100,7 +107,7 @@ export class CalendarZView extends ItemView {
 			target: this.contentEl,
 			props: {
 				settings: this.settings,
-				i18n: this.plugin.i18n,
+				i18n: this.deps.i18n,
 				dateCounts,
 				currentDate: this.currentDate,
 				onDayClick: (date: Date) => void this.handleDayClick(date),
@@ -124,7 +131,7 @@ export class CalendarZView extends ItemView {
 		const existingNote = findDailyNote(date);
 
 		if (existingNote) {
-			await this.app.workspace.openLinkText(existingNote.path, "", false);
+			await this.deps.app.workspace.openLinkText(existingNote.path, "", false);
 			return;
 		}
 
@@ -132,8 +139,8 @@ export class CalendarZView extends ItemView {
 			const { ConfirmModal } = await import("./ui/ConfirmModal");
 			const dateStr = dayjs(date).format(DATE_FORMAT);
 			new ConfirmModal(
-				this.app,
-				this.plugin.i18n,
+				this.deps.app,
+				this.deps.i18n,
 				dateStr,
 				() => void this.createDailyNote(date)
 			).open();
@@ -143,15 +150,15 @@ export class CalendarZView extends ItemView {
 	}
 
 	private async createDailyNote(date: Date): Promise<void> {
-		await openOrCreateDailyNote(this.app, this.plugin.i18n, date);
+		await openOrCreateDailyNote(this.deps.app, this.deps.i18n, date);
 	}
 
 	private async fetchDateCounts(): Promise<DateCount[]> {
 		const { dateSource, ignoredFolders, dateFieldName, filenameDateFormat } = this.settings;
 
 		if (dateSource === DATE_SOURCE.FILENAME) {
-			return getNotesCountByFilenameDate(this.app, ignoredFolders, filenameDateFormat);
+			return getNotesCountByFilenameDate(this.deps.app, ignoredFolders, filenameDateFormat);
 		}
-		return getNotesCountByYamlDate(this.app, ignoredFolders, dateFieldName);
+		return getNotesCountByYamlDate(this.deps.app, ignoredFolders, dateFieldName);
 	}
 }

@@ -1,5 +1,5 @@
-import {App, PluginSettingTab} from "obsidian";
-import CalendarZ from "../main";
+import {App, Plugin, PluginSettingTab} from "obsidian";
+import type { PluginLike } from "../types";
 import {renderLanguageSettings} from "./modules/language";
 import {renderBasicSettings} from "./modules/basic";
 import {renderStatisticsSettings} from "./modules/statistics";
@@ -11,15 +11,15 @@ import {renderClickSettings} from "./modules/click";
  */
 export class CalendarZSettingTab extends PluginSettingTab {
 	/** Reference to the main plugin instance */
-	plugin: CalendarZ;
+	plugin: PluginLike;
 
 	/**
 	 * Creates a new settings tab instance.
 	 * @param app - Obsidian App instance
-	 * @param plugin - CalendarZ plugin instance
+	 * @param plugin - Plugin instance satisfying PluginLike interface
 	 */
-	constructor(app: App, plugin: CalendarZ) {
-		super(app, plugin);
+	constructor(app: App, plugin: PluginLike) {
+		super(app, plugin as unknown as Plugin);
 		this.plugin = plugin;
 	}
 

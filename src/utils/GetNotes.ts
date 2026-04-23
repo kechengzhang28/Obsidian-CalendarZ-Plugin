@@ -1,22 +1,7 @@
 import {App, parseYaml, TFile} from "obsidian";
-import dayjs from "dayjs";
 import type {DateCount} from "../components/types";
-import {DATE_FORMAT} from "../constants";
-import {parseDateFromFilename, parseYamlDate} from "./date";
-
-/**
- * Checks if a file path should be ignored based on the ignore list
- * @param filePath - Path to check
- * @param ignoredFolders - List of folder paths to ignore
- * @returns True if the path should be ignored
- */
-function isPathIgnored(filePath: string, ignoredFolders: string[]): boolean {
-	const normalizedPath = filePath.replace(/\\/g, "/");
-	return ignoredFolders.some(folder => {
-		const normalizedFolder = folder.replace(/\\/g, "/").replace(/\/$/, "");
-		return normalizedPath === normalizedFolder || normalizedPath.startsWith(normalizedFolder + "/");
-	});
-}
+import {formatDate, parseDateFromFilename, parseYamlDate} from "./date";
+import {isPathIgnored} from "./path";
 
 /**
  * Extracts YAML frontmatter from file content
@@ -57,7 +42,7 @@ function countNotesByDate<T>(
 
 		const date = extractDate(item);
 		if (date) {
-			const dateStr = dayjs(date).format(DATE_FORMAT);
+			const dateStr = formatDate(date);
 			counts.set(dateStr, (counts.get(dateStr) || 0) + 1);
 		}
 	}
@@ -131,7 +116,7 @@ export async function getNotesCountByYamlDate(
 		const date = await extractDateFromYaml(file, app, dateFieldName);
 		if (!date) return null;
 
-		return dayjs(date).format(DATE_FORMAT);
+		return formatDate(date);
 	});
 
 	const dates = await Promise.all(datePromises);
