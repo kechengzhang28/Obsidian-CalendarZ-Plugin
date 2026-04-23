@@ -1,5 +1,5 @@
 import {App, Modal, Setting} from "obsidian";
-import {I18n} from "../i18n";
+import type {I18n} from "../i18n";
 
 /**
  * Modal for managing ignored folders.

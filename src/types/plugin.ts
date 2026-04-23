@@ -1,6 +1,6 @@
-import { App } from "obsidian";
-import { I18n } from "../i18n";
-import { CalendarZSettings } from "../settings/types";
+import type { App } from "obsidian";
+import type { I18n } from "../i18n";
+import type { CalendarZSettings } from "../settings/types";
 
 /**
  * Minimal interface for plugin-like objects

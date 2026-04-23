@@ -1,6 +1,6 @@
 import {App, parseYaml, TFile} from "obsidian";
 import dayjs from "dayjs";
-import {DateCount} from "../ui/DaysGrid";
+import type {DateCount} from "../ui/DaysGrid";
 import {DATE_FORMAT} from "../constants";
 import {parseDateFromFilename, parseYamlDate} from "./date";
 

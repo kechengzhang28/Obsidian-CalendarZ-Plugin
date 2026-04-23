@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { WeekStart, DisplayMode } from "../settings/types";
+import type { WeekStart, DisplayMode } from "../settings/types";
 import {
 	formatDate,
 	isSameDay,
@@ -11,8 +11,10 @@ import {
 } from "../utils/date";
 import { CSS_CLASSES, ATTRS, GRID } from "../constants";
 import {
-	DisplayStrategy,
 	DisplayStrategyFactory,
+} from "../display";
+import type {
+	DisplayStrategy,
 	DayDisplayConfig,
 	DisplayContext,
 } from "../display";

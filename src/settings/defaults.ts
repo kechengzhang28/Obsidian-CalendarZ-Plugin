@@ -1,4 +1,4 @@
-import {CalendarZSettings} from "./types";
+import type {CalendarZSettings} from "./types";
 
 /** Default settings values */
 export const DEFAULT_SETTINGS: CalendarZSettings = {

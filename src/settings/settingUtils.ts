@@ -1,4 +1,4 @@
-import { PluginLike } from "../types";
+import type { PluginLike } from "../types";
 
 /**
  * Type-safe setting change handler factory

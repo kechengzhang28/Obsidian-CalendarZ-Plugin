@@ -5,7 +5,7 @@ import {
 	getDailyNote,
 	getAllDailyNotes,
 } from "obsidian-daily-notes-interface";
-import {I18n} from "../i18n";
+import type {I18n} from "../i18n";
 
 /**
  * Finds an existing daily note for the given date using the core Daily Notes plugin.

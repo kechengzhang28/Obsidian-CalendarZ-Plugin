@@ -1,7 +1,9 @@
 import {Plugin, WorkspaceLeaf} from 'obsidian';
-import {DEFAULT_SETTINGS, CalendarZSettings, CalendarZSettingTab} from "./settings/index";
+import {DEFAULT_SETTINGS, CalendarZSettingTab} from "./settings/index";
+import type { CalendarZSettings } from "./settings/index";
 import {CALENDARZ_VIEW_TYPE, CalendarZView} from "./CalendarView";
-import {I18n, loadI18n} from "./i18n";
+import {loadI18n} from "./i18n";
+import type {I18n} from "./i18n";
 
 export default class CalendarZ extends Plugin {
 	settings: CalendarZSettings;

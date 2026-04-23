@@ -1,4 +1,4 @@
-import { PluginLike } from "../../types";
+import type { PluginLike } from "../../types";
 import { SettingGroup } from "../../ui/components/SettingGroup";
 import { ToggleSettingRenderer } from "../ui/SettingRenderer";
 

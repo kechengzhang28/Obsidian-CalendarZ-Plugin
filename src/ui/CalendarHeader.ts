@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import { I18n } from "../i18n";
-import { TitleFormat, MonthFormat } from "../settings/index";
+import type { I18n } from "../i18n";
+import type { TitleFormat, MonthFormat } from "../settings/index";
 import { Component } from "../core/Component";
 import { IconButton } from "./components/Button";
 import { formatMonth } from "../utils/date";

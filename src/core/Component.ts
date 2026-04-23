@@ -1,4 +1,5 @@
-import { Disposable, DisposableManager } from "./Disposable";
+import type { Disposable } from "./Disposable";
+import { DisposableManager } from "./Disposable";
 
 /**
  * Base class for UI components

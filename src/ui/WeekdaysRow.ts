@@ -1,5 +1,5 @@
-import { I18n } from "../i18n";
-import { WeekStart } from "../settings/index";
+import type { I18n } from "../i18n";
+import type { WeekStart } from "../settings/index";
 
 /**
  * Renders the weekday names row (Sun, Mon, Tue, etc.).

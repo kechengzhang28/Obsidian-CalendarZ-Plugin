@@ -1,6 +1,6 @@
 import { Setting } from "obsidian";
-import { PluginLike } from "../../types";
-import { Language } from "../types";
+import type { PluginLike } from "../../types";
+import type { Language } from "../types";
 import { SettingGroup } from "../../ui/components/SettingGroup";
 
 /**

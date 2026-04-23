@@ -3,6 +3,8 @@ import process from "process";
 import { builtinModules } from 'node:module';
 import fs from 'fs';
 import path from 'path';
+import esbuildSvelte from "esbuild-svelte";
+import { sveltePreprocess } from "svelte-preprocess";
 
 const banner =
 `/*
@@ -59,7 +61,13 @@ const context = await esbuild.context({
 	treeShaking: true,
 	outfile: "main.js",
 	minify: prod,
-	plugins: [jsonPlugin],
+	plugins: [
+		jsonPlugin,
+		esbuildSvelte({
+			preprocess: sveltePreprocess(),
+			compilerOptions: { css: "injected" }
+		})
+	],
 });
 
 if (prod) {

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { WeekStart } from "../../settings/types";
+import type { WeekStart } from "../../settings/types";
 import { DAY_OF_WEEK, HEATMAP } from "../../constants";
 
 /**

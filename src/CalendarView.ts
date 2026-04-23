@@ -1,40 +1,28 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import dayjs from "dayjs";
-import { I18n } from "./i18n";
-import { CalendarHeader } from "./ui/CalendarHeader";
-import { WeekdaysRow } from "./ui/WeekdaysRow";
-import { DaysGrid, DateCount } from "./ui/DaysGrid";
-import { ConfirmModal } from "./ui/ConfirmModal";
-import { CalendarZSettings } from "./settings/index";
+import { mount, unmount } from "svelte";
+import type { CalendarZSettings } from "./settings/index";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/GetNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
-import { CSS_CLASSES, ATTRS, DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
+import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
 import CalendarZ from "./main";
+import Calendar from "./components/Calendar.svelte";
+import type { DateCount } from "./components/types";
 
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
 export class CalendarZView extends ItemView {
 	private currentDate = new Date();
 	private plugin: CalendarZ;
-	private daysGrid: DaysGrid | null = null;
+	private calendarComponent: ReturnType<typeof mount> | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: CalendarZ) {
 		super(leaf);
 		this.plugin = plugin;
 	}
 
-	/**
-	 * Gets the plugin settings
-	 */
 	private get settings(): CalendarZSettings {
 		return this.plugin.settings;
-	}
-
-	/**
-	 * Gets the i18n strings
-	 */
-	private get i18n(): I18n {
-		return this.plugin.i18n;
 	}
 
 	getViewType(): string {
@@ -42,16 +30,13 @@ export class CalendarZView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return this.i18n.calendar.viewTitle;
+		return this.plugin.i18n.calendar.viewTitle;
 	}
 
 	getIcon(): string {
 		return "calendar";
 	}
 
-	/**
-	 * Updates the view when settings change
-	 */
 	updateSettings(): void {
 		void this.renderCalendar();
 	}
@@ -61,6 +46,10 @@ export class CalendarZView extends ItemView {
 	}
 
 	async onClose(): Promise<void> {
+		if (this.calendarComponent) {
+			void unmount(this.calendarComponent);
+			this.calendarComponent = null;
+		}
 		this.contentEl.empty();
 	}
 
@@ -68,8 +57,9 @@ export class CalendarZView extends ItemView {
 		if (this.settings.displayMode === DISPLAY_MODE.NONE) return;
 
 		const dateCounts = await this.fetchDateCounts();
-		if (this.daysGrid) {
-			this.daysGrid.updateDisplay(dateCounts);
+		if (this.calendarComponent) {
+			// Re-mount with updated dateCounts
+			void this.renderCalendar(dateCounts);
 		} else {
 			void this.renderCalendar();
 		}
@@ -85,48 +75,39 @@ export class CalendarZView extends ItemView {
 			return;
 		}
 
-		const todayStr = today.format(DATE_FORMAT);
-		this.contentEl.querySelectorAll(`.${CSS_CLASSES.DAY}`).forEach(el => {
-			const isToday = el.getAttribute(ATTRS.DATA_DATE) === todayStr;
-			el.toggleClass(CSS_CLASSES.DAY_TODAY, isToday);
-			if (this.settings.displayMode !== DISPLAY_MODE.HEATMAP) {
-				el.toggleClass(CSS_CLASSES.DAY_TODAY_THEMED, isToday);
-			}
-		});
-	}
-
-	private async renderCalendar(): Promise<void> {
-		this.contentEl.empty();
-		this.contentEl.addClass(CSS_CLASSES.CONTAINER);
-
-		const header = new CalendarHeader({
-			i18n: this.i18n,
-			monthFormat: this.settings.monthFormat,
-			language: this.settings.language,
-			titleFormat: this.settings.titleFormat,
-			callbacks: {
-				onPrevMonth: () => this.navigateMonth(-1),
-				onNextMonth: () => this.navigateMonth(1),
-				onToday: () => this.goToToday(),
-			},
-			initialDate: this.currentDate,
-		});
-		header.render(this.contentEl);
-
-		new WeekdaysRow(this.contentEl, this.i18n, this.settings.weekStart).render();
-
+		// Svelte handles reactivity, just re-render with same data
 		const dateCounts = this.settings.displayMode !== DISPLAY_MODE.NONE
 			? await this.fetchDateCounts()
 			: [];
+		void this.renderCalendar(dateCounts);
+	}
 
-		this.daysGrid = new DaysGrid(
-			this.contentEl,
-			this.settings.weekStart,
-			this.settings.displayMode,
-			this.settings.dotThreshold,
-			(date) => void this.handleDayClick(date)
+	private async renderCalendar(preloadedDateCounts?: DateCount[]): Promise<void> {
+		// Clean up previous Svelte component
+		if (this.calendarComponent) {
+			void unmount(this.calendarComponent);
+			this.calendarComponent = null;
+		}
+		this.contentEl.empty();
+
+		const dateCounts = preloadedDateCounts ?? (
+			this.settings.displayMode !== DISPLAY_MODE.NONE
+				? await this.fetchDateCounts()
+				: []
 		);
-		this.daysGrid.render(this.currentDate, dateCounts);
+
+		this.calendarComponent = mount(Calendar, {
+			target: this.contentEl,
+			props: {
+				settings: this.settings,
+				i18n: this.plugin.i18n,
+				dateCounts,
+				currentDate: this.currentDate,
+				onDayClick: (date: Date) => void this.handleDayClick(date),
+				onNavigateMonth: (direction: -1 | 1) => this.navigateMonth(direction),
+				onGoToToday: () => this.goToToday(),
+			},
+		});
 	}
 
 	private navigateMonth(direction: -1 | 1): void {
@@ -148,6 +129,7 @@ export class CalendarZView extends ItemView {
 		}
 
 		if (this.settings.confirmBeforeCreate) {
+			const { ConfirmModal } = await import("./ui/ConfirmModal");
 			const dateStr = dayjs(date).format(DATE_FORMAT);
 			new ConfirmModal(
 				this.app,
