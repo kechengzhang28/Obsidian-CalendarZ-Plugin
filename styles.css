@@ -19,7 +19,8 @@
 	color: var(--text-normal);
 	background-color: transparent;
 	position: relative;
-	gap: 2px;
+	padding: 2px;
+	gap: 1px;
 }
 
 .calendarz-header {
@@ -153,14 +154,14 @@
 	cursor: pointer;
 }
 
-/* Dots container for dots mode - always reserve space for alignment */
+/* Dots container for dots mode */
 .calendarz-dots-container {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
 	gap: 2px;
 	max-width: 24px;
-	min-height: 4px;
+	margin-top: 1px;
 }
 
 /* Individual dot */
