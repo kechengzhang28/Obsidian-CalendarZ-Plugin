@@ -80,21 +80,19 @@ export function renderStatisticsSettings(
 		onChange: handleDateSourceChange,
 	});
 
-	// Filename date format setting (only shown when dateSource is filename)
-	if (plugin.settings.dateSource === DATE_SOURCE.FILENAME) {
-		const filenameFormatRenderer = new TextSettingRenderer(plugin, DEFAULTS.FILENAME_FORMAT_PLACEHOLDER);
-		const handleFilenameFormatChange = createSettingHandler({
-			plugin,
-			settingKey: "filenameDateFormat",
-			transform: (value) => value.trim() || DEFAULTS.FILENAME_DATE_FORMAT,
-		});
-		filenameFormatRenderer.render(contentEl, {
-			name: t.settings.filenameDateFormat.name,
-			description: t.settings.filenameDateFormat.description,
-			value: plugin.settings.filenameDateFormat,
-			onChange: handleFilenameFormatChange,
-		});
-	}
+	// Filename date format setting
+	const filenameFormatRenderer = new TextSettingRenderer(plugin, DEFAULTS.FILENAME_FORMAT_PLACEHOLDER);
+	const handleFilenameFormatChange = createSettingHandler({
+		plugin,
+		settingKey: "filenameDateFormat",
+		transform: (value) => value.trim() || DEFAULTS.FILENAME_DATE_FORMAT,
+	});
+	filenameFormatRenderer.render(contentEl, {
+		name: t.settings.filenameDateFormat.name,
+		description: t.settings.filenameDateFormat.description,
+		value: plugin.settings.filenameDateFormat,
+		onChange: handleFilenameFormatChange,
+	});
 
 	// Ignored folders setting
 	const ignoredFoldersDesc = getIgnoredFoldersDescription(plugin);
