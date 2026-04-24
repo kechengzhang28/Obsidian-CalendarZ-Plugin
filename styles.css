@@ -57,7 +57,7 @@
 .calendarz-year {
 	font-weight: 600;
 	font-size: 24px;
-	color: var(--text-accent);
+	color: var(--interactive-accent);
 	margin-right: 8px;
 }
 
@@ -94,6 +94,7 @@
 .calendarz-weekday-label {
 	font-size: 11px;
 	font-weight: 500;
+	color: var(--text-accent);
 }
 
 .calendarz-days {
@@ -122,6 +123,7 @@
 	padding: 2px;
 	gap: 1px;
 	min-height: 0;
+	color: var(--text-accent);
 }
 
 .calendarz-week-number-clickable {
