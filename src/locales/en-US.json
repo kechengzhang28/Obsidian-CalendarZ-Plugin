@@ -140,6 +140,11 @@
     "weekNoteFolder": {
       "name": "Weekly Note Folder",
       "description": "Folder path for weekly notes (leave empty for root directory)"
+    },
+    "weekNoteFormat": {
+      "name": "Weekly Note Naming Format",
+      "description": "Use YYYY for year, WW for week number. Content in [] brackets will be displayed as-is. Example: YYYY-[W]WW produces 2024-W01.md",
+      "placeholder": "YYYY-[W]WW"
     }
   },
   "commands": {

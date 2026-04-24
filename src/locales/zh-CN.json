@@ -140,6 +140,11 @@
     "weekNoteFolder": {
       "name": "周记文件夹",
       "description": "周记存放的文件夹路径（留空存放在根目录）"
+    },
+    "weekNoteFormat": {
+      "name": "周记命名格式",
+      "description": "使用 YYYY 代表年份，WW 代表周数，用 [] 括起来的内容会原样显示。例如：YYYY-[W]WW 会生成 2024-W01.md",
+      "placeholder": "YYYY-[W]WW"
     }
   },
   "commands": {

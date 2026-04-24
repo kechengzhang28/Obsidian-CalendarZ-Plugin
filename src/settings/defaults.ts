@@ -21,5 +21,6 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	showWeekNumber: false,
 	weekNoteEnabled: false,
 	weekNoteTemplate: "",
-	weekNoteFolder: ""
+	weekNoteFolder: "",
+	weekNoteFormat: "YYYY-[W]WW"
 };

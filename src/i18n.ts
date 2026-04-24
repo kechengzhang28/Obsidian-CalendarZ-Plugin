@@ -192,6 +192,12 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
+		/** Week note naming format setting strings */
+		weekNoteFormat: {
+			name: string;
+			description: string;
+			placeholder: string;
+		};
 	};
 	/** Command names */
 	commands: {

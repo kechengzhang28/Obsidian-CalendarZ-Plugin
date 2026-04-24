@@ -45,4 +45,14 @@ export function renderWeekNoteSettings(containerEl: HTMLElement, plugin: PluginL
 		value: plugin.settings.weekNoteFolder,
 		onChange: handleWeekNoteFolderChange,
 	});
+
+	// Week note format setting
+	const weekNoteFormatRenderer = new TextSettingRenderer(plugin, t.settings.weekNoteFormat.placeholder);
+	const handleWeekNoteFormatChange = createSettingHandler({ plugin, settingKey: "weekNoteFormat" });
+	weekNoteFormatRenderer.render(contentEl, {
+		name: t.settings.weekNoteFormat.name,
+		description: t.settings.weekNoteFormat.description,
+		value: plugin.settings.weekNoteFormat,
+		onChange: handleWeekNoteFormatChange,
+	});
 }

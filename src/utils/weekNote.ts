@@ -4,16 +4,45 @@ import type { CalendarZSettings, WeekStart } from "../settings/types";
 import dayjs from "./date/dayjsConfig";
 
 /**
+ * Parses the week note format pattern and generates filename
+ * Format rules:
+ * - YYYY: 4-digit year (e.g., 2024)
+ * - WW: 2-digit week number (e.g., 01, 52)
+ * - [text]: literal text that appears as-is
+ * @param format - The format pattern (e.g., "YYYY-[W]WW", "[Week] WW, YYYY")
+ * @param year - The year
+ * @param week - The week number
+ * @returns Formatted filename without extension
+ */
+function parseWeekNoteFormat(format: string, year: number, week: number): string {
+	let result = format;
+
+	// Replace YYYY with 4-digit year
+	result = result.replace(/YYYY/g, year.toString());
+
+	// Replace WW with 2-digit week number
+	result = result.replace(/WW/g, week.toString().padStart(2, "0"));
+
+	// Remove brackets from literal text [text] -> text
+	result = result.replace(/\[([^\]]+)\]/g, "$1");
+
+	return result;
+}
+
+/**
  * Generates the week note filename based on the date and settings
  * @param date - The date within the week
- * @param weekStart - Week start preference
- * @returns Formatted filename (e.g., "2024-W01.md")
+ * @param settings - Plugin settings
+ * @returns Formatted filename based on the format pattern
  */
-export function getWeekNoteFilename(date: Date, weekStart: WeekStart): string {
+export function getWeekNoteFilename(date: Date, settings: CalendarZSettings): string {
 	const d = dayjs(date);
 	const year = d.year();
 	const week = d.week();
-	return `${year}-W${week.toString().padStart(2, "0")}.md`;
+	const format = settings.weekNoteFormat || "YYYY-[W]WW";
+
+	const filename = parseWeekNoteFormat(format, year, week);
+	return `${filename}.md`;
 }
 
 /**
@@ -23,7 +52,7 @@ export function getWeekNoteFilename(date: Date, weekStart: WeekStart): string {
  * @returns Full path to the week note
  */
 export function getWeekNotePath(date: Date, settings: CalendarZSettings): string {
-	const filename = getWeekNoteFilename(date, settings.weekStart);
+	const filename = getWeekNoteFilename(date, settings);
 	const folder = settings.weekNoteFolder.trim();
 	if (folder) {
 		return normalizePath(`${folder}/${filename}`);

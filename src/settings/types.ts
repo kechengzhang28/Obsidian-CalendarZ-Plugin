@@ -64,4 +64,6 @@ export interface CalendarZSettings {
 	weekNoteTemplate: string;
 	/** Week note folder path */
 	weekNoteFolder: string;
+	/** Week note naming format pattern (e.g., "YYYY-[W]WW", "YYYYWW", "[Week] WW, YYYY") */
+	weekNoteFormat: string;
 }
