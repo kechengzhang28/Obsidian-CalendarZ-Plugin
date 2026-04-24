@@ -48,3 +48,7 @@ Issues and Pull Requests are welcome!
 ***
 
 If you find this plugin helpful, please consider giving it a ⭐️
+
+You can also support me by buying me a coffee:
+
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" width="100">](https://www.buymeacoffee.com/kechengzhang)
