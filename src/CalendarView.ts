@@ -9,7 +9,7 @@ import {
 	getWordCountByYamlDate, getWordCountByFilenameDate, getWordCountByBoth
 } from "./utils/getNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
-import { openOrCreateWeekNote, findWeekNote, getWeekDateRange, getWeekNotePath } from "./utils/weekNote";
+import { openOrCreateWeekNote, findWeekNote, getWeekDateRange } from "./utils/weekNote";
 import { getTodoStatus } from "./utils/todoDetector";
 import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT, STATISTICS_TYPE } from "./constants";
 import Calendar from "./components/Calendar.svelte";
@@ -396,24 +396,66 @@ export class CalendarZView extends ItemView {
 
 	/**
 	 * Extracts week key from file path if it's a week note.
+	 * Uses forward parsing instead of brute-force loop for better performance.
 	 * @param filePath - The file path
 	 * @returns Week key (e.g., "2024-W01") or null if not a week note
 	 */
 	private extractWeekKeyFromPath(filePath: string): string | null {
-		// Get the expected week note path pattern
-		const currentYear = dayjs().year();
-		
-		// Try different weeks to find a match
-		for (let week = 1; week <= 53; week++) {
-			const date = dayjs().year(currentYear).week(week).startOf("week").toDate();
-			const expectedPath = getWeekNotePath(date, this.settings);
-			
-			if (filePath === expectedPath || filePath.endsWith("/" + expectedPath)) {
-				const year = dayjs(date).year();
-				return `${year}-W${week.toString().padStart(2, "0")}`;
-			}
+		const folder = this.settings.weekNoteFolder.trim();
+		const format = this.settings.weekNoteFormat || "YYYY-[W]WW";
+
+		// Remove folder prefix if present
+		let filename = filePath;
+		if (folder && filePath.startsWith(folder + "/")) {
+			filename = filePath.slice(folder.length + 1);
 		}
-		
-		return null;
+
+		// Remove .md extension
+		if (filename.endsWith(".md")) {
+			filename = filename.slice(0, -3);
+		}
+
+		// Build regex pattern from format
+		// YYYY -> (\d{4}), WW -> (\d{2}), [text] -> literal text
+		const regexPattern = format
+			.replace(/\[/g, "\\[")
+			.replace(/\]/g, "\\]")
+			.replace(/YYYY/g, "(\\d{4})")
+			.replace(/WW/g, "(\\d{2})")
+			.replace(/\\\[([^\\\]]+)\\\]/g, "$1");
+
+		const regex = new RegExp(`^${regexPattern}$`);
+		const match = filename.match(regex);
+
+		if (!match) {
+			return null;
+		}
+
+		// Extract year and week from match groups based on format order
+		const yearIndex = format.indexOf("YYYY");
+		const weekIndex = format.indexOf("WW");
+
+		if (yearIndex === -1 || weekIndex === -1) {
+			return null;
+		}
+
+		// Determine capture group indices (1-based)
+		let yearGroup = 1;
+		let weekGroup = 1;
+
+		if (yearIndex < weekIndex) {
+			weekGroup = 2;
+		} else {
+			yearGroup = 2;
+		}
+
+		const year = match[yearGroup];
+		const week = match[weekGroup];
+
+		if (!year || !week) {
+			return null;
+		}
+
+		return `${year}-W${week}`;
 	}
 }
