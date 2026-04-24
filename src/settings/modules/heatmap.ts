@@ -1,6 +1,6 @@
 import type { PluginLike } from "../../types";
 import { SettingGroup } from "../ui/SettingGroup";
-import { SliderSettingRenderer, NumberSettingRenderer } from "../ui/SettingRenderer";
+import { SliderSettingRenderer, NumberSettingRenderer, ToggleSettingRenderer } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
 
 /**
@@ -37,5 +37,15 @@ export function renderHeatmapSettings(
 		description: t.settings.heatmapMaxWords.description,
 		value: plugin.settings.heatmapMaxWords,
 		onChange: handleHeatmapMaxWordsChange,
+	});
+
+	// Heatmap hide date numbers setting
+	const toggleRenderer = new ToggleSettingRenderer(plugin);
+	const handleHeatmapHideDateNumbersChange = createSettingHandler({ plugin, settingKey: "heatmapHideDateNumbers" });
+	toggleRenderer.render(contentEl, {
+		name: t.settings.heatmapHideDateNumbers.name,
+		description: t.settings.heatmapHideDateNumbers.description,
+		value: plugin.settings.heatmapHideDateNumbers,
+		onChange: handleHeatmapHideDateNumbersChange,
 	});
 }

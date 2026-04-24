@@ -47,10 +47,12 @@ export const CSS_CLASSES = {
 	DAY_TODAY: "calendarz-day-today",
 	DAY_TODAY_THEMED: "calendarz-day-today-themed",
 	DAY_HEATMAP: "calendarz-day-heatmap",
+	DAY_HEATMAP_EMPTY: "calendarz-day-heatmap-empty",
 	DOTS_CONTAINER: "calendarz-dots-container",
 	DOT: "calendarz-dot",
 	DOT_GRAY: "calendarz-dot-gray",
 	BAR_TODAY: "calendarz-bar-today",
+	STAR_TODAY: "calendarz-star-today",
 } as const;
 
 /** CSS custom property names */

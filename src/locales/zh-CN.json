@@ -105,6 +105,10 @@
       "name": "热力图最大字数",
       "description": "热力图达到最大亮度时的字数。任何字数大于等于此值的日期都将显示最大亮度。（最小值为 1）"
     },
+    "heatmapHideDateNumbers": {
+      "name": "隐藏日期数字",
+      "description": "在热力图模式下隐藏日期数字，仅显示颜色块"
+    },
     "confirmBeforeCreate": {
       "name": "创建前确认",
       "description": "左键点击日期时，是否在创建日记前弹出确认对话框"

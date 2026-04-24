@@ -146,6 +146,11 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
+		/** Heatmap hide date numbers setting strings */
+		heatmapHideDateNumbers: {
+			name: string;
+			description: string;
+		};
 		/** Confirm before creating daily note setting strings */
 		confirmBeforeCreate: {
 			name: string;

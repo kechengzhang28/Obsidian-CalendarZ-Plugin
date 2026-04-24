@@ -19,6 +19,7 @@
 		displayMode: DisplayMode;
 		dotThreshold: number;
 		heatmapMaxNotes: number;
+		heatmapHideDateNumbers: boolean;
 		dateCounts: DateCount[];
 		onDayClick: (date: Date) => void;
 	}
@@ -29,6 +30,7 @@
 		displayMode,
 		dotThreshold,
 		heatmapMaxNotes,
+		heatmapHideDateNumbers,
 		dateCounts,
 		onDayClick,
 	}: Props = $props();
@@ -114,8 +116,12 @@
 				classes.push(CSS_CLASSES.DAY_TODAY_THEMED);
 			}
 		}
-		if (displayMode === "heatmap" && cell.count > 0) {
-			classes.push(CSS_CLASSES.DAY_HEATMAP);
+		if (displayMode === "heatmap") {
+			if (cell.count > 0) {
+				classes.push(CSS_CLASSES.DAY_HEATMAP);
+			} else {
+				classes.push(CSS_CLASSES.DAY_HEATMAP_EMPTY);
+			}
 		}
 		return classes.join(" ");
 	}
@@ -167,9 +173,11 @@
 			tabindex="0"
 			onclick={() => handleClick(cell)}
 		>
-			{cell.date.date()}
+			{#if !(displayMode === "heatmap" && heatmapHideDateNumbers)}
+				{cell.date.date()}
+			{/if}
 
-			{#if getDotCount(cell) > 0 || showGrayDot(cell) || showTodayIndicator(cell)}
+			{#if getDotCount(cell) > 0 || showGrayDot(cell) || (showTodayIndicator(cell) && !heatmapHideDateNumbers)}
 				<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
 					{#if showTodayIndicator(cell)}
 						<div class="{CSS_CLASSES.BAR_TODAY}"></div>

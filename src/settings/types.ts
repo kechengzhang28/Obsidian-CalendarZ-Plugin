@@ -52,6 +52,8 @@ export interface CalendarZSettings {
 	heatmapMaxNotes: number;
 	/** Maximum word count for heatmap brightness calculation */
 	heatmapMaxWords: number;
+	/** Whether to hide date numbers in heatmap mode */
+	heatmapHideDateNumbers: boolean;
 	/** Whether to confirm before creating a daily note on click */
 	confirmBeforeCreate: boolean;
 }

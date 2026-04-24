@@ -105,6 +105,10 @@
       "name": "Max Words for Heatmap",
       "description": "Maximum word count to reach full brightness in heatmap mode. Any date with words >= this value will show maximum brightness. (minimum 1)"
     },
+    "heatmapHideDateNumbers": {
+      "name": "Hide Date Numbers",
+      "description": "Hide date numbers in heatmap mode, show only color blocks"
+    },
     "confirmBeforeCreate": {
       "name": "Confirm Before Creating",
       "description": "Show a confirmation dialog before creating a daily note when left-clicking a date"

@@ -59,6 +59,7 @@
 		displayMode={settings.displayMode}
 		dotThreshold={effectiveDotThreshold}
 		heatmapMaxNotes={effectiveHeatmapMax}
+		heatmapHideDateNumbers={settings.heatmapHideDateNumbers}
 		{dateCounts}
 		{onDayClick}
 	/>

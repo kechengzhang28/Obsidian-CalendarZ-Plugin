@@ -16,5 +16,6 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	dotWordThreshold: 100,
 	heatmapMaxNotes: 10,
 	heatmapMaxWords: 1000,
+	heatmapHideDateNumbers: false,
 	confirmBeforeCreate: true
 };

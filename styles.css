@@ -147,6 +147,12 @@
 	filter: brightness(1.1);
 }
 
+/* Heatmap empty cells (no notes) - gray background */
+.calendarz-day-heatmap-empty {
+	background-color: var(--background-modifier-border-hover);
+	border-radius: 4px;
+}
+
 /* Remove button in modal */
 .calendarz-modal-remove-btn {
 	background-color: transparent !important;
@@ -186,6 +192,13 @@
 	border-radius: 1px;
 	background-color: var(--text-normal);
 	flex-shrink: 0;
+}
+
+/* Today indicator star for heatmap mode when date numbers are hidden */
+.calendarz-star-today {
+	font-size: 12px;
+	color: var(--text-normal);
+	line-height: 1;
 }
 
 /* Settings folder item */
