@@ -4,7 +4,7 @@
 	"version": "1.0.0",
 	"minAppVersion": "1.12.3",
 	"description": "A visual calendar with heatmap & dots tracking for your daily notes.",
-	"author": "kechengzhang28",
+	"author": "Kecheng Zhang",
 	"authorUrl": "https://github.com/kechengzhang28",
 	"fundingUrl": "https://www.buymeacoffee.com/kechengzhang",
 	"isDesktopOnly": true
