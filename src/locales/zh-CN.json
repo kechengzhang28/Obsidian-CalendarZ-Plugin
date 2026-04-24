@@ -76,7 +76,7 @@
       "description": "选择在日历上显示笔记统计的方式",
       "options": {
         "heatmap": "热力图",
-        "dots": "点",
+        "dots": "点图",
         "none": "无"
       }
     },

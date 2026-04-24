@@ -127,7 +127,7 @@ export class CalendarZView extends ItemView {
 	private async renderCalendar(preloadedDateCounts?: DateCount[]): Promise<void> {
 		// Clean up previous Svelte component
 		if (this.calendarComponent) {
-			void unmount(this.calendarComponent);
+			await unmount(this.calendarComponent);
 			this.calendarComponent = null;
 		}
 		this.contentEl.empty();

@@ -142,8 +142,7 @@
 	function showTodayIndicator(cell: DayCell): boolean {
 		return (
 			displayMode === "heatmap" &&
-			cell.isToday &&
-			cell.count === 0
+			cell.isToday
 		);
 	}
 
