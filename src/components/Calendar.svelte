@@ -22,6 +22,7 @@
 		onNavigateMonth: (direction: -1 | 1) => void;
 		onGoToToday: () => void;
 		currentDate: Date;
+		hasWeekNote?: (date: Date) => boolean;
 	}
 
 	let {
@@ -33,6 +34,7 @@
 		onNavigateMonth,
 		onGoToToday,
 		currentDate,
+		hasWeekNote,
 	}: Props = $props();
 
 	// Determine which thresholds to use based on statistics type
@@ -67,5 +69,6 @@
 		{dateCounts}
 		{onDayClick}
 		{onWeekClick}
+		{hasWeekNote}
 	/>
 </div>

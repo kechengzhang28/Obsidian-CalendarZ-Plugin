@@ -26,6 +26,7 @@
 		dateCounts: DateCount[];
 		onDayClick: (date: Date) => void;
 		onWeekClick: (date: Date) => void;
+		hasWeekNote?: (date: Date) => boolean;
 	}
 
 	let {
@@ -40,6 +41,7 @@
 		dateCounts,
 		onDayClick,
 		onWeekClick,
+		hasWeekNote,
 	}: Props = $props();
 
 	const countsMap = $derived(
@@ -185,6 +187,25 @@
 			onWeekClick(row.cells[0].date.toDate());
 		}
 	}
+
+	function getWeekNoteDotClass(row: { weekNumber: number; cells: DayCell[] }): string {
+		if (!weekNoteEnabled || displayMode !== "dots" || !hasWeekNote || row.cells.length === 0) {
+			return "";
+		}
+		const firstDay = row.cells[0];
+		const hasNote = hasWeekNote(firstDay.date.toDate());
+		const isCurrentWeek = row.cells.some(cell => cell.isToday);
+		const isBeforeCurrentWeek = firstDay.date.isBefore(today, "week");
+
+		if (hasNote) {
+			return CSS_CLASSES.DOT;
+		} else if (isCurrentWeek) {
+			return ""; // Current week without note: no dot
+		} else if (isBeforeCurrentWeek) {
+			return `${CSS_CLASSES.DOT} ${CSS_CLASSES.DOT_GRAY}`;
+		}
+		return "";
+	}
 </script>
 
 <div class={CSS_CLASSES.DAYS} class:calendarz-days-with-week={showWeekNumber}>
@@ -199,6 +220,9 @@
 					onclick={() => handleWeekClick(row)}
 				>
 					{row.weekNumber}
+					{#if getWeekNoteDotClass(row)}
+						<div class="calendarz-week-number-dot {getWeekNoteDotClass(row)}"></div>
+					{/if}
 				</div>
 			{:else}
 				<div class="calendarz-week-number">

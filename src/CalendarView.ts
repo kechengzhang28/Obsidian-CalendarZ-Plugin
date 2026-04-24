@@ -152,6 +152,7 @@ export class CalendarZView extends ItemView {
 				onWeekClick: (date: Date) => void this.handleWeekClick(date),
 				onNavigateMonth: (direction: -1 | 1) => this.navigateMonth(direction),
 				onGoToToday: () => this.goToToday(),
+				hasWeekNote: (date: Date) => this.hasWeekNote(date),
 			},
 		});
 	}
@@ -243,6 +244,16 @@ export class CalendarZView extends ItemView {
 	 */
 	private async createWeekNote(date: Date): Promise<void> {
 		await openOrCreateWeekNote(this.deps.app, this.i18n, date, this.settings);
+	}
+
+	/**
+	 * Checks if a week note exists for the given date.
+	 * @param date - Date within the week to check
+	 * @returns True if week note exists, false otherwise
+	 */
+	private hasWeekNote(date: Date): boolean {
+		if (!this.settings.weekNoteEnabled) return false;
+		return findWeekNote(this.deps.app, date, this.settings) !== null;
 	}
 
 	/**
