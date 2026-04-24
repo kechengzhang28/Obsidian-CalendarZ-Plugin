@@ -1,26 +1,27 @@
-import {App, parseYaml, TFile} from "obsidian";
+import {App, TFile, MetadataCache} from "obsidian";
 import type {DateCount} from "../components/types";
 import {formatDate, parseDateFromFilename, parseYamlDate} from "./date";
 import {isPathIgnored} from "./path";
 
 /**
- * Extracts YAML frontmatter from file content
- * @param content - File content
- * @returns Parsed frontmatter object or null
+ * Extracts date from file metadata cache (avoids disk I/O)
+ * @param file - Markdown file
+ * @param metadataCache - Obsidian metadata cache
+ * @param dateFieldName - Name of the date field in frontmatter
+ * @returns Date or null
  */
-function extractYamlFrontmatter(content: string): Record<string, unknown> | null {
-	const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
-	if (!match?.[1]) return null;
+function extractDateFromMetadataCache(
+	file: TFile,
+	metadataCache: MetadataCache,
+	dateFieldName: string
+): Date | null {
+	const cache = metadataCache.getFileCache(file);
+	if (!cache?.frontmatter) return null;
 
-	try {
-		const parsed = parseYaml(match[1]) as unknown;
-		if (parsed && typeof parsed === "object") {
-			return parsed as Record<string, unknown>;
-		}
-		return {};
-	} catch {
-		return null;
-	}
+	const dateValue = cache.frontmatter[dateFieldName] as unknown;
+	if (!dateValue) return null;
+
+	return parseYamlDate(dateValue);
 }
 
 /**
@@ -51,32 +52,6 @@ function countNotesByDate<T>(
 }
 
 /**
- * Extracts date from a file using YAML frontmatter
- * @param file - Markdown file
- * @param app - Obsidian app instance
- * @param dateFieldName - Name of the date field in frontmatter
- * @returns Promise resolving to Date or null
- */
-async function extractDateFromYaml(
-	file: TFile,
-	app: App,
-	dateFieldName: string
-): Promise<Date | null> {
-	try {
-		const content = await app.vault.read(file);
-		const frontmatter = extractYamlFrontmatter(content);
-		const dateValue = frontmatter?.[dateFieldName];
-
-		if (!dateValue) return null;
-
-		return parseYamlDate(dateValue);
-	} catch (error) {
-		console.warn(`Failed to read file ${file.path}:`, error);
-		return null;
-	}
-}
-
-/**
  * Counts notes by date extracted from filenames
  * @param app - Obsidian app instance
  * @param ignoredFolders - List of folder paths to ignore
@@ -96,36 +71,30 @@ export function getNotesCountByFilenameDate(
 }
 
 /**
- * Counts notes by date extracted from YAML frontmatter
+ * Counts notes by date extracted from YAML frontmatter using metadata cache
  * @param app - Obsidian app instance
  * @param ignoredFolders - List of folder paths to ignore
  * @param dateFieldName - Name of the date field in frontmatter
- * @returns Promise resolving to array of date counts
+ * @returns Array of date counts
  */
-export async function getNotesCountByYamlDate(
+export function getNotesCountByYamlDate(
 	app: App,
 	ignoredFolders: string[],
 	dateFieldName: string
-): Promise<DateCount[]> {
+): DateCount[] {
 	const files = app.vault.getMarkdownFiles();
-	const datePromises = files.map(async (file) => {
-		if (isPathIgnored(file.path, ignoredFolders)) {
-			return null;
-		}
-
-		const date = await extractDateFromYaml(file, app, dateFieldName);
-		if (!date) return null;
-
-		return formatDate(date);
-	});
-
-	const dates = await Promise.all(datePromises);
 	const counts = new Map<string, number>();
 
-	for (const dateStr of dates) {
-		if (dateStr) {
-			counts.set(dateStr, (counts.get(dateStr) || 0) + 1);
+	for (const file of files) {
+		if (isPathIgnored(file.path, ignoredFolders)) {
+			continue;
 		}
+
+		const date = extractDateFromMetadataCache(file, app.metadataCache, dateFieldName);
+		if (!date) continue;
+
+		const dateStr = formatDate(date);
+		counts.set(dateStr, (counts.get(dateStr) || 0) + 1);
 	}
 
 	return Array.from(counts.entries()).map(([date, count]) => ({ date, count }));
@@ -137,15 +106,15 @@ export async function getNotesCountByYamlDate(
  * @param ignoredFolders - List of folder paths to ignore
  * @param dateFieldName - Name of the date field in frontmatter
  * @param filenameDateFormat - Date format pattern in filenames
- * @returns Promise resolving to array of date counts
+ * @returns Array of date counts
  */
-export async function getNotesCountByBoth(
+export function getNotesCountByBoth(
 	app: App,
 	ignoredFolders: string[],
 	dateFieldName: string,
 	filenameDateFormat: string
-): Promise<DateCount[]> {
-	const yamlCounts = await getNotesCountByYamlDate(app, ignoredFolders, dateFieldName);
+): DateCount[] {
+	const yamlCounts = getNotesCountByYamlDate(app, ignoredFolders, dateFieldName);
 	const filenameCounts = getNotesCountByFilenameDate(app, ignoredFolders, filenameDateFormat);
 
 	const mergedCounts = new Map<string, number>();

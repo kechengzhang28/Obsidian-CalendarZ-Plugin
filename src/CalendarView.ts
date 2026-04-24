@@ -103,9 +103,9 @@ export class CalendarZView extends ItemView {
 	 * Refreshes only the statistics display without full re-render.
 	 * Efficient update for when note counts change.
 	 */
-	async refreshStatsOnly(): Promise<void> {
+	refreshStatsOnly(): void {
 		if (this.settings.displayMode === DISPLAY_MODE.NONE) return;
-		void this.renderCalendar(await this.fetchDateCounts());
+		void this.renderCalendar(this.fetchDateCounts());
 	}
 
 	/**
@@ -135,7 +135,7 @@ export class CalendarZView extends ItemView {
 		}
 		this.contentEl.empty();
 
-		const dateCounts = preloadedDateCounts ?? await this.getDateCountsOrEmpty();
+		const dateCounts = preloadedDateCounts ?? this.getDateCountsOrEmpty();
 
 		this.calendarComponent = mount(Calendar, {
 			target: this.contentEl,
@@ -207,7 +207,7 @@ export class CalendarZView extends ItemView {
 	 * Gets date counts or empty array if display mode is none.
 	 * @returns Array of date counts
 	 */
-	private async getDateCountsOrEmpty(): Promise<DateCount[]> {
+	private getDateCountsOrEmpty(): DateCount[] {
 		if (this.settings.displayMode === DISPLAY_MODE.NONE) return [];
 		return this.fetchDateCounts();
 	}
@@ -217,7 +217,7 @@ export class CalendarZView extends ItemView {
 	 * Uses either YAML frontmatter, filename, or both based on settings.
 	 * @returns Array of date counts
 	 */
-	private async fetchDateCounts(): Promise<DateCount[]> {
+	private fetchDateCounts(): DateCount[] {
 		const { dateSource, ignoredFolders, dateFieldName, filenameDateFormat } = this.settings;
 
 		if (dateSource === DATE_SOURCE.FILENAME) {

@@ -41,8 +41,8 @@ export default class CalendarZ extends Plugin {
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
 		this.registerFileEvents();
 
-		// Auto-refresh statistics every second
-		this.registerInterval(window.setInterval(() => this.forEachView(v => void v.refreshStatsOnly()), 1000));
+		// Auto-refresh statistics every 30 seconds as a fallback
+		this.registerInterval(window.setInterval(() => this.forEachView(v => v.refreshStatsOnly()), 30000));
 	}
 
 	/**
