@@ -21,7 +21,7 @@ export const HEATMAP = {
 /** Dots display mode constants */
 export const DOTS = {
 	/** Maximum number of dots to display */
-	MAX_DOTS: 4,
+	MAX_DOTS: 3,
 } as const;
 
 /** Calendar grid layout constants */
@@ -53,6 +53,8 @@ export const CSS_CLASSES = {
 	DOT_GRAY: "calendarz-dot-gray",
 	BAR_TODAY: "calendarz-bar-today",
 	STAR_TODAY: "calendarz-star-today",
+	TODO_CIRCLE_EMPTY: "calendarz-todo-circle-empty",
+	TODO_CIRCLE_FILLED: "calendarz-todo-circle-filled",
 } as const;
 
 /** CSS custom property names */

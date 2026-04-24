@@ -135,6 +135,14 @@
 	color: var(--text-normal);
 }
 
+.calendarz-week-number-dots-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 2px;
+	margin-top: 1px;
+}
+
 .calendarz-week-number-dot {
 	width: 4px;
 	height: 4px;
@@ -145,7 +153,7 @@
 
 .calendarz-week-number-dot.calendarz-dot-gray {
 	background-color: var(--text-muted);
-	opacity: 0.4;
+	opacity: 0.25;
 }
 
 .calendarz-day:hover {
@@ -216,10 +224,11 @@
 /* Dots container for dots mode */
 .calendarz-dots-container {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	justify-content: center;
+	align-items: center;
 	gap: 2px;
-	max-width: 24px;
+	max-width: 32px;
 	margin-top: 1px;
 }
 
@@ -235,7 +244,7 @@
 /* Gray dot for dates before today with no notes */
 .calendarz-dot-gray {
 	background-color: var(--text-muted);
-	opacity: 0.4;
+	opacity: 0.25;
 }
 
 /* Today indicator bar for heatmap mode */
@@ -263,4 +272,23 @@
 .setting-item-heading h3 {
 	padding: 0;
 	margin: 0;
+}
+
+/* Todo circle styles - empty (hollow) circle for incomplete todos */
+.calendarz-todo-circle-empty {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	border: 1px solid var(--text-normal);
+	background-color: transparent;
+	flex-shrink: 0;
+}
+
+/* Todo circle styles - filled circle for all todos completed */
+.calendarz-todo-circle-filled {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background-color: var(--text-normal);
+	flex-shrink: 0;
 }

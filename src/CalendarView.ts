@@ -9,10 +9,11 @@ import {
 	getWordCountByYamlDate, getWordCountByFilenameDate, getWordCountByBoth
 } from "./utils/getNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
-import { openOrCreateWeekNote, findWeekNote, getWeekDateRange } from "./utils/weekNote";
+import { openOrCreateWeekNote, findWeekNote, getWeekDateRange, getWeekNotePath } from "./utils/weekNote";
+import { getTodoStatus } from "./utils/todoDetector";
 import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT, STATISTICS_TYPE } from "./constants";
 import Calendar from "./components/Calendar.svelte";
-import type { DateCount } from "./components/types";
+import type { DateCount, DateTodoStatus, WeekTodoStatus } from "./components/types";
 
 /** Unique identifier for the CalendarZ view type */
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
@@ -140,6 +141,8 @@ export class CalendarZView extends ItemView {
 		this.contentEl.empty();
 
 		const dateCounts = preloadedDateCounts ?? await this.getDateCountsOrEmpty();
+		const todoStatuses = await this.fetchTodoStatuses();
+		const weekTodoStatuses = await this.fetchWeekTodoStatuses();
 
 		this.calendarComponent = mount(Calendar, {
 			target: this.contentEl,
@@ -147,6 +150,8 @@ export class CalendarZView extends ItemView {
 				settings: this.settings,
 				i18n: this.i18n,
 				dateCounts,
+				todoStatuses,
+				weekTodoStatuses,
 				currentDate: this.currentDate,
 				onDayClick: (date: Date) => void this.handleDayClick(date),
 				onWeekClick: (date: Date) => void this.handleWeekClick(date),
@@ -288,5 +293,127 @@ export class CalendarZView extends ItemView {
 		return isWordCount
 			? await getWordCountByYamlDate(this.deps.app, ignoredFolders, dateFieldName)
 			: getNotesCountByYamlDate(this.deps.app, ignoredFolders, dateFieldName);
+	}
+
+	/**
+	 * Fetches todo statuses for all daily notes in the current month.
+	 * @returns Array of date todo statuses
+	 */
+	private async fetchTodoStatuses(): Promise<DateTodoStatus[]> {
+		const { dateSource, ignoredFolders, dateFieldName } = this.settings;
+		const statuses: DateTodoStatus[] = [];
+
+		// Get all markdown files
+		const files = this.deps.app.vault.getMarkdownFiles();
+
+		for (const file of files) {
+			// Check if file is in ignored folders
+			if (ignoredFolders.some(folder => file.path.startsWith(folder))) {
+				continue;
+			}
+
+			let dateStr: string | null = null;
+
+			// Try to extract date based on date source setting
+			if (dateSource === DATE_SOURCE.YAML || dateSource === DATE_SOURCE.BOTH) {
+				const cache = this.deps.app.metadataCache.getFileCache(file);
+				const frontmatter = cache?.frontmatter;
+				if (frontmatter) {
+					const dateValue: unknown = frontmatter[dateFieldName];
+					if (typeof dateValue === "string") {
+						const parsed = dayjs(dateValue);
+						if (parsed.isValid()) {
+							dateStr = parsed.format(DATE_FORMAT);
+						}
+					}
+				}
+			}
+
+			if ((dateSource === DATE_SOURCE.FILENAME || dateSource === DATE_SOURCE.BOTH) && !dateStr) {
+				// Try to extract date from filename
+				const filename = file.basename;
+				// Simple date extraction from filename - look for YYYY-MM-DD pattern
+				const dateMatch = filename.match(/(\d{4})[-_]?(\d{2})[-_]?(\d{2})/);
+				if (dateMatch) {
+					const [, year, month, day] = dateMatch;
+					const parsed = dayjs(`${year}-${month}-${day}`);
+					if (parsed.isValid()) {
+						dateStr = parsed.format(DATE_FORMAT);
+					}
+				}
+			}
+
+			if (dateStr) {
+				const todoStatus = await getTodoStatus(this.deps.app, file);
+				if (todoStatus.hasTodos) {
+					statuses.push({
+						date: dateStr,
+						hasTodos: true,
+						allCompleted: todoStatus.allCompleted,
+					});
+				}
+			}
+		}
+
+		return statuses;
+	}
+
+	/**
+	 * Fetches todo statuses for all week notes.
+	 * @returns Array of week todo statuses
+	 */
+	private async fetchWeekTodoStatuses(): Promise<WeekTodoStatus[]> {
+		const { ignoredFolders } = this.settings;
+		const statuses: WeekTodoStatus[] = [];
+
+		// Get all markdown files
+		const files = this.deps.app.vault.getMarkdownFiles();
+
+		for (const file of files) {
+			// Check if file is in ignored folders
+			if (ignoredFolders.some(folder => file.path.startsWith(folder))) {
+				continue;
+			}
+
+			// Check if this file is a week note by comparing its path
+			// We need to check if it matches the week note pattern
+			const todoStatus = await getTodoStatus(this.deps.app, file);
+			if (todoStatus.hasTodos) {
+				// Try to extract week info from the file path
+				const weekKey = this.extractWeekKeyFromPath(file.path);
+				if (weekKey) {
+					statuses.push({
+						weekKey,
+						hasTodos: true,
+						allCompleted: todoStatus.allCompleted,
+					});
+				}
+			}
+		}
+
+		return statuses;
+	}
+
+	/**
+	 * Extracts week key from file path if it's a week note.
+	 * @param filePath - The file path
+	 * @returns Week key (e.g., "2024-W01") or null if not a week note
+	 */
+	private extractWeekKeyFromPath(filePath: string): string | null {
+		// Get the expected week note path pattern
+		const currentYear = dayjs().year();
+		
+		// Try different weeks to find a match
+		for (let week = 1; week <= 53; week++) {
+			const date = dayjs().year(currentYear).week(week).startOf("week").toDate();
+			const expectedPath = getWeekNotePath(date, this.settings);
+			
+			if (filePath === expectedPath || filePath.endsWith("/" + expectedPath)) {
+				const year = dayjs(date).year();
+				return `${year}-W${week.toString().padStart(2, "0")}`;
+			}
+		}
+		
+		return null;
 	}
 }

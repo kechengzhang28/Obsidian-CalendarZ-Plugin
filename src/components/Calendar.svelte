@@ -11,12 +11,14 @@
 		StatisticsType,
 	} from "../settings/types";
 	import { CSS_CLASSES, DISPLAY_MODE, DATE_FORMAT, STATISTICS_TYPE } from "../constants";
-	import type { DateCount } from "./types";
+	import type { DateCount, DateTodoStatus, WeekTodoStatus } from "./types";
 
 	interface Props {
 		settings: CalendarZSettings;
 		i18n: I18n;
 		dateCounts: DateCount[];
+		todoStatuses: DateTodoStatus[];
+		weekTodoStatuses: WeekTodoStatus[];
 		onDayClick: (date: Date) => void;
 		onWeekClick: (date: Date) => void;
 		onNavigateMonth: (direction: -1 | 1) => void;
@@ -29,6 +31,8 @@
 		settings,
 		i18n,
 		dateCounts,
+		todoStatuses,
+		weekTodoStatuses,
 		onDayClick,
 		onWeekClick,
 		onNavigateMonth,
@@ -67,6 +71,8 @@
 		showWeekNumber={settings.showWeekNumber}
 		weekNoteEnabled={settings.weekNoteEnabled}
 		{dateCounts}
+		{todoStatuses}
+		{weekTodoStatuses}
 		{onDayClick}
 		{onWeekClick}
 		{hasWeekNote}

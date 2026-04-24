@@ -12,7 +12,7 @@
 		getWeekNumber,
 	} from "../utils/date";
 	import { CSS_CLASSES, ATTRS, GRID, DOTS, HEATMAP } from "../constants";
-	import type { DateCount } from "./types";
+	import type { DateCount, DateTodoStatus, WeekTodoStatus } from "./types";
 
 	interface Props {
 		currentDate: Date;
@@ -24,6 +24,8 @@
 		showWeekNumber: boolean;
 		weekNoteEnabled: boolean;
 		dateCounts: DateCount[];
+		todoStatuses: DateTodoStatus[];
+		weekTodoStatuses: WeekTodoStatus[];
 		onDayClick: (date: Date) => void;
 		onWeekClick: (date: Date) => void;
 		hasWeekNote?: (date: Date) => boolean;
@@ -39,6 +41,8 @@
 		showWeekNumber,
 		weekNoteEnabled,
 		dateCounts,
+		todoStatuses,
+		weekTodoStatuses,
 		onDayClick,
 		onWeekClick,
 		hasWeekNote,
@@ -46,6 +50,14 @@
 
 	const countsMap = $derived(
 		new Map(dateCounts.map((d) => [d.date, d.count]))
+	);
+
+	const todoMap = $derived(
+		new Map(todoStatuses.map((t) => [t.date, t]))
+	);
+
+	const weekTodoMap = $derived(
+		new Map(weekTodoStatuses.map((t) => [t.weekKey, t]))
 	);
 
 	const today = $derived(dayjs());
@@ -206,6 +218,44 @@
 		}
 		return "";
 	}
+
+	function getTodoStatusClass(cell: DayCell): string {
+		const todoStatus = todoMap.get(cell.dateStr);
+		if (!todoStatus) return "";
+
+		if (todoStatus.allCompleted) {
+			return CSS_CLASSES.TODO_CIRCLE_FILLED;
+		} else {
+			return CSS_CLASSES.TODO_CIRCLE_EMPTY;
+		}
+	}
+
+	function hasTodoStatus(cell: DayCell): boolean {
+		return todoMap.has(cell.dateStr);
+	}
+
+	function getWeekTodoStatusClass(row: { weekNumber: number; cells: DayCell[] }): string {
+		if (row.cells.length === 0) return "";
+		const firstDay = row.cells[0];
+		const year = firstDay.date.year();
+		const weekKey = `${year}-W${row.weekNumber.toString().padStart(2, "0")}`;
+		const weekTodoStatus = weekTodoMap.get(weekKey);
+		if (!weekTodoStatus) return "";
+
+		if (weekTodoStatus.allCompleted) {
+			return CSS_CLASSES.TODO_CIRCLE_FILLED;
+		} else {
+			return CSS_CLASSES.TODO_CIRCLE_EMPTY;
+		}
+	}
+
+	function hasWeekTodoStatus(row: { weekNumber: number; cells: DayCell[] }): boolean {
+		if (row.cells.length === 0) return false;
+		const firstDay = row.cells[0];
+		const year = firstDay.date.year();
+		const weekKey = `${year}-W${row.weekNumber.toString().padStart(2, "0")}`;
+		return weekTodoMap.has(weekKey);
+	}
 </script>
 
 <div class={CSS_CLASSES.DAYS} class:calendarz-days-with-week={showWeekNumber}>
@@ -220,13 +270,25 @@
 					onclick={() => handleWeekClick(row)}
 				>
 					{row.weekNumber}
-					{#if getWeekNoteDotClass(row)}
-						<div class="calendarz-week-number-dot {getWeekNoteDotClass(row)}"></div>
+					{#if getWeekNoteDotClass(row) || hasWeekTodoStatus(row)}
+						<div class="calendarz-week-number-dots-container">
+							{#if getWeekNoteDotClass(row)}
+								<div class="calendarz-week-number-dot {getWeekNoteDotClass(row)}"></div>
+							{/if}
+							{#if hasWeekTodoStatus(row)}
+								<div class="{getWeekTodoStatusClass(row)}"></div>
+							{/if}
+						</div>
 					{/if}
 				</div>
 			{:else}
 				<div class="calendarz-week-number">
 					{row.weekNumber}
+					{#if hasWeekTodoStatus(row)}
+						<div class="calendarz-week-number-dots-container">
+							<div class="{getWeekTodoStatusClass(row)}"></div>
+						</div>
+					{/if}
 				</div>
 			{/if}
 		{/if}
@@ -248,7 +310,7 @@
 					{cell.date.date()}
 				{/if}
 
-				{#if getDotCount(cell) > 0 || showGrayDot(cell) || (showTodayIndicator(cell) && !heatmapHideDateNumbers)}
+				{#if getDotCount(cell) > 0 || showGrayDot(cell) || (showTodayIndicator(cell) && !heatmapHideDateNumbers) || hasTodoStatus(cell)}
 					<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
 						{#if showTodayIndicator(cell)}
 							<div class="{CSS_CLASSES.BAR_TODAY}"></div>
@@ -258,6 +320,9 @@
 							{#each Array(getDotCount(cell)) as _, i (i)}
 								<div class={CSS_CLASSES.DOT}></div>
 							{/each}
+						{/if}
+						{#if hasTodoStatus(cell)}
+							<div class="{getTodoStatusClass(cell)}"></div>
 						{/if}
 					</div>
 				{/if}
