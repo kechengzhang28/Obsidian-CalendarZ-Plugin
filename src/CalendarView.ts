@@ -9,6 +9,7 @@ import {
 	getWordCountByYamlDate, getWordCountByFilenameDate, getWordCountByBoth
 } from "./utils/getNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
+import { openOrCreateWeekNote, findWeekNote, getWeekDateRange } from "./utils/weekNote";
 import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT, STATISTICS_TYPE } from "./constants";
 import Calendar from "./components/Calendar.svelte";
 import type { DateCount } from "./components/types";
@@ -148,6 +149,7 @@ export class CalendarZView extends ItemView {
 				dateCounts,
 				currentDate: this.currentDate,
 				onDayClick: (date: Date) => void this.handleDayClick(date),
+				onWeekClick: (date: Date) => void this.handleWeekClick(date),
 				onNavigateMonth: (direction: -1 | 1) => this.navigateMonth(direction),
 				onGoToToday: () => this.goToToday(),
 			},
@@ -204,6 +206,43 @@ export class CalendarZView extends ItemView {
 	 */
 	private async createDailyNote(date: Date): Promise<void> {
 		await openOrCreateDailyNote(this.deps.app, this.i18n, date);
+	}
+
+	/**
+	 * Handles click on a week number.
+	 * Opens existing week note or creates new week note.
+	 * @param date - Date within the clicked week
+	 */
+	private async handleWeekClick(date: Date): Promise<void> {
+		if (!this.settings.weekNoteEnabled) return;
+
+		const existingNote = findWeekNote(this.deps.app, date, this.settings);
+
+		if (existingNote) {
+			await this.deps.app.workspace.openLinkText(existingNote.path, "", false);
+			return;
+		}
+
+		if (this.settings.confirmBeforeCreate) {
+			const { ConfirmModal } = await import("./ui/ConfirmModal");
+			const dateRange = getWeekDateRange(date, this.settings.weekStart);
+			new ConfirmModal(
+				this.deps.app,
+				this.deps.plugin,
+				dateRange,
+				() => void this.createWeekNote(date)
+			).open();
+		} else {
+			await this.createWeekNote(date);
+		}
+	}
+
+	/**
+	 * Creates a week note for the specified date.
+	 * @param date - Date within the week for the week note
+	 */
+	private async createWeekNote(date: Date): Promise<void> {
+		await openOrCreateWeekNote(this.deps.app, this.i18n, date, this.settings);
 	}
 
 	/**

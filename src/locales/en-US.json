@@ -10,7 +10,8 @@
     "statistics": "Statistics",
     "dots": "Dots",
     "heatmap": "Heatmap",
-    "click": "Click Behavior"
+    "click": "Click Behavior",
+    "weekNote": "Weekly Note"
   },
   "settings": {
     "language": {
@@ -127,6 +128,18 @@
       "name": "Refresh Plugin",
       "description": "Refresh the calendar view to apply latest settings",
       "buttonText": "Refresh"
+    },
+    "weekNoteEnabled": {
+      "name": "Enable Weekly Note",
+      "description": "Create or open weekly note when clicking week number"
+    },
+    "weekNoteTemplate": {
+      "name": "Weekly Note Template",
+      "description": "Path to weekly note template file (leave empty for default style)"
+    },
+    "weekNoteFolder": {
+      "name": "Weekly Note Folder",
+      "description": "Folder path for weekly notes (leave empty for root directory)"
     }
   },
   "commands": {
@@ -137,7 +150,8 @@
   },
   "notifications": {
     "dailyNotesNotEnabled": "Please enable the Daily Notes core plugin first",
-    "dailyNotesCreateFailed": "Failed to create daily note, please check the daily notes plugin settings"
+    "dailyNotesCreateFailed": "Failed to create daily note, please check the daily notes plugin settings",
+    "weekNoteCreateFailed": "Failed to create week note"
   },
   "modal": {
     "confirmTitle": "Create Daily Note",

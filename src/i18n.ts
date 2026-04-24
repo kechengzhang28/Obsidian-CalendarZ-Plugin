@@ -32,6 +32,8 @@ export interface I18n {
 		heatmap: string;
 		/** Click settings section title */
 		click: string;
+		/** Week note settings section title */
+		weekNote: string;
 	};
 	/** Settings panel strings */
 	settings: {
@@ -175,6 +177,21 @@ export interface I18n {
 			description: string;
 			buttonText: string;
 		};
+		/** Week note enabled setting strings */
+		weekNoteEnabled: {
+			name: string;
+			description: string;
+		};
+		/** Week note template setting strings */
+		weekNoteTemplate: {
+			name: string;
+			description: string;
+		};
+		/** Week note folder setting strings */
+		weekNoteFolder: {
+			name: string;
+			description: string;
+		};
 	};
 	/** Command names */
 	commands: {
@@ -192,6 +209,8 @@ export interface I18n {
 		dailyNotesNotEnabled: string;
 		/** Message shown when daily note creation fails */
 		dailyNotesCreateFailed: string;
+		/** Message shown when week note creation fails */
+		weekNoteCreateFailed: string;
 	};
 	/** Modal dialog strings */
 	modal: {

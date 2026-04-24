@@ -6,6 +6,7 @@ import {renderStatisticsSettings} from "./modules/statistics";
 import {renderDotsSettings} from "./modules/dots";
 import {renderHeatmapSettings} from "./modules/heatmap";
 import {renderClickSettings} from "./modules/click";
+import {renderWeekNoteSettings} from "./modules/weekNote";
 
 /**
  * Settings tab for the CalendarZ plugin.
@@ -38,5 +39,6 @@ export class CalendarZSettingTab extends PluginSettingTab {
 		renderDotsSettings(containerEl, this.plugin);
 		renderHeatmapSettings(containerEl, this.plugin);
 		renderClickSettings(containerEl, this.plugin);
+		renderWeekNoteSettings(containerEl, this.plugin);
 	}
 }

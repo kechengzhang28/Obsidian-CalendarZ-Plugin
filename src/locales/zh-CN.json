@@ -10,7 +10,8 @@
     "statistics": "统计设置",
     "dots": "点图设置",
     "heatmap": "热力图设置",
-    "click": "点击设置"
+    "click": "点击设置",
+    "weekNote": "周记设置"
   },
   "settings": {
     "language": {
@@ -127,6 +128,18 @@
       "name": "刷新插件",
       "description": "刷新日历视图以应用最新设置",
       "buttonText": "刷新"
+    },
+    "weekNoteEnabled": {
+      "name": "启用周记",
+      "description": "点击周数时创建或打开周记"
+    },
+    "weekNoteTemplate": {
+      "name": "周记模板",
+      "description": "周记模板文件路径（留空使用默认样式）"
+    },
+    "weekNoteFolder": {
+      "name": "周记文件夹",
+      "description": "周记存放的文件夹路径（留空存放在根目录）"
     }
   },
   "commands": {
@@ -137,7 +150,8 @@
   },
   "notifications": {
     "dailyNotesNotEnabled": "请先启用日记核心插件",
-    "dailyNotesCreateFailed": "创建日记失败，请检查日记插件设置"
+    "dailyNotesCreateFailed": "创建日记失败，请检查日记插件设置",
+    "weekNoteCreateFailed": "创建周记失败"
   },
   "modal": {
     "confirmTitle": "创建日记",

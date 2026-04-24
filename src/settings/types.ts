@@ -58,4 +58,10 @@ export interface CalendarZSettings {
 	confirmBeforeCreate: boolean;
 	/** Whether to show week numbers in the calendar */
 	showWeekNumber: boolean;
+	/** Week note settings */
+	weekNoteEnabled: boolean;
+	/** Week note template file path */
+	weekNoteTemplate: string;
+	/** Week note folder path */
+	weekNoteFolder: string;
 }

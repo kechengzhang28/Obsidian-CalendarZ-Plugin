@@ -22,8 +22,10 @@
 		heatmapMaxNotes: number;
 		heatmapHideDateNumbers: boolean;
 		showWeekNumber: boolean;
+		weekNoteEnabled: boolean;
 		dateCounts: DateCount[];
 		onDayClick: (date: Date) => void;
+		onWeekClick: (date: Date) => void;
 	}
 
 	let {
@@ -34,8 +36,10 @@
 		heatmapMaxNotes,
 		heatmapHideDateNumbers,
 		showWeekNumber,
+		weekNoteEnabled,
 		dateCounts,
 		onDayClick,
+		onWeekClick,
 	}: Props = $props();
 
 	const countsMap = $derived(
@@ -174,12 +178,33 @@
 	function handleClick(cell: DayCell) {
 		onDayClick(cell.date.toDate());
 	}
+
+	function handleWeekClick(row: { weekNumber: number; cells: DayCell[] }) {
+		if (weekNoteEnabled && row.cells.length > 0) {
+			// Use the first day of the week to identify the week
+			onWeekClick(row.cells[0].date.toDate());
+		}
+	}
 </script>
 
 <div class={CSS_CLASSES.DAYS} class:calendarz-days-with-week={showWeekNumber}>
 	{#each rows as row (row.weekNumber)}
 		{#if showWeekNumber}
-			<div class="calendarz-week-number">{row.weekNumber}</div>
+			{#if weekNoteEnabled}
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<div
+					class="calendarz-week-number calendarz-week-number-clickable"
+					role="button"
+					tabindex="0"
+					onclick={() => handleWeekClick(row)}
+				>
+					{row.weekNumber}
+				</div>
+			{:else}
+				<div class="calendarz-week-number">
+					{row.weekNumber}
+				</div>
+			{/if}
 		{/if}
 		{#each row.cells as cell (cell.dateStr)}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->

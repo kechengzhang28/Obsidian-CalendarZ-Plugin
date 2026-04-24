@@ -18,6 +18,7 @@
 		i18n: I18n;
 		dateCounts: DateCount[];
 		onDayClick: (date: Date) => void;
+		onWeekClick: (date: Date) => void;
 		onNavigateMonth: (direction: -1 | 1) => void;
 		onGoToToday: () => void;
 		currentDate: Date;
@@ -28,6 +29,7 @@
 		i18n,
 		dateCounts,
 		onDayClick,
+		onWeekClick,
 		onNavigateMonth,
 		onGoToToday,
 		currentDate,
@@ -61,7 +63,9 @@
 		heatmapMaxNotes={effectiveHeatmapMax}
 		heatmapHideDateNumbers={settings.heatmapHideDateNumbers}
 		showWeekNumber={settings.showWeekNumber}
+		weekNoteEnabled={settings.weekNoteEnabled}
 		{dateCounts}
 		{onDayClick}
+		{onWeekClick}
 	/>
 </div>

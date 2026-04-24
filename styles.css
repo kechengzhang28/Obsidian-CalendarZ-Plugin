@@ -118,7 +118,15 @@
 	cursor: default;
 }
 
+.calendarz-week-number-clickable {
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
 
+.calendarz-week-number-clickable:hover {
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
 
 .calendarz-day:hover {
 	background-color: var(--background-modifier-hover);

@@ -18,5 +18,8 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	heatmapMaxWords: 1000,
 	heatmapHideDateNumbers: false,
 	confirmBeforeCreate: true,
-	showWeekNumber: false
+	showWeekNumber: false,
+	weekNoteEnabled: false,
+	weekNoteTemplate: "",
+	weekNoteFolder: ""
 };
