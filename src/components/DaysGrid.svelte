@@ -200,7 +200,7 @@
 		}
 	}
 
-	function getWeekNoteDotClass(row: { weekNumber: number; cells: DayCell[] }): string {
+	function getWeekNoteDotType(row: { weekNumber: number; cells: DayCell[] }): "normal" | "gray" | "" {
 		if (!weekNoteEnabled || displayMode !== "dots" || !hasWeekNote || row.cells.length === 0) {
 			return "";
 		}
@@ -210,11 +210,11 @@
 		const isBeforeCurrentWeek = firstDay.date.isBefore(today, "week");
 
 		if (hasNote) {
-			return CSS_CLASSES.DOT;
+			return "normal";
 		} else if (isCurrentWeek) {
 			return ""; // Current week without note: no dot
 		} else if (isBeforeCurrentWeek) {
-			return `${CSS_CLASSES.DOT} ${CSS_CLASSES.DOT_GRAY}`;
+			return "gray";
 		}
 		return "";
 	}
@@ -264,16 +264,18 @@
 			{#if weekNoteEnabled}
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				<div
-					class="calendarz-week-number calendarz-week-number-clickable"
+					class="{CSS_CLASSES.WEEK_NUMBER} {CSS_CLASSES.WEEK_NUMBER_CLICKABLE}"
 					role="button"
 					tabindex="0"
 					onclick={() => handleWeekClick(row)}
 				>
 					{row.weekNumber}
-					{#if getWeekNoteDotClass(row) || hasWeekTodoStatus(row)}
-						<div class="calendarz-week-number-dots-container">
-							{#if getWeekNoteDotClass(row)}
-								<div class="calendarz-week-number-dot {getWeekNoteDotClass(row)}"></div>
+					{#if getWeekNoteDotType(row) || hasWeekTodoStatus(row)}
+						<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
+							{#if getWeekNoteDotType(row) === "normal"}
+								<div class={CSS_CLASSES.DOT}></div>
+							{:else if getWeekNoteDotType(row) === "gray"}
+								<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_GRAY}"></div>
 							{/if}
 							{#if hasWeekTodoStatus(row)}
 								<div class="{getWeekTodoStatusClass(row)}"></div>
@@ -282,10 +284,10 @@
 					{/if}
 				</div>
 			{:else}
-				<div class="calendarz-week-number">
+				<div class={CSS_CLASSES.WEEK_NUMBER}>
 					{row.weekNumber}
 					{#if hasWeekTodoStatus(row)}
-						<div class="calendarz-week-number-dots-container">
+						<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
 							<div class="{getWeekTodoStatusClass(row)}"></div>
 						</div>
 					{/if}

@@ -48,6 +48,8 @@ export const CSS_CLASSES = {
 	DAY_TODAY_THEMED: "calendarz-day-today-themed",
 	DAY_HEATMAP: "calendarz-day-heatmap",
 	DAY_HEATMAP_EMPTY: "calendarz-day-heatmap-empty",
+	WEEK_NUMBER: "calendarz-week-number",
+	WEEK_NUMBER_CLICKABLE: "calendarz-week-number-clickable",
 	DOTS_CONTAINER: "calendarz-dots-container",
 	DOT: "calendarz-dot",
 	DOT_GRAY: "calendarz-dot-gray",

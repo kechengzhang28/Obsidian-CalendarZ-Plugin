@@ -135,26 +135,7 @@
 	color: var(--text-normal);
 }
 
-.calendarz-week-number-dots-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 2px;
-	margin-top: 1px;
-}
 
-.calendarz-week-number-dot {
-	width: 4px;
-	height: 4px;
-	border-radius: 50%;
-	background-color: var(--interactive-accent);
-	flex-shrink: 0;
-}
-
-.calendarz-week-number-dot.calendarz-dot-gray {
-	background-color: var(--text-muted);
-	opacity: 0.25;
-}
 
 .calendarz-day:hover {
 	background-color: var(--background-modifier-hover);
