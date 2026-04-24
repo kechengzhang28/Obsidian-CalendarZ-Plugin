@@ -44,15 +44,17 @@ export default class CalendarZ extends Plugin {
 
 		// Add settings tab
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
+
+		// Auto-open calendar view on plugin load and initial refresh
+		this.app.workspace.onLayoutReady(async () => {
+			await this.activateView();
+			this.forEachView(v => v.refreshStatsOnly());
+		});
+
 		this.registerFileEvents();
 
 		// Auto-refresh statistics every 30 seconds as a fallback
 		this.registerInterval(window.setInterval(() => this.forEachView(v => v.refreshStatsOnly()), 30000));
-
-		// Initial refresh after layout is ready
-		this.app.workspace.onLayoutReady(() => {
-			this.forEachView(v => v.refreshStatsOnly());
-		});
 	}
 
 	/**

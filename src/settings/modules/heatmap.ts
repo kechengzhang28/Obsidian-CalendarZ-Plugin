@@ -20,7 +20,7 @@ export function renderHeatmapSettings(
 	if (!contentEl) return;
 
 	// Heatmap max notes setting
-	const sliderRenderer = new SliderSettingRenderer(1, 50, 1, plugin);
+	const sliderRenderer = new SliderSettingRenderer(1, 40, 1, plugin);
 	const handleHeatmapMaxNotesChange = createSettingHandler({ plugin, settingKey: "heatmapMaxNotes" });
 	sliderRenderer.render(contentEl, {
 		name: t.settings.heatmapMaxNotes.name,
