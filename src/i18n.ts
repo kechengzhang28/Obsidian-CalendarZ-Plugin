@@ -117,13 +117,32 @@ export interface I18n {
 				none: string;
 			};
 		};
+		/** Statistics type setting strings */
+		statisticsType: {
+			name: string;
+			description: string;
+			options: {
+				count: string;
+				wordCount: string;
+			};
+		};
 		/** Dot threshold setting strings */
 		dotThreshold: {
 			name: string;
 			description: string;
 		};
+		/** Dot word threshold setting strings */
+		dotWordThreshold: {
+			name: string;
+			description: string;
+		};
 		/** Heatmap max notes setting strings */
 		heatmapMaxNotes: {
+			name: string;
+			description: string;
+		};
+		/** Heatmap max words setting strings */
+		heatmapMaxWords: {
 			name: string;
 			description: string;
 		};

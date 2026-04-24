@@ -11,7 +11,10 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	dateSource: "yaml",
 	filenameDateFormat: "YYYY-MM-DD",
 	displayMode: "none",
+	statisticsType: "count",
 	dotThreshold: 1,
+	dotWordThreshold: 100,
 	heatmapMaxNotes: 10,
+	heatmapMaxWords: 1000,
 	confirmBeforeCreate: true
 };

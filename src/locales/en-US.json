@@ -81,13 +81,29 @@
         "none": "None"
       }
     },
+    "statisticsType": {
+      "name": "Statistics Type",
+      "description": "Choose whether to count by note quantity or total word count",
+      "options": {
+        "count": "Note Count",
+        "wordCount": "Word Count"
+      }
+    },
     "dotThreshold": {
       "name": "Notes per Dot",
       "description": "Number of notes represented by each dot (1-10)"
     },
+    "dotWordThreshold": {
+      "name": "Words per Dot",
+      "description": "Number of words represented by each dot (minimum 1)"
+    },
     "heatmapMaxNotes": {
       "name": "Max Notes for Heatmap",
       "description": "Maximum note count to reach full brightness in heatmap mode. Any date with notes >= this value will show maximum brightness."
+    },
+    "heatmapMaxWords": {
+      "name": "Max Words for Heatmap",
+      "description": "Maximum word count to reach full brightness in heatmap mode. Any date with words >= this value will show maximum brightness. (minimum 1)"
     },
     "confirmBeforeCreate": {
       "name": "Confirm Before Creating",

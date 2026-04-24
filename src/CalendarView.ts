@@ -4,9 +4,12 @@ import { mount, unmount } from "svelte";
 import type { CalendarZSettings } from "./settings/types";
 import type { I18n } from "./i18n";
 import type { PluginLike } from "./types/plugin";
-import { getNotesCountByYamlDate, getNotesCountByFilenameDate, getNotesCountByBoth } from "./utils/getNotes";
+import {
+	getNotesCountByYamlDate, getNotesCountByFilenameDate, getNotesCountByBoth,
+	getWordCountByYamlDate, getWordCountByFilenameDate, getWordCountByBoth
+} from "./utils/getNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
-import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
+import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT, STATISTICS_TYPE } from "./constants";
 import Calendar from "./components/Calendar.svelte";
 import type { DateCount } from "./components/types";
 
@@ -103,9 +106,9 @@ export class CalendarZView extends ItemView {
 	 * Refreshes only the statistics display without full re-render.
 	 * Efficient update for when note counts change.
 	 */
-	refreshStatsOnly(): void {
+	async refreshStatsOnly(): Promise<void> {
 		if (this.settings.displayMode === DISPLAY_MODE.NONE) return;
-		void this.renderCalendar(this.fetchDateCounts());
+		void this.renderCalendar(await this.fetchDateCounts());
 	}
 
 	/**
@@ -135,7 +138,7 @@ export class CalendarZView extends ItemView {
 		}
 		this.contentEl.empty();
 
-		const dateCounts = preloadedDateCounts ?? this.getDateCountsOrEmpty();
+		const dateCounts = preloadedDateCounts ?? await this.getDateCountsOrEmpty();
 
 		this.calendarComponent = mount(Calendar, {
 			target: this.contentEl,
@@ -207,25 +210,33 @@ export class CalendarZView extends ItemView {
 	 * Gets date counts or empty array if display mode is none.
 	 * @returns Array of date counts
 	 */
-	private getDateCountsOrEmpty(): DateCount[] {
+	private async getDateCountsOrEmpty(): Promise<DateCount[]> {
 		if (this.settings.displayMode === DISPLAY_MODE.NONE) return [];
-		return this.fetchDateCounts();
+		return await this.fetchDateCounts();
 	}
 
 	/**
 	 * Fetches note counts grouped by date.
 	 * Uses either YAML frontmatter, filename, or both based on settings.
+	 * Also considers statistics type (count vs word count).
 	 * @returns Array of date counts
 	 */
-	private fetchDateCounts(): DateCount[] {
-		const { dateSource, ignoredFolders, dateFieldName, filenameDateFormat } = this.settings;
+	private async fetchDateCounts(): Promise<DateCount[]> {
+		const { dateSource, ignoredFolders, dateFieldName, filenameDateFormat, statisticsType } = this.settings;
+		const isWordCount = statisticsType === STATISTICS_TYPE.WORD_COUNT;
 
 		if (dateSource === DATE_SOURCE.FILENAME) {
-			return getNotesCountByFilenameDate(this.deps.app, ignoredFolders, filenameDateFormat);
+			return isWordCount
+				? await getWordCountByFilenameDate(this.deps.app, ignoredFolders, filenameDateFormat)
+				: getNotesCountByFilenameDate(this.deps.app, ignoredFolders, filenameDateFormat);
 		}
 		if (dateSource === DATE_SOURCE.BOTH) {
-			return getNotesCountByBoth(this.deps.app, ignoredFolders, dateFieldName, filenameDateFormat);
+			return isWordCount
+				? await getWordCountByBoth(this.deps.app, ignoredFolders, dateFieldName, filenameDateFormat)
+				: getNotesCountByBoth(this.deps.app, ignoredFolders, dateFieldName, filenameDateFormat);
 		}
-		return getNotesCountByYamlDate(this.deps.app, ignoredFolders, dateFieldName);
+		return isWordCount
+			? await getWordCountByYamlDate(this.deps.app, ignoredFolders, dateFieldName)
+			: getNotesCountByYamlDate(this.deps.app, ignoredFolders, dateFieldName);
 	}
 }

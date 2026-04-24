@@ -91,3 +91,9 @@ export const DATE_SOURCE = {
 	FILENAME: "filename",
 	BOTH: "both",
 } as const;
+
+/** Statistics type values */
+export const STATISTICS_TYPE = {
+	COUNT: "count",
+	WORD_COUNT: "wordCount",
+} as const;

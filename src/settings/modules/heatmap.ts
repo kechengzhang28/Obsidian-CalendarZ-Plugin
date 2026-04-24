@@ -1,6 +1,6 @@
 import type { PluginLike } from "../../types";
 import { SettingGroup } from "../ui/SettingGroup";
-import { SliderSettingRenderer } from "../ui/SettingRenderer";
+import { SliderSettingRenderer, NumberSettingRenderer } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
 
 /**
@@ -27,5 +27,15 @@ export function renderHeatmapSettings(
 		description: t.settings.heatmapMaxNotes.description,
 		value: plugin.settings.heatmapMaxNotes,
 		onChange: handleHeatmapMaxNotesChange,
+	});
+
+	// Heatmap max words setting
+	const numberRenderer = new NumberSettingRenderer(plugin, 1);
+	const handleHeatmapMaxWordsChange = createSettingHandler({ plugin, settingKey: "heatmapMaxWords" });
+	numberRenderer.render(contentEl, {
+		name: t.settings.heatmapMaxWords.name,
+		description: t.settings.heatmapMaxWords.description,
+		value: plugin.settings.heatmapMaxWords,
+		onChange: handleHeatmapMaxWordsChange,
 	});
 }

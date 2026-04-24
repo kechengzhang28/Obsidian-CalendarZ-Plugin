@@ -81,13 +81,29 @@
         "none": "无"
       }
     },
+    "statisticsType": {
+      "name": "统计类型",
+      "description": "选择根据笔记数量还是笔记总字数进行统计",
+      "options": {
+        "count": "笔记数量",
+        "wordCount": "笔记字数"
+      }
+    },
     "dotThreshold": {
       "name": "每点代表笔记数",
       "description": "每个点代表的笔记数量（1-10）"
     },
+    "dotWordThreshold": {
+      "name": "每点代表字数",
+      "description": "每个点代表的字数（最小值为 1）"
+    },
     "heatmapMaxNotes": {
       "name": "热力图最大笔记数",
       "description": "热力图达到最大亮度时的笔记数量。任何笔记数大于等于此值的日期都将显示最大亮度。"
+    },
+    "heatmapMaxWords": {
+      "name": "热力图最大字数",
+      "description": "热力图达到最大亮度时的字数。任何字数大于等于此值的日期都将显示最大亮度。（最小值为 1）"
     },
     "confirmBeforeCreate": {
       "name": "创建前确认",

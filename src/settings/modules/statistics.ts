@@ -1,7 +1,7 @@
 import { App } from "obsidian";
 import type { PluginLike } from "../../types";
 import { IgnoredFoldersModal } from "../../ui/IgnoredFoldersModal";
-import type { DateSource, DisplayMode } from "../types";
+import type { DateSource, DisplayMode, StatisticsType } from "../types";
 import { SettingGroup } from "../ui/SettingGroup";
 import {
 	DropdownSettingRenderer,
@@ -9,7 +9,7 @@ import {
 	ButtonSettingRenderer,
 } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
-import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE } from "../../constants";
+import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE, STATISTICS_TYPE } from "../../constants";
 
 /**
  * Renders statistics settings (display mode, dot threshold, date source, etc.).
@@ -46,6 +46,22 @@ export function renderStatisticsSettings(
 		description: t.settings.displayMode.description,
 		value: plugin.settings.displayMode,
 		onChange: handleDisplayModeChange,
+	});
+
+	// Statistics type setting
+	const statisticsTypeRenderer = new DropdownSettingRenderer<StatisticsType>(plugin, {
+		[STATISTICS_TYPE.COUNT]: t.settings.statisticsType.options.count,
+		[STATISTICS_TYPE.WORD_COUNT]: t.settings.statisticsType.options.wordCount,
+	});
+	const handleStatisticsTypeChange = createSettingHandler({
+		plugin,
+		settingKey: "statisticsType",
+	});
+	statisticsTypeRenderer.render(contentEl, {
+		name: t.settings.statisticsType.name,
+		description: t.settings.statisticsType.description,
+		value: plugin.settings.statisticsType,
+		onChange: handleStatisticsTypeChange,
 	});
 
 	// Date field name setting (for YAML source)

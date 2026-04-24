@@ -8,8 +8,9 @@
 		CalendarZSettings,
 		WeekStart,
 		DisplayMode,
+		StatisticsType,
 	} from "../settings/types";
-	import { CSS_CLASSES, DISPLAY_MODE, DATE_FORMAT } from "../constants";
+	import { CSS_CLASSES, DISPLAY_MODE, DATE_FORMAT, STATISTICS_TYPE } from "../constants";
 	import type { DateCount } from "./types";
 
 	interface Props {
@@ -31,6 +32,11 @@
 		onGoToToday,
 		currentDate,
 	}: Props = $props();
+
+	// Determine which thresholds to use based on statistics type
+	const isWordCount = $derived(settings.statisticsType === STATISTICS_TYPE.WORD_COUNT);
+	const effectiveDotThreshold = $derived(isWordCount ? settings.dotWordThreshold : settings.dotThreshold);
+	const effectiveHeatmapMax = $derived(isWordCount ? settings.heatmapMaxWords : settings.heatmapMaxNotes);
 </script>
 
 <div class={CSS_CLASSES.CONTAINER}>
@@ -51,8 +57,8 @@
 		{currentDate}
 		weekStart={settings.weekStart}
 		displayMode={settings.displayMode}
-		dotThreshold={settings.dotThreshold}
-		heatmapMaxNotes={settings.heatmapMaxNotes}
+		dotThreshold={effectiveDotThreshold}
+		heatmapMaxNotes={effectiveHeatmapMax}
 		{dateCounts}
 		{onDayClick}
 	/>

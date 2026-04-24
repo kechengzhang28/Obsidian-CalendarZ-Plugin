@@ -48,13 +48,13 @@ export default class CalendarZ extends Plugin {
 		// Auto-open calendar view on plugin load and initial refresh
 		this.app.workspace.onLayoutReady(async () => {
 			await this.activateView();
-			this.forEachView(v => v.refreshStatsOnly());
+			this.forEachView(v => void v.refreshStatsOnly());
 		});
 
 		this.registerFileEvents();
 
 		// Auto-refresh statistics every 30 seconds as a fallback
-		this.registerInterval(window.setInterval(() => this.forEachView(v => v.refreshStatsOnly()), 30000));
+		this.registerInterval(window.setInterval(() => this.forEachView(v => void v.refreshStatsOnly()), 30000));
 	}
 
 	/**
@@ -73,7 +73,7 @@ export default class CalendarZ extends Plugin {
 			const newDate = cache.frontmatter?.[dateField] as unknown;
 
 			if (oldDate !== newDate) {
-				this.forEachView(v => v.refreshStatsOnly());
+				this.forEachView(v => void v.refreshStatsOnly());
 			}
 
 			// Update cache
@@ -85,7 +85,7 @@ export default class CalendarZ extends Plugin {
 		this.registerEvent(this.app.vault.on("create", (file) => {
 			if (file instanceof TFile) {
 				this.fileMtimes.set(file.path, file.stat.mtime);
-				this.forEachView(v => v.refreshStatsOnly());
+				this.forEachView(v => void v.refreshStatsOnly());
 			}
 		}));
 
@@ -94,7 +94,7 @@ export default class CalendarZ extends Plugin {
 			if (file instanceof TFile) {
 				this.previousCaches.delete(file.path);
 				this.fileMtimes.delete(file.path);
-				this.forEachView(v => v.refreshStatsOnly());
+				this.forEachView(v => void v.refreshStatsOnly());
 			}
 		}));
 
@@ -108,7 +108,7 @@ export default class CalendarZ extends Plugin {
 				}
 				this.fileMtimes.delete(oldPath);
 				this.fileMtimes.set(file.path, file.stat.mtime);
-				this.forEachView(v => v.refreshStatsOnly());
+				this.forEachView(v => void v.refreshStatsOnly());
 			}
 		}));
 	}
