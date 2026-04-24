@@ -40,7 +40,6 @@ export function renderStatisticsSettings(
 	const handleDisplayModeChange = createSettingHandler({
 		plugin,
 		settingKey: "displayMode",
-		refreshDisplay,
 	});
 	displayModeRenderer.render(contentEl, {
 		name: t.settings.displayMode.name,
@@ -71,7 +70,6 @@ export function renderStatisticsSettings(
 	const handleDateSourceChange = createSettingHandler({
 		plugin,
 		settingKey: "dateSource",
-		refreshDisplay,
 	});
 	dateSourceRenderer.render(contentEl, {
 		name: t.settings.dateSource.name,
