@@ -7,6 +7,7 @@
   "sectionTitles": {
     "basic": "基本设置",
     "statistics": "统计设置",
+    "dots": "点图设置",
     "click": "点击设置"
   },
   "settings": {

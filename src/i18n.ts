@@ -24,6 +24,8 @@ export interface I18n {
 		basic: string;
 		/** Statistics settings section title */
 		statistics: string;
+		/** Dots settings section title */
+		dots: string;
 		/** Click settings section title */
 		click: string;
 	};

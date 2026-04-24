@@ -3,6 +3,7 @@ import type { PluginLike } from "../types";
 import {renderLanguageSettings} from "./modules/language";
 import {renderBasicSettings} from "./modules/basic";
 import {renderStatisticsSettings} from "./modules/statistics";
+import {renderDotsSettings} from "./modules/dots";
 import {renderClickSettings} from "./modules/click";
 
 /**
@@ -33,6 +34,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 		renderLanguageSettings(containerEl, this.plugin, () => this.display());
 		renderBasicSettings(containerEl, this.plugin);
 		renderStatisticsSettings(containerEl, this.plugin, this.app, () => this.display());
+		renderDotsSettings(containerEl, this.plugin);
 		renderClickSettings(containerEl, this.plugin);
 	}
 }

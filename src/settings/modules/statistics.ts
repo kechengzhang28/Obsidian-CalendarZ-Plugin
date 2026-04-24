@@ -5,7 +5,6 @@ import type { DateSource, DisplayMode } from "../types";
 import { SettingGroup } from "../ui/SettingGroup";
 import {
 	DropdownSettingRenderer,
-	SliderSettingRenderer,
 	TextSettingRenderer,
 	ButtonSettingRenderer,
 } from "../ui/SettingRenderer";
@@ -49,18 +48,6 @@ export function renderStatisticsSettings(
 		value: plugin.settings.displayMode,
 		onChange: handleDisplayModeChange,
 	});
-
-	// Dot threshold setting (only shown when displayMode is dots)
-	if (plugin.settings.displayMode === DISPLAY_MODE.DOTS) {
-		const sliderRenderer = new SliderSettingRenderer(1, 10, 1, plugin);
-		const handleDotThresholdChange = createSettingHandler({ plugin, settingKey: "dotThreshold" });
-		sliderRenderer.render(contentEl, {
-			name: t.settings.dotThreshold.name,
-			description: t.settings.dotThreshold.description,
-			value: plugin.settings.dotThreshold,
-			onChange: handleDotThresholdChange,
-		});
-	}
 
 	// Date field name setting (for YAML source)
 	const textRenderer = new TextSettingRenderer(plugin, DEFAULTS.DATE_FORMAT_PLACEHOLDER);
