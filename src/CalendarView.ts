@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { mount, unmount } from "svelte";
 import type { CalendarZSettings } from "./settings/types";
 import type { I18n } from "./i18n";
-import type { PluginLike } from "./types";
+import type { PluginLike } from "./types/plugin";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate, getNotesCountByBoth } from "./utils/getNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
 import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
@@ -17,8 +17,6 @@ export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 export interface CalendarZViewDeps {
 	/** Plugin settings */
 	settings: CalendarZSettings;
-	/** Internationalization strings */
-	i18n: I18n;
 	/** Obsidian app instance */
 	app: App;
 	/** Plugin instance for accessing i18n dynamically */
@@ -54,6 +52,11 @@ export class CalendarZView extends ItemView {
 		return this.deps.settings;
 	}
 
+	/** Gets the current i18n strings */
+	private get i18n(): I18n {
+		return this.deps.plugin.i18n;
+	}
+
 	/** Returns the unique view type identifier */
 	getViewType(): string {
 		return CALENDARZ_VIEW_TYPE;
@@ -61,7 +64,7 @@ export class CalendarZView extends ItemView {
 
 	/** Returns the display text for the view tab */
 	getDisplayText(): string {
-		return this.deps.i18n.calendar.viewTitle;
+		return this.i18n.calendar.viewTitle;
 	}
 
 	/** Returns the icon name for the view */
@@ -138,7 +141,7 @@ export class CalendarZView extends ItemView {
 			target: this.contentEl,
 			props: {
 				settings: this.settings,
-				i18n: this.deps.i18n,
+				i18n: this.i18n,
 				dateCounts,
 				currentDate: this.currentDate,
 				onDayClick: (date: Date) => void this.handleDayClick(date),
@@ -197,7 +200,7 @@ export class CalendarZView extends ItemView {
 	 * @param date - Date for the daily note
 	 */
 	private async createDailyNote(date: Date): Promise<void> {
-		await openOrCreateDailyNote(this.deps.app, this.deps.i18n, date);
+		await openOrCreateDailyNote(this.deps.app, this.i18n, date);
 	}
 
 	/**

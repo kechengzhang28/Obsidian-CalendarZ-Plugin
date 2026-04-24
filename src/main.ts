@@ -124,7 +124,6 @@ export default class CalendarZ extends Plugin {
 	private getViewDeps(): CalendarZViewDeps {
 		return {
 			settings: this.settings,
-			i18n: this.i18n,
 			app: this.app,
 			plugin: this,
 			refreshView: () => this.refreshView(),
