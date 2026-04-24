@@ -32,7 +32,7 @@ export default class CalendarZ extends Plugin {
 
 		// Add command to open calendar view
 		this.addCommand({
-			id: 'open-calendarz-view',
+			id: 'open-calendar-view',
 			name: this.i18n.commands.openCalendar,
 			callback: () => void this.activateView()
 		});
