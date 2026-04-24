@@ -80,7 +80,7 @@
 }
 
 .calendarz-weekdays-with-week {
-	grid-template-columns: 24px repeat(7, 1fr);
+	grid-template-columns: repeat(8, 1fr);
 }
 
 .calendarz-weekday {
@@ -104,7 +104,7 @@
 }
 
 .calendarz-days-with-week {
-	grid-template-columns: 24px repeat(7, 1fr);
+	grid-template-columns: repeat(8, 1fr);
 }
 
 .calendarz-week-number {
