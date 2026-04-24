@@ -4,7 +4,7 @@ import { mount, unmount } from "svelte";
 import type { CalendarZSettings } from "./settings/types";
 import type { I18n } from "./i18n";
 import type { PluginLike } from "./types";
-import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/getNotes";
+import { getNotesCountByYamlDate, getNotesCountByFilenameDate, getNotesCountByBoth } from "./utils/getNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
 import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
 import Calendar from "./components/Calendar.svelte";
@@ -211,7 +211,7 @@ export class CalendarZView extends ItemView {
 
 	/**
 	 * Fetches note counts grouped by date.
-	 * Uses either YAML frontmatter or filename based on settings.
+	 * Uses either YAML frontmatter, filename, or both based on settings.
 	 * @returns Array of date counts
 	 */
 	private async fetchDateCounts(): Promise<DateCount[]> {
@@ -219,6 +219,9 @@ export class CalendarZView extends ItemView {
 
 		if (dateSource === DATE_SOURCE.FILENAME) {
 			return getNotesCountByFilenameDate(this.deps.app, ignoredFolders, filenameDateFormat);
+		}
+		if (dateSource === DATE_SOURCE.BOTH) {
+			return getNotesCountByBoth(this.deps.app, ignoredFolders, dateFieldName, filenameDateFormat);
 		}
 		return getNotesCountByYamlDate(this.deps.app, ignoredFolders, dateFieldName);
 	}

@@ -63,7 +63,8 @@
       "description": "Select the source for note date statistics",
       "options": {
         "yaml": "YAML frontmatter",
-        "filename": "Date in filename"
+        "filename": "Date in filename",
+        "both": "Both"
       }
     },
     "filenameDateFormat": {

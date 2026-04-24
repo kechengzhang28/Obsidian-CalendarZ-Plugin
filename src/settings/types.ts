@@ -11,7 +11,7 @@ export type TitleFormat = "yearMonth" | "monthYear";
 export type WeekStart = "sunday" | "monday";
 
 /** Date source options for extracting dates from notes */
-export type DateSource = "yaml" | "filename";
+export type DateSource = "yaml" | "filename" | "both";
 
 /** Display mode options for note statistics */
 export type DisplayMode = "none" | "dots" | "heatmap";

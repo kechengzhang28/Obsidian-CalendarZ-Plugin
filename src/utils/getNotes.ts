@@ -130,3 +130,33 @@ export async function getNotesCountByYamlDate(
 
 	return Array.from(counts.entries()).map(([date, count]) => ({ date, count }));
 }
+
+/**
+ * Counts notes by date from both YAML frontmatter and filenames
+ * @param app - Obsidian app instance
+ * @param ignoredFolders - List of folder paths to ignore
+ * @param dateFieldName - Name of the date field in frontmatter
+ * @param filenameDateFormat - Date format pattern in filenames
+ * @returns Promise resolving to array of date counts
+ */
+export async function getNotesCountByBoth(
+	app: App,
+	ignoredFolders: string[],
+	dateFieldName: string,
+	filenameDateFormat: string
+): Promise<DateCount[]> {
+	const yamlCounts = await getNotesCountByYamlDate(app, ignoredFolders, dateFieldName);
+	const filenameCounts = getNotesCountByFilenameDate(app, ignoredFolders, filenameDateFormat);
+
+	const mergedCounts = new Map<string, number>();
+
+	for (const { date, count } of yamlCounts) {
+		mergedCounts.set(date, (mergedCounts.get(date) || 0) + count);
+	}
+
+	for (const { date, count } of filenameCounts) {
+		mergedCounts.set(date, (mergedCounts.get(date) || 0) + count);
+	}
+
+	return Array.from(mergedCounts.entries()).map(([date, count]) => ({ date, count }));
+}

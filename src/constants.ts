@@ -89,4 +89,5 @@ export const DISPLAY_MODE = {
 export const DATE_SOURCE = {
 	YAML: "yaml",
 	FILENAME: "filename",
+	BOTH: "both",
 } as const;

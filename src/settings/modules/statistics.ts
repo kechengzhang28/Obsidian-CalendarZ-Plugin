@@ -66,6 +66,7 @@ export function renderStatisticsSettings(
 	const dateSourceRenderer = new DropdownSettingRenderer<DateSource>(plugin, {
 		[DATE_SOURCE.YAML]: t.settings.dateSource.options.yaml,
 		[DATE_SOURCE.FILENAME]: t.settings.dateSource.options.filename,
+		[DATE_SOURCE.BOTH]: t.settings.dateSource.options.both,
 	});
 	const handleDateSourceChange = createSettingHandler({
 		plugin,

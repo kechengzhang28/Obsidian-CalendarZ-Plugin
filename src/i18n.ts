@@ -97,6 +97,7 @@ export interface I18n {
 			options: {
 				yaml: string;
 				filename: string;
+				both: string;
 			};
 		};
 		/** Filename date format setting strings */
