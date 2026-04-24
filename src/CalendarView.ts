@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { mount, unmount } from "svelte";
 import type { CalendarZSettings } from "./settings/types";
 import type { I18n } from "./i18n";
+import type { PluginLike } from "./types";
 import { getNotesCountByYamlDate, getNotesCountByFilenameDate } from "./utils/getNotes";
 import { openOrCreateDailyNote, findDailyNote } from "./utils/createNote";
 import { DISPLAY_MODE, DATE_SOURCE, DATE_FORMAT } from "./constants";
@@ -20,6 +21,8 @@ export interface CalendarZViewDeps {
 	i18n: I18n;
 	/** Obsidian app instance */
 	app: App;
+	/** Plugin instance for accessing i18n dynamically */
+	plugin: PluginLike;
 	/** Callback to refresh the view */
 	refreshView(): void;
 }
@@ -180,7 +183,7 @@ export class CalendarZView extends ItemView {
 			const dateStr = dayjs(date).format(DATE_FORMAT);
 			new ConfirmModal(
 				this.deps.app,
-				this.deps.i18n,
+				this.deps.plugin,
 				dateStr,
 				() => void this.createDailyNote(date)
 			).open();

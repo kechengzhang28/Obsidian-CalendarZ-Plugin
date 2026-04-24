@@ -120,7 +120,7 @@ export function renderStatisticsSettings(
 			const modal = new IgnoredFoldersModal(
 				app,
 				plugin.settings.ignoredFolders,
-				plugin.i18n,
+				plugin,
 				async (folders) => {
 					plugin.settings.ignoredFolders = folders;
 					await plugin.saveSettings();

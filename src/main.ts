@@ -126,6 +126,7 @@ export default class CalendarZ extends Plugin {
 			settings: this.settings,
 			i18n: this.i18n,
 			app: this.app,
+			plugin: this,
 			refreshView: () => this.refreshView(),
 		};
 	}

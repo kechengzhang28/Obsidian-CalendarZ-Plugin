@@ -1,5 +1,5 @@
 import {App, Modal, Setting} from "obsidian";
-import type {I18n} from "../i18n";
+import type {PluginLike} from "../types";
 
 /**
  * Modal for managing ignored folders.
@@ -8,8 +8,8 @@ import type {I18n} from "../i18n";
 export class IgnoredFoldersModal extends Modal {
 	/** Current list of ignored folders */
 	ignoredFolders: string[];
-	/** Internationalization strings */
-	i18n: I18n;
+	/** Plugin instance for accessing current i18n */
+	private plugin: PluginLike;
 	/** Callback when folders are updated */
 	onUpdate: (folders: string[]) => Promise<void>;
 
@@ -17,18 +17,18 @@ export class IgnoredFoldersModal extends Modal {
 	 * Creates a new ignored folders modal.
 	 * @param app - Obsidian App instance
 	 * @param ignoredFolders - Current list of ignored folders
-	 * @param i18n - Internationalization strings
+	 * @param plugin - Plugin instance for accessing i18n
 	 * @param onUpdate - Callback function when folders are updated
 	 */
 	constructor(
 		app: App,
 		ignoredFolders: string[],
-		i18n: I18n,
+		plugin: PluginLike,
 		onUpdate: (folders: string[]) => Promise<void>
 	) {
 		super(app);
 		this.ignoredFolders = [...ignoredFolders];
-		this.i18n = i18n;
+		this.plugin = plugin;
 		this.onUpdate = onUpdate;
 	}
 
@@ -38,7 +38,7 @@ export class IgnoredFoldersModal extends Modal {
 	 */
 	onOpen(): void {
 		const {contentEl} = this;
-		const t = this.i18n.settings.ignoredFolders;
+		const t = this.plugin.i18n.settings.ignoredFolders;
 
 		contentEl.empty();
 		this.titleEl.setText(t.modalTitle);
@@ -101,7 +101,7 @@ export class IgnoredFoldersModal extends Modal {
 	 */
 	private renderFolderList(): void {
 		this.folderListContainer.empty();
-		const t = this.i18n.settings.ignoredFolders;
+		const t = this.plugin.i18n.settings.ignoredFolders;
 
 		if (this.ignoredFolders.length === 0) {
 			this.folderListContainer.createEl("div", {
