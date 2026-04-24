@@ -43,7 +43,7 @@ Issues and Pull Requests are welcome!
 
 ## Special Thanks
 
-- [liamcain](https://github.com/liamcain) for the original plugin and its great idea.
+- [liamcain](https://github.com/liamcain) for the [obsidian-calendar-plugin](https://github.com/liamcain/obsidian-calendar-plugin).
 
 ***
 
