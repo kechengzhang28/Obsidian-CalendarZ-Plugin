@@ -187,3 +187,9 @@
 .calendarz-settings-folder-item {
 	margin-top: 4px;
 }
+
+/* Setting group heading - remove padding from H3 */
+.setting-item-heading h3 {
+	padding: 0;
+	margin: 0;
+}
