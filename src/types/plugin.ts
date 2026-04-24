@@ -5,7 +5,7 @@ import type { CalendarZSettings } from "../settings/types";
 /**
  * Minimal interface for plugin-like objects
  * Used to avoid circular dependencies between modules and main.ts
- * 
+ *
  * This interface defines the contract that any plugin-like object must satisfy
  * to be used by settings modules and utility functions.
  */

@@ -2,10 +2,10 @@
 	"id": "calendarz",
 	"name": "CalendarZ",
 	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Test Calendar Plugin",
+	"minAppVersion": "1.12.3",
+	"description": "A visual calendar with heatmap & dots tracking for your daily notes.",
 	"author": "kechengzhang28",
 	"authorUrl": "https://github.com/kechengzhang28",
 	"fundingUrl": "",
-	"isDesktopOnly": false
+	"isDesktopOnly": true
 }

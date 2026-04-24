@@ -1,16 +1,41 @@
 import {App, Modal, ButtonComponent} from "obsidian";
 import type {I18n} from "../i18n";
 
+/**
+ * Modal dialog for confirming daily note creation.
+ * Displays a confirmation message before creating a new daily note.
+ */
 export class ConfirmModal extends Modal {
+	/** Internationalization strings */
+	private i18n: I18n;
+	/** Date string to display in the confirmation message */
+	private dateStr: string;
+	/** Callback function when user confirms */
+	private onConfirm: () => void;
+
+	/**
+	 * Creates a new confirmation modal.
+	 * @param app - Obsidian App instance
+	 * @param i18n - Internationalization strings
+	 * @param dateStr - Date string to display
+	 * @param onConfirm - Callback when user confirms
+	 */
 	constructor(
 		app: App,
-		private i18n: I18n,
-		private dateStr: string,
-		private onConfirm: () => void
+		i18n: I18n,
+		dateStr: string,
+		onConfirm: () => void
 	) {
 		super(app);
+		this.i18n = i18n;
+		this.dateStr = dateStr;
+		this.onConfirm = onConfirm;
 	}
 
+	/**
+	 * Called when the modal is opened.
+	 * Renders the modal content with title, message, and buttons.
+	 */
 	onOpen(): void {
 		const {contentEl} = this;
 		const t = this.i18n.modal;
@@ -33,6 +58,10 @@ export class ConfirmModal extends Modal {
 			});
 	}
 
+	/**
+	 * Called when the modal is closed.
+	 * Cleans up the modal content.
+	 */
 	onClose(): void {
 		this.contentEl.empty();
 	}

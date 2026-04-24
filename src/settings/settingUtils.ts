@@ -1,10 +1,16 @@
 import type { PluginLike } from "../types";
 
+/** Options for creating a setting change handler */
 export interface SettingHandlerOptions<K extends keyof PluginLike["settings"]> {
+	/** Plugin instance */
 	plugin: PluginLike;
+	/** Key of the setting to handle */
 	settingKey: K;
+	/** Optional callback to refresh the display after change */
 	refreshDisplay?: () => void;
+	/** Optional transform function to modify the value before saving */
 	transform?: (value: PluginLike["settings"][K]) => PluginLike["settings"][K];
+	/** Optional callback to execute after saving */
 	postSave?: () => void | Promise<void>;
 }
 
@@ -52,5 +58,3 @@ export function createSettingHandler<K extends keyof PluginLike["settings"]>(
 		await postSave?.();
 	};
 }
-
-
