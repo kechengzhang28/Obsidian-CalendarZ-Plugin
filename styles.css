@@ -79,6 +79,10 @@
 	margin-bottom: 6px;
 }
 
+.calendarz-weekdays-with-week {
+	grid-template-columns: 24px repeat(7, 1fr);
+}
+
 .calendarz-weekday {
 	text-align: center;
 	font-size: 11px;
@@ -87,10 +91,31 @@
 	padding: 4px 0;
 }
 
+.calendarz-weekday-label {
+	font-size: 10px;
+	font-weight: 600;
+}
+
 .calendarz-days {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
 	gap: 2px;
+}
+
+.calendarz-days-with-week {
+	grid-template-columns: 24px repeat(7, 1fr);
+}
+
+.calendarz-week-number {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 10px;
+	font-weight: 500;
+	color: var(--text-muted);
+	background-color: var(--background-modifier-border-hover);
+	border-radius: 4px;
+	aspect-ratio: 1;
 }
 
 

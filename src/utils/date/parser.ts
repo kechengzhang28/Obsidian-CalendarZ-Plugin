@@ -1,7 +1,4 @@
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-
-dayjs.extend(customParseFormat);
+import dayjs from "./dayjsConfig";
 
 /**
  * Common date formats to try when parsing date strings

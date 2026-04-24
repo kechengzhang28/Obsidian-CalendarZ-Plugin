@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from "./dayjsConfig";
 import { DATE_FORMAT } from "../../constants";
 
 /**

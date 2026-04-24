@@ -1,5 +1,5 @@
 <script lang="ts">
-	import dayjs from "dayjs";
+	import dayjs from "../utils/date/dayjsConfig";
 	import CalendarHeader from "./CalendarHeader.svelte";
 	import WeekdaysRow from "./WeekdaysRow.svelte";
 	import DaysGrid from "./DaysGrid.svelte";
@@ -51,7 +51,7 @@
 		onToday={onGoToToday}
 	/>
 
-	<WeekdaysRow {i18n} weekStart={settings.weekStart} />
+	<WeekdaysRow {i18n} weekStart={settings.weekStart} showWeekNumber={settings.showWeekNumber} />
 
 	<DaysGrid
 		{currentDate}
@@ -60,6 +60,7 @@
 		dotThreshold={effectiveDotThreshold}
 		heatmapMaxNotes={effectiveHeatmapMax}
 		heatmapHideDateNumbers={settings.heatmapHideDateNumbers}
+		showWeekNumber={settings.showWeekNumber}
 		{dateCounts}
 		{onDayClick}
 	/>

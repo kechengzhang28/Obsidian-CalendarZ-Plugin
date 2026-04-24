@@ -2,7 +2,8 @@
   "calendar": {
     "today": "今天",
     "weekdays": ["日", "一", "二", "三", "四", "五", "六"],
-    "viewTitle": "CalendarZ"
+    "viewTitle": "CalendarZ",
+    "weekLabel": "周"
   },
   "sectionTitles": {
     "basic": "基本设置",
@@ -112,6 +113,10 @@
     "confirmBeforeCreate": {
       "name": "创建前确认",
       "description": "左键点击日期时，是否在创建日记前弹出确认对话框"
+    },
+    "showWeekNumber": {
+      "name": "显示周数",
+      "description": "在日历左侧显示周数"
     },
     "openCalendar": {
       "name": "打开日历视图",

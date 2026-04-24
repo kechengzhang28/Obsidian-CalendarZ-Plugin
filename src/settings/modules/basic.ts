@@ -1,7 +1,7 @@
 import type { PluginLike } from "../../types";
 import type { MonthFormat, TitleFormat, WeekStart } from "../types";
 import { SettingGroup } from "../ui/SettingGroup";
-import { DropdownSettingRenderer } from "../ui/SettingRenderer";
+import { DropdownSettingRenderer, ToggleSettingRenderer } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
 
 /**
@@ -55,5 +55,15 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike
 		description: t.settings.weekStart.description,
 		value: plugin.settings.weekStart,
 		onChange: handleWeekStartChange,
+	});
+
+	// Show week number setting
+	const showWeekNumberRenderer = new ToggleSettingRenderer(plugin);
+	const handleShowWeekNumberChange = createSettingHandler({ plugin, settingKey: "showWeekNumber" });
+	showWeekNumberRenderer.render(contentEl, {
+		name: t.settings.showWeekNumber.name,
+		description: t.settings.showWeekNumber.description,
+		value: plugin.settings.showWeekNumber,
+		onChange: handleShowWeekNumberChange,
 	});
 }

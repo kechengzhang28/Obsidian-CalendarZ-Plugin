@@ -17,6 +17,8 @@ export interface I18n {
 		weekdays: string[];
 		/** Title displayed in the view tab */
 		viewTitle: string;
+		/** Label for week number column */
+		weekLabel: string;
 	};
 	/** Settings section titles */
 	sectionTitles: {
@@ -153,6 +155,11 @@ export interface I18n {
 		};
 		/** Confirm before creating daily note setting strings */
 		confirmBeforeCreate: {
+			name: string;
+			description: string;
+		};
+		/** Show week number setting strings */
+		showWeekNumber: {
 			name: string;
 			description: string;
 		};

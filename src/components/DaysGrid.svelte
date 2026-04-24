@@ -1,5 +1,5 @@
 <script lang="ts">
-	import dayjs from "dayjs";
+	import dayjs from "../utils/date/dayjsConfig";
 	import type { WeekStart, DisplayMode } from "../settings/types";
 	import {
 		formatDate,
@@ -9,6 +9,7 @@
 		getDaysInMonth,
 		getPreviousMonthLastDay,
 		calculatePaddingDays,
+		getWeekNumber,
 	} from "../utils/date";
 	import { CSS_CLASSES, ATTRS, GRID, DOTS, HEATMAP } from "../constants";
 	import type { DateCount } from "./types";
@@ -20,6 +21,7 @@
 		dotThreshold: number;
 		heatmapMaxNotes: number;
 		heatmapHideDateNumbers: boolean;
+		showWeekNumber: boolean;
 		dateCounts: DateCount[];
 		onDayClick: (date: Date) => void;
 	}
@@ -31,6 +33,7 @@
 		dotThreshold,
 		heatmapMaxNotes,
 		heatmapHideDateNumbers,
+		showWeekNumber,
 		dateCounts,
 		onDayClick,
 	}: Props = $props();
@@ -48,6 +51,7 @@
 		isToday: boolean;
 		isBeforeToday: boolean;
 		dateStr: string;
+		weekNumber: number;
 	}
 
 	function calculateHeatmapOpacity(count: number, maxNotes: number): number {
@@ -70,6 +74,7 @@
 			isToday: isSameDay(date, today),
 			isBeforeToday: isBeforeToday(date),
 			dateStr,
+			weekNumber: getWeekNumber(date.toDate(), weekStart),
 		};
 	}
 
@@ -104,6 +109,19 @@
 			));
 		}
 
+		return result;
+	});
+
+	let rows = $derived.by(() => {
+		const result: { weekNumber: number; cells: DayCell[] }[] = [];
+		for (let i = 0; i < cells.length; i += GRID.DAYS_PER_WEEK) {
+			const rowCells = cells.slice(i, i + GRID.DAYS_PER_WEEK);
+			const firstCell = rowCells[0];
+			result.push({
+				weekNumber: firstCell.weekNumber,
+				cells: rowCells,
+			});
+		}
 		return result;
 	});
 
@@ -158,38 +176,43 @@
 	}
 </script>
 
-<div class={CSS_CLASSES.DAYS}>
-	{#each cells as cell (cell.dateStr)}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div
-			class={getDayClasses(cell)}
-			style={getDayStyle(cell)}
-			data-date={cell.dateStr}
-			data-count={cell.count > 0 ? cell.count : undefined}
-			aria-label={cell.count > 0 || cell.isBeforeToday
-				? `${cell.dateStr}: ${cell.count} notes`
-				: undefined}
-			role="button"
-			tabindex="0"
-			onclick={() => handleClick(cell)}
-		>
-			{#if !(displayMode === "heatmap" && heatmapHideDateNumbers)}
-				{cell.date.date()}
-			{/if}
+<div class={CSS_CLASSES.DAYS} class:calendarz-days-with-week={showWeekNumber}>
+	{#each rows as row (row.weekNumber)}
+		{#if showWeekNumber}
+			<div class="calendarz-week-number">{row.weekNumber}</div>
+		{/if}
+		{#each row.cells as cell (cell.dateStr)}
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<div
+				class={getDayClasses(cell)}
+				style={getDayStyle(cell)}
+				data-date={cell.dateStr}
+				data-count={cell.count > 0 ? cell.count : undefined}
+				aria-label={cell.count > 0 || cell.isBeforeToday
+					? `${cell.dateStr}: ${cell.count} notes`
+					: undefined}
+				role="button"
+				tabindex="0"
+				onclick={() => handleClick(cell)}
+			>
+				{#if !(displayMode === "heatmap" && heatmapHideDateNumbers)}
+					{cell.date.date()}
+				{/if}
 
-			{#if getDotCount(cell) > 0 || showGrayDot(cell) || (showTodayIndicator(cell) && !heatmapHideDateNumbers)}
-				<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
-					{#if showTodayIndicator(cell)}
-						<div class="{CSS_CLASSES.BAR_TODAY}"></div>
-					{:else if showGrayDot(cell)}
-						<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_GRAY}"></div>
-					{:else}
-						{#each Array(getDotCount(cell)) as _, i (i)}
-							<div class={CSS_CLASSES.DOT}></div>
-						{/each}
-					{/if}
-				</div>
-			{/if}
-		</div>
+				{#if getDotCount(cell) > 0 || showGrayDot(cell) || (showTodayIndicator(cell) && !heatmapHideDateNumbers)}
+					<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
+						{#if showTodayIndicator(cell)}
+							<div class="{CSS_CLASSES.BAR_TODAY}"></div>
+						{:else if showGrayDot(cell)}
+							<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_GRAY}"></div>
+						{:else}
+							{#each Array(getDotCount(cell)) as _, i (i)}
+								<div class={CSS_CLASSES.DOT}></div>
+							{/each}
+						{/if}
+					</div>
+				{/if}
+			</div>
+		{/each}
 	{/each}
 </div>

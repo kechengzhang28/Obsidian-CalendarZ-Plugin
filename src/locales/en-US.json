@@ -2,7 +2,8 @@
   "calendar": {
     "today": "Today",
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    "viewTitle": "CalendarZ"
+    "viewTitle": "CalendarZ",
+    "weekLabel": "W"
   },
   "sectionTitles": {
     "basic": "Basic",
@@ -112,6 +113,10 @@
     "confirmBeforeCreate": {
       "name": "Confirm Before Creating",
       "description": "Show a confirmation dialog before creating a daily note when left-clicking a date"
+    },
+    "showWeekNumber": {
+      "name": "Show Week Numbers",
+      "description": "Display week numbers on the left side of the calendar"
     },
     "openCalendar": {
       "name": "Open Calendar View",

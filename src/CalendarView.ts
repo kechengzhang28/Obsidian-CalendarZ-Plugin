@@ -1,5 +1,5 @@
 import { ItemView, WorkspaceLeaf, App } from "obsidian";
-import dayjs from "dayjs";
+import dayjs from "./utils/date/dayjsConfig";
 import { mount, unmount } from "svelte";
 import type { CalendarZSettings } from "./settings/types";
 import type { I18n } from "./i18n";

@@ -56,4 +56,6 @@ export interface CalendarZSettings {
 	heatmapHideDateNumbers: boolean;
 	/** Whether to confirm before creating a daily note on click */
 	confirmBeforeCreate: boolean;
+	/** Whether to show week numbers in the calendar */
+	showWeekNumber: boolean;
 }
