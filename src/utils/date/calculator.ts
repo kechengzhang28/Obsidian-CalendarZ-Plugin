@@ -1,4 +1,4 @@
-import dayjs from "./dayjsConfig";
+import dayjs, { setWeekStart } from "./dayjsConfig";
 import type { WeekStart } from "../../settings/types";
 import { DAY_OF_WEEK } from "../../constants";
 
@@ -86,19 +86,18 @@ export function calculatePaddingDays(year: number, month: number, weekStart: Wee
 }
 
 /**
- * Calculates the ISO week number for a given date
+ * Calculates the week number for a given date
  *
- * Week numbers follow ISO 8601 standard:
- * - Week 1 is the week containing the first Thursday of the year
- * - Weeks start on Monday (ISO standard)
- * - If weekStart is "sunday", the week number is still calculated
- *   based on ISO weeks but displayed aligned to the row
+ * Week numbers are calculated based on the user's weekStart preference:
+ * - If weekStart is "monday": Uses ISO 8601 standard (week 1 contains first Thursday)
+ * - If weekStart is "sunday": Uses US standard (week 1 contains Jan 1st)
  *
  * @param date - Date to calculate week number for
- * @param weekStart - Week start preference (affects display alignment)
- * @returns ISO week number (1-53)
+ * @param weekStart - Week start preference ("sunday" or "monday")
+ * @returns Week number (1-53)
  */
 export function getWeekNumber(date: Date, weekStart: WeekStart): number {
+	setWeekStart(weekStart);
 	return dayjs(date).week();
 }
 
