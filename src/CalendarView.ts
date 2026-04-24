@@ -93,7 +93,7 @@ export class CalendarZView extends ItemView {
 	 */
 	async onClose(): Promise<void> {
 		if (this.calendarComponent) {
-			void unmount(this.calendarComponent);
+			await unmount(this.calendarComponent);
 			this.calendarComponent = null;
 		}
 		this.contentEl.empty();
@@ -112,7 +112,7 @@ export class CalendarZView extends ItemView {
 	 * Updates the today highlight if the month has changed.
 	 * Resets to current month if user navigated away.
 	 */
-	async updateTodayHighlight(): Promise<void> {
+	updateTodayHighlight(): void {
 		const today = dayjs();
 		const current = dayjs(this.currentDate);
 
@@ -174,7 +174,7 @@ export class CalendarZView extends ItemView {
 	 * @param date - Clicked date
 	 */
 	private async handleDayClick(date: Date): Promise<void> {
-		const existingNote = findDailyNote(date);
+		const existingNote = findDailyNote(this.deps.app, date);
 
 		if (existingNote) {
 			await this.deps.app.workspace.openLinkText(existingNote.path, "", false);

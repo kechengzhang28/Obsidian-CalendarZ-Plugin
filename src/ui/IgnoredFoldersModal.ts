@@ -57,7 +57,7 @@ export class IgnoredFoldersModal extends Modal {
 			.addButton(button => {
 				button.setButtonText(t.addButton);
 				button.setCta();
-				button.onClick(async () => {
+				button.onClick(() => {
 					const folderPath = folderInput.value.trim();
 					if (folderPath && !this.ignoredFolders.includes(folderPath)) {
 						this.ignoredFolders.push(folderPath);

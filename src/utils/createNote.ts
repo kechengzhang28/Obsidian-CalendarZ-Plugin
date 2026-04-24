@@ -10,10 +10,11 @@ import type {I18n} from "../i18n";
 /**
  * Finds an existing daily note for the given date using the core Daily Notes plugin.
  * This strictly follows the Daily Notes plugin's matching method based on filename format.
+ * @param app - Obsidian App instance
  * @param date - The date for which to find the daily note
  * @returns The existing TFile if found, null otherwise
  */
-export function findDailyNote(date: Date): TFile | null {
+export function findDailyNote(app: App, date: Date): TFile | null {
 	// Check if daily notes plugin is enabled
 	if (!appHasDailyNotesPluginLoaded()) {
 		return null;
@@ -24,9 +25,18 @@ export function findDailyNote(date: Date): TFile | null {
 	const allDailyNotes = getAllDailyNotes();
 	const existingNote = getDailyNote(moment(date), allDailyNotes);
 
-	// The interface returns a compatible type at runtime
-	// eslint-disable-next-line obsidianmd/no-tfile-tfolder-cast
-	return existingNote ? (existingNote as TFile) : null;
+	// Return null if no note found
+	// Note: existingNote is compatible with TFile at runtime despite type differences
+	// between obsidian package versions
+	if (!existingNote) {
+		return null;
+	}
+
+	// Use vault.getFileByPath to get the TFile from the vault
+	// This avoids direct type casting between incompatible TFile types from different packages
+	const filePath = existingNote.path;
+	const file = app.vault.getFileByPath(filePath);
+	return file;
 }
 
 /**
@@ -53,7 +63,7 @@ export async function openOrCreateDailyNote(
 		}
 
 		// Get all daily notes and find the note for the specific date
-		const existingNote = findDailyNote(date);
+		const existingNote = findDailyNote(app, date);
 
 		// If note exists, open it
 		if (existingNote) {
