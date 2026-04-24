@@ -50,7 +50,7 @@ export const CSS_CLASSES = {
 	DOTS_CONTAINER: "calendarz-dots-container",
 	DOT: "calendarz-dot",
 	DOT_GRAY: "calendarz-dot-gray",
-	DOT_TODAY: "today",
+	BAR_TODAY: "calendarz-bar-today",
 } as const;
 
 /** CSS custom property names */

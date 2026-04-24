@@ -172,7 +172,7 @@
 			{#if getDotCount(cell) > 0 || showGrayDot(cell) || showTodayIndicator(cell)}
 				<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
 					{#if showTodayIndicator(cell)}
-						<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_TODAY}"></div>
+						<div class="{CSS_CLASSES.BAR_TODAY}"></div>
 					{:else if showGrayDot(cell)}
 						<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_GRAY}"></div>
 					{:else}
