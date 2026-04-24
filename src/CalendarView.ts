@@ -49,7 +49,7 @@ export class CalendarZView extends ItemView {
 
 	/** Gets the current plugin settings */
 	private get settings(): CalendarZSettings {
-		return this.deps.settings;
+		return this.deps.plugin.settings;
 	}
 
 	/** Gets the current i18n strings */

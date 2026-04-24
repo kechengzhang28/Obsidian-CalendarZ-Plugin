@@ -2,7 +2,6 @@ import type { PluginLike } from "../../types";
 import type { Language } from "../types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { DropdownSettingRenderer, ButtonSettingRenderer } from "../ui/SettingRenderer";
-import { createSettingHandler } from "../settingUtils";
 
 /**
  * Renders language settings.
@@ -22,15 +21,14 @@ export function renderLanguageSettings(
 
 	const t = plugin.i18n;
 
-	// Language setting with special handling (needs to reload i18n)
-	const handleLanguageChange = createSettingHandler({
-		plugin,
-		settingKey: "language",
-		postSave: () => {
-			plugin.loadI18n();
-			refreshDisplay();
-		},
-	});
+	// Language setting with special handling (needs to reload i18n before refresh)
+	const handleLanguageChange = async (value: Language) => {
+		plugin.settings.language = value;
+		await plugin.saveSettings();
+		plugin.loadI18n();
+		refreshDisplay();
+		plugin.refreshView();
+	};
 
 	const languageRenderer = new DropdownSettingRenderer<Language>(plugin, {
 		"en-US": "English",
