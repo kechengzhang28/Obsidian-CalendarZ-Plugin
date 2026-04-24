@@ -18,7 +18,7 @@ So, I made a new calendar plugin, CalendarZ.
 
 - **YAML Frontmatter**: Extract dates from note frontmatter with customizable field names
 - **Filename Parsing**: Parse dates from filenames, supporting various date formats
-- **Both YAML and Filename (To be implemented)**: Automatically detect and use dates from both sources
+- **Both YAML and Filename**: Automatically detect and use dates from both sources
 
 ### Daily Note Integration
 
