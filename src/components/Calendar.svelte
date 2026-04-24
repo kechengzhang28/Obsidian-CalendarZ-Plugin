@@ -52,6 +52,7 @@
 		weekStart={settings.weekStart}
 		displayMode={settings.displayMode}
 		dotThreshold={settings.dotThreshold}
+		heatmapMaxNotes={settings.heatmapMaxNotes}
 		{dateCounts}
 		{onDayClick}
 	/>

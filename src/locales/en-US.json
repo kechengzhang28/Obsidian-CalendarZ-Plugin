@@ -8,6 +8,7 @@
     "basic": "Basic",
     "statistics": "Statistics",
     "dots": "Dots",
+    "heatmap": "Heatmap",
     "click": "Click Behavior"
   },
   "settings": {
@@ -83,6 +84,10 @@
     "dotThreshold": {
       "name": "Notes per Dot",
       "description": "Number of notes represented by each dot (1-10)"
+    },
+    "heatmapMaxNotes": {
+      "name": "Max Notes for Heatmap",
+      "description": "Maximum note count to reach full brightness in heatmap mode. Any date with notes >= this value will show maximum brightness."
     },
     "confirmBeforeCreate": {
       "name": "Confirm Before Creating",

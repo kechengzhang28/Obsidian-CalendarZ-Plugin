@@ -26,6 +26,8 @@ export interface I18n {
 		statistics: string;
 		/** Dots settings section title */
 		dots: string;
+		/** Heatmap settings section title */
+		heatmap: string;
 		/** Click settings section title */
 		click: string;
 	};
@@ -117,6 +119,11 @@ export interface I18n {
 		};
 		/** Dot threshold setting strings */
 		dotThreshold: {
+			name: string;
+			description: string;
+		};
+		/** Heatmap max notes setting strings */
+		heatmapMaxNotes: {
 			name: string;
 			description: string;
 		};

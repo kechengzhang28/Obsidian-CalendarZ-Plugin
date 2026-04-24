@@ -4,6 +4,7 @@ import {renderLanguageSettings} from "./modules/language";
 import {renderBasicSettings} from "./modules/basic";
 import {renderStatisticsSettings} from "./modules/statistics";
 import {renderDotsSettings} from "./modules/dots";
+import {renderHeatmapSettings} from "./modules/heatmap";
 import {renderClickSettings} from "./modules/click";
 
 /**
@@ -35,6 +36,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 		renderBasicSettings(containerEl, this.plugin);
 		renderStatisticsSettings(containerEl, this.plugin, this.app, () => this.display());
 		renderDotsSettings(containerEl, this.plugin);
+		renderHeatmapSettings(containerEl, this.plugin);
 		renderClickSettings(containerEl, this.plugin);
 	}
 }

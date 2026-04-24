@@ -12,5 +12,6 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	filenameDateFormat: "YYYY-MM-DD",
 	displayMode: "none",
 	dotThreshold: 1,
+	heatmapMaxNotes: 10,
 	confirmBeforeCreate: true
 };

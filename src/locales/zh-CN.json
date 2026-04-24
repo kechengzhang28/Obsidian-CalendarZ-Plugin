@@ -8,6 +8,7 @@
     "basic": "基本设置",
     "statistics": "统计设置",
     "dots": "点图设置",
+    "heatmap": "热力图设置",
     "click": "点击设置"
   },
   "settings": {
@@ -83,6 +84,10 @@
     "dotThreshold": {
       "name": "每点代表笔记数",
       "description": "每个点代表的笔记数量（1-10）"
+    },
+    "heatmapMaxNotes": {
+      "name": "热力图最大笔记数",
+      "description": "热力图达到最大亮度时的笔记数量。任何笔记数大于等于此值的日期都将显示最大亮度。"
     },
     "confirmBeforeCreate": {
       "name": "创建前确认",

@@ -18,6 +18,7 @@
 		weekStart: WeekStart;
 		displayMode: DisplayMode;
 		dotThreshold: number;
+		heatmapMaxNotes: number;
 		dateCounts: DateCount[];
 		onDayClick: (date: Date) => void;
 	}
@@ -27,6 +28,7 @@
 		weekStart,
 		displayMode,
 		dotThreshold,
+		heatmapMaxNotes,
 		dateCounts,
 		onDayClick,
 	}: Props = $props();
@@ -35,7 +37,6 @@
 		new Map(dateCounts.map((d) => [d.date, d.count]))
 	);
 
-	const maxCount = $derived(Math.max(0, ...countsMap.values()));
 	const today = $derived(dayjs());
 
 	interface DayCell {
@@ -47,9 +48,9 @@
 		dateStr: string;
 	}
 
-	function calculateHeatmapOpacity(count: number, maxCount: number): number {
-		if (maxCount <= 0) return HEATMAP.MIN_OPACITY;
-		const intensity = count / maxCount;
+	function calculateHeatmapOpacity(count: number, maxNotes: number): number {
+		if (maxNotes <= 0) return HEATMAP.MIN_OPACITY;
+		const intensity = Math.min(count / maxNotes, 1);
 		return HEATMAP.MIN_OPACITY + intensity * HEATMAP.OPACITY_RANGE;
 	}
 
@@ -121,7 +122,7 @@
 
 	function getDayStyle(cell: DayCell): string {
 		if (displayMode === "heatmap" && cell.count > 0) {
-			const opacity = calculateHeatmapOpacity(cell.count, maxCount);
+			const opacity = calculateHeatmapOpacity(cell.count, heatmapMaxNotes);
 			return `--heatmap-opacity: ${opacity.toFixed(2)}`;
 		}
 		return "";
