@@ -1,4 +1,5 @@
-import {Plugin, WorkspaceLeaf} from 'obsidian';
+import {Plugin, WorkspaceLeaf, TFile} from 'obsidian';
+import type {CachedMetadata} from 'obsidian';
 import {DEFAULT_SETTINGS, CalendarZSettingTab} from "./settings/index";
 import type { CalendarZSettings } from "./settings/types";
 import {CALENDARZ_VIEW_TYPE, CalendarZView} from "./CalendarView";
@@ -15,6 +16,10 @@ export default class CalendarZ extends Plugin {
 	settings: CalendarZSettings;
 	/** Internationalization strings */
 	i18n: I18n;
+	/** Cache for previous metadata to detect date field changes */
+	private previousCaches = new Map<string, CachedMetadata>();
+	/** Cache for file modification times */
+	private fileMtimes = new Map<string, number>();
 
 	/**
 	 * Called when the plugin is loaded.
@@ -43,18 +48,67 @@ export default class CalendarZ extends Plugin {
 
 		// Auto-refresh statistics every 30 seconds as a fallback
 		this.registerInterval(window.setInterval(() => this.forEachView(v => v.refreshStatsOnly()), 30000));
+
+		// Initial refresh after layout is ready
+		this.app.workspace.onLayoutReady(() => {
+			this.forEachView(v => v.refreshStatsOnly());
+		});
 	}
 
 	/**
 	 * Registers file system event listeners to refresh statistics.
-	 * Triggers on create, delete, rename, and modify events.
+	 * Uses metadataCache for precise change detection.
 	 */
 	private registerFileEvents(): void {
-		const refresh = () => this.forEachView(v => void v.refreshStatsOnly());
-		this.registerEvent(this.app.vault.on("create", refresh));
-		this.registerEvent(this.app.vault.on("delete", refresh));
-		this.registerEvent(this.app.vault.on("rename", refresh));
-		this.registerEvent(this.app.vault.on("modify", refresh));
+		// Listen to metadata changes for precise date field detection
+		this.registerEvent(this.app.metadataCache.on("changed", (file: TFile, _data: string, cache: CachedMetadata) => {
+			if (file.extension !== "md") return;
+
+			// Check if date field changed
+			const oldCache = this.previousCaches.get(file.path);
+			const dateField = this.settings.dateFieldName;
+			const oldDate = oldCache?.frontmatter?.[dateField] as unknown;
+			const newDate = cache.frontmatter?.[dateField] as unknown;
+
+			if (oldDate !== newDate) {
+				this.forEachView(v => v.refreshStatsOnly());
+			}
+
+			// Update cache
+			this.previousCaches.set(file.path, cache);
+			this.fileMtimes.set(file.path, file.stat.mtime);
+		}));
+
+		// File creation - new file may have date
+		this.registerEvent(this.app.vault.on("create", (file) => {
+			if (file instanceof TFile) {
+				this.fileMtimes.set(file.path, file.stat.mtime);
+				this.forEachView(v => v.refreshStatsOnly());
+			}
+		}));
+
+		// File deletion - remove from cache
+		this.registerEvent(this.app.vault.on("delete", (file) => {
+			if (file instanceof TFile) {
+				this.previousCaches.delete(file.path);
+				this.fileMtimes.delete(file.path);
+				this.forEachView(v => v.refreshStatsOnly());
+			}
+		}));
+
+		// File rename - update cache keys
+		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
+			if (file instanceof TFile) {
+				const oldCache = this.previousCaches.get(oldPath);
+				if (oldCache) {
+					this.previousCaches.set(file.path, oldCache);
+					this.previousCaches.delete(oldPath);
+				}
+				this.fileMtimes.delete(oldPath);
+				this.fileMtimes.set(file.path, file.stat.mtime);
+				this.forEachView(v => v.refreshStatsOnly());
+			}
+		}));
 	}
 
 	/**
