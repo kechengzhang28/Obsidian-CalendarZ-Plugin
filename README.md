@@ -10,6 +10,8 @@ So, I made a new calendar plugin, CalendarZ.
 
 ### Visual Note Tracking
 
+![Display Modes](img/display.png)
+
 - **Heatmap Mode**: Display varying color intensities based on note count or word count, giving you an instant overview of your writing activity
 - **Dots Mode**: Each dot represents a configurable number of notes or words, providing a clean visual representation of daily output
 - **None Mode**: Clean calendar view focused purely on date navigation
@@ -31,10 +33,23 @@ So, I made a new calendar plugin, CalendarZ.
 - Customizable weekly note naming format (e.g., `YYYY-[W]WW` produces `2024-W01.md`)
 - Support for weekly note templates and custom folder paths
 
+### Monthly Note Support
+
+- Enable monthly notes and click month headers to create or open monthly notes
+- Customizable monthly note naming format (e.g., `YYYY-MM` produces `2024-01.md`)
+- Support for monthly note templates and custom folder paths
+
+### Yearly Note Support
+
+- Enable yearly notes and click year headers to create or open yearly notes
+- Customizable yearly note naming format (e.g., `YYYY` produces `2024.md`)
+- Support for yearly note templates and custom folder paths
+
 ### Todo Status Indicators
 
 - Visual indicators show todo completion status on calendar dates
 - Quickly identify dates with pending or completed todos at a glance
+- Option to hide completed todos for a cleaner view
 
 ### Statistics Options
 
