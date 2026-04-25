@@ -253,7 +253,7 @@ let {
 </script>
 
 <div class={CSS_CLASSES.DAYS} class:calendarz-days-with-week={showWeekNumber}>
-	{#each rows as row (row.weekNumber)}
+	{#each rows as row (row.cells[0]?.dateStr ?? `${getYearMonth(currentDate)}-week-${row.weekNumber}`)}
 		{#if showWeekNumber}
 			{#if weekNoteEnabled}
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
