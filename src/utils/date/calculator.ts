@@ -53,7 +53,7 @@ export function getYearMonth(date: Date | dayjs.Dayjs): { year: number; month: n
  * @returns Number of days in the month
  */
 export function getDaysInMonth(year: number, month: number): number {
-	return dayjs(new Date(year, month + 1, 0)).date();
+	return dayjs(new Date(year, month, 1)).daysInMonth();
 }
 
 /**
@@ -65,7 +65,7 @@ export function getDaysInMonth(year: number, month: number): number {
  * @returns Last day number of previous month
  */
 export function getPreviousMonthLastDay(year: number, month: number): number {
-	return dayjs(new Date(year, month, 0)).date();
+	return dayjs(new Date(year, month, 0)).daysInMonth();
 }
 
 /**

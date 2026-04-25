@@ -2,15 +2,7 @@
  * Path utility functions for the CalendarZ plugin
  */
 
-/**
- * Normalizes a path by converting backslashes to forward slashes
- * and removing trailing slashes.
- * @param path - Path to normalize
- * @returns Normalized path
- */
-export function normalizePath(path: string): string {
-	return path.replace(/\\/g, "/").replace(/\/$/, "");
-}
+import { normalizePath as obsidianNormalizePath } from "obsidian";
 
 /**
  * Checks if a file path should be ignored based on the ignore list.
@@ -20,9 +12,9 @@ export function normalizePath(path: string): string {
  * @returns True if the path should be ignored
  */
 export function isPathIgnored(filePath: string, ignoredFolders: string[]): boolean {
-	const normalizedPath = normalizePath(filePath);
+	const normalizedPath = obsidianNormalizePath(filePath);
 	return ignoredFolders.some(folder => {
-		const normalizedFolder = normalizePath(folder);
+		const normalizedFolder = obsidianNormalizePath(folder);
 		return normalizedPath === normalizedFolder || normalizedPath.startsWith(normalizedFolder + "/");
 	});
 }
