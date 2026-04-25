@@ -88,9 +88,13 @@ export function calculatePaddingDays(year: number, month: number, weekStart: Wee
 /**
  * Calculates the week number for a given date
  *
- * Week numbers are calculated based on the user's weekStart preference:
- * - If weekStart is "monday": Uses ISO 8601 standard (week 1 contains first Thursday)
- * - If weekStart is "sunday": Uses US standard (week 1 contains Jan 1st)
+ * Week numbers are calculated based on the user's weekStart preference using
+ * locale-based week numbering (via dayjs weekOfYear plugin):
+ * - If weekStart is "monday": Week 1 is the week containing Jan 1st, weeks start on Monday
+ * - If weekStart is "sunday": Week 1 is the week containing Jan 1st, weeks start on Sunday
+ *
+ * Note: This is NOT strict ISO 8601 week numbering (which requires yearStart=4 so week 1
+ * contains the first Thursday). Week numbers near year boundaries may differ from ISO 8601.
  *
  * @param date - Date to calculate week number for
  * @param weekStart - Week start preference ("sunday" or "monday")

@@ -6,7 +6,7 @@
 import { App, Notice, TFile, normalizePath } from "obsidian";
 import type { CalendarZSettings, WeekStart } from "../../core/types";
 import type { I18nLike } from "../../core/types";
-import dayjs from "../../utils/date/dayjsConfig";
+import dayjs, { setWeekStart } from "../../utils/date/dayjsConfig";
 
 function parseWeekNoteFormat(format: string, year: number, week: number): string {
 	let result = format;
@@ -20,6 +20,7 @@ export class WeekNoteService {
 	constructor(private app: App) {}
 
 	getWeekNoteFilename(date: Date, settings: CalendarZSettings): string {
+		setWeekStart(settings.weekStart);
 		const d = dayjs(date);
 		const year = d.year();
 		const week = d.week();
@@ -44,6 +45,7 @@ export class WeekNoteService {
 	}
 
 	getWeekDateRange(date: Date, weekStart: WeekStart): string {
+		setWeekStart(weekStart);
 		const d = dayjs(date);
 		const startOfWeek = d.startOf("week");
 		const endOfWeek = d.endOf("week");
@@ -79,6 +81,7 @@ export class WeekNoteService {
 		const templateFile = this.app.vault.getFileByPath(settings.weekNoteTemplate);
 		if (!templateFile) return "";
 
+		setWeekStart(settings.weekStart);
 		const d = dayjs(date);
 		const year = d.year();
 		const week = d.week();

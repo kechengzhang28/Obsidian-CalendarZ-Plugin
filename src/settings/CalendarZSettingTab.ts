@@ -26,7 +26,7 @@ export class CalendarZSettingTab extends PluginSettingTab {
 
 		renderLanguageSettings(containerEl, this.plugin, () => this.display());
 		renderBasicSettings(containerEl, this.plugin);
-		renderStatisticsSettings(containerEl, this.plugin, this.app, () => this.display());
+		renderStatisticsSettings(containerEl, this.plugin, this.app);
 		renderDotsSettings(containerEl, this.plugin);
 		renderHeatmapSettings(containerEl, this.plugin);
 		renderClickSettings(containerEl, this.plugin);

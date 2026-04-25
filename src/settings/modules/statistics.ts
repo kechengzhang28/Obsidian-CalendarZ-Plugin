@@ -16,13 +16,11 @@ import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE, STATISTICS_TYPE } from "../../core
  * @param containerEl - Container element
  * @param plugin - Plugin instance
  * @param app - Obsidian App instance
- * @param refreshDisplay - Callback to refresh the settings display
  */
 export function renderStatisticsSettings(
 	containerEl: HTMLElement,
 	plugin: PluginLike,
-	app: App,
-	refreshDisplay: () => void
+	app: App
 ): void {
 	const group = new SettingGroup({ title: getSectionTitle(plugin, "statistics") });
 	group.render(containerEl);
