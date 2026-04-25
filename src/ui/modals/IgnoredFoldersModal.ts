@@ -1,5 +1,6 @@
 import { App, Modal, Setting } from "obsidian";
 import type { I18nLike } from "../../core/types";
+import { CSS_CLASSES } from "../../core/constants";
 
 /**
  * Modal for managing the list of ignored folders.
@@ -115,7 +116,7 @@ export class IgnoredFoldersModal extends Modal {
 			itemEl.createSpan({ text: folder, cls: "calendarz-modal-folder-path" });
 
 			const removeBtn = itemEl.createEl("button", {
-				cls: "calendarz-modal-remove-btn",
+				cls: `${CSS_CLASSES.BTN} ${CSS_CLASSES.BTN_REMOVE}`,
 				text: t.removeButton ?? "Remove"
 			});
 
