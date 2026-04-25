@@ -1,5 +1,5 @@
 import { Setting } from "obsidian";
-import type { PluginLike } from "../../types";
+import type { PluginLike } from "../../core/types";
 
 /**
  * Handler function type for setting value changes

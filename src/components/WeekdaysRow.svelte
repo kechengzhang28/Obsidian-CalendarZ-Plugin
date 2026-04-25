@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { I18n } from "../i18n";
-	import type { WeekStart } from "../settings/types";
+	import type { WeekStart } from "../core/types";
 
 	interface Props {
 		i18n: I18n;

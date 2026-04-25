@@ -1,7 +1,12 @@
-import type { PluginLike } from "../../types";
+import type { PluginLike } from "../../core/types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { SliderSettingRenderer, NumberSettingRenderer } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
+
+/** Helper to get nested i18n string values */
+function ts(plugin: PluginLike, section: string, key: string): string {
+	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
+}
 
 /**
  * Renders dots chart settings (dot threshold).
@@ -12,9 +17,8 @@ export function renderDotsSettings(
 	containerEl: HTMLElement,
 	plugin: PluginLike
 ): void {
-	const t = plugin.i18n;
-
-	const group = new SettingGroup({ title: t.sectionTitles.dots });
+	const sectionTitles = plugin.i18n.sectionTitles as Record<string, string>;
+	const group = new SettingGroup({ title: sectionTitles.dots! });
 	group.render(containerEl);
 	const contentEl = group.getContentEl();
 	if (!contentEl) return;
@@ -23,8 +27,8 @@ export function renderDotsSettings(
 	const sliderRenderer = new SliderSettingRenderer(1, 10, 1, plugin);
 	const handleDotThresholdChange = createSettingHandler({ plugin, settingKey: "dotThreshold" });
 	sliderRenderer.render(contentEl, {
-		name: t.settings.dotThreshold.name,
-		description: t.settings.dotThreshold.description,
+		name: ts(plugin, "dotThreshold", "name"),
+		description: ts(plugin, "dotThreshold", "description"),
 		value: plugin.settings.dotThreshold,
 		onChange: handleDotThresholdChange,
 	});
@@ -33,8 +37,8 @@ export function renderDotsSettings(
 	const numberRenderer = new NumberSettingRenderer(plugin, 1);
 	const handleDotWordThresholdChange = createSettingHandler({ plugin, settingKey: "dotWordThreshold" });
 	numberRenderer.render(contentEl, {
-		name: t.settings.dotWordThreshold.name,
-		description: t.settings.dotWordThreshold.description,
+		name: ts(plugin, "dotWordThreshold", "name"),
+		description: ts(plugin, "dotWordThreshold", "description"),
 		value: plugin.settings.dotWordThreshold,
 		onChange: handleDotWordThresholdChange,
 	});

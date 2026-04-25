@@ -1,7 +1,7 @@
 import { App } from "obsidian";
-import type { PluginLike } from "../../types";
-import { IgnoredFoldersModal } from "../../ui/IgnoredFoldersModal";
-import type { DateSource, DisplayMode, StatisticsType } from "../types";
+import type { PluginLike } from "../../core/types";
+import { IgnoredFoldersModal } from "../../ui/modals/IgnoredFoldersModal";
+import type { DateSource, DisplayMode, StatisticsType } from "../../core/types";
 import { SettingGroup } from "../ui/SettingGroup";
 import {
 	DropdownSettingRenderer,
@@ -9,7 +9,12 @@ import {
 	ButtonSettingRenderer,
 } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
-import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE, STATISTICS_TYPE } from "../../constants";
+import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE, STATISTICS_TYPE } from "../../core/constants";
+
+/** Helper to get nested i18n string values */
+function ts(plugin: PluginLike, section: string, key: string): string {
+	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
+}
 
 /**
  * Renders statistics settings (display mode, dot threshold, date source, etc.).
@@ -24,136 +29,103 @@ export function renderStatisticsSettings(
 	app: App,
 	refreshDisplay: () => void
 ): void {
-	const t = plugin.i18n;
-
-	const group = new SettingGroup({ title: t.sectionTitles.statistics });
+	const sectionTitles = plugin.i18n.sectionTitles as Record<string, string>;
+	const group = new SettingGroup({ title: sectionTitles.statistics! });
 	group.render(containerEl);
 	const contentEl = group.getContentEl();
 	if (!contentEl) return;
 
 	// Display mode setting
 	const displayModeRenderer = new DropdownSettingRenderer<DisplayMode>(plugin, {
-		[DISPLAY_MODE.NONE]: t.settings.displayMode.options.none,
-		[DISPLAY_MODE.DOTS]: t.settings.displayMode.options.dots,
-		[DISPLAY_MODE.HEATMAP]: t.settings.displayMode.options.heatmap,
+		[DISPLAY_MODE.NONE]: ts(plugin, "displayMode", "options_none"),
+		[DISPLAY_MODE.DOTS]: ts(plugin, "displayMode", "options_dots"),
+		[DISPLAY_MODE.HEATMAP]: ts(plugin, "displayMode", "options_heatmap"),
 	});
 	const handleDisplayModeChange = createSettingHandler({
 		plugin,
 		settingKey: "displayMode",
 	});
 	displayModeRenderer.render(contentEl, {
-		name: t.settings.displayMode.name,
-		description: t.settings.displayMode.description,
+		name: ts(plugin, "displayMode", "name"),
+		description: ts(plugin, "displayMode", "description"),
 		value: plugin.settings.displayMode,
 		onChange: handleDisplayModeChange,
 	});
 
 	// Statistics type setting
 	const statisticsTypeRenderer = new DropdownSettingRenderer<StatisticsType>(plugin, {
-		[STATISTICS_TYPE.COUNT]: t.settings.statisticsType.options.count,
-		[STATISTICS_TYPE.WORD_COUNT]: t.settings.statisticsType.options.wordCount,
+		[STATISTICS_TYPE.COUNT]: ts(plugin, "statisticsType", "options_count"),
+		[STATISTICS_TYPE.WORD_COUNT]: ts(plugin, "statisticsType", "options_wordCount"),
 	});
 	const handleStatisticsTypeChange = createSettingHandler({
 		plugin,
 		settingKey: "statisticsType",
 	});
 	statisticsTypeRenderer.render(contentEl, {
-		name: t.settings.statisticsType.name,
-		description: t.settings.statisticsType.description,
+		name: ts(plugin, "statisticsType", "name"),
+		description: ts(plugin, "statisticsType", "description"),
 		value: plugin.settings.statisticsType,
 		onChange: handleStatisticsTypeChange,
 	});
 
-	// Date field name setting (for YAML source)
-	const textRenderer = new TextSettingRenderer(plugin, DEFAULTS.DATE_FORMAT_PLACEHOLDER);
-	const handleDateFieldNameChange = createSettingHandler({
-		plugin,
-		settingKey: "dateFieldName",
-		transform: (value) => value.trim() || DEFAULTS.DATE_FIELD_NAME,
-	});
-	textRenderer.render(contentEl, {
-		name: t.settings.dateFieldName.name,
-		description: t.settings.dateFieldName.description,
-		value: plugin.settings.dateFieldName,
-		onChange: handleDateFieldNameChange,
-	});
-
 	// Date source setting
 	const dateSourceRenderer = new DropdownSettingRenderer<DateSource>(plugin, {
-		[DATE_SOURCE.YAML]: t.settings.dateSource.options.yaml,
-		[DATE_SOURCE.FILENAME]: t.settings.dateSource.options.filename,
-		[DATE_SOURCE.BOTH]: t.settings.dateSource.options.both,
+		[DATE_SOURCE.YAML]: ts(plugin, "dateSource", "options_yaml"),
+		[DATE_SOURCE.FILENAME]: ts(plugin, "dateSource", "options_filename"),
+		[DATE_SOURCE.BOTH]: ts(plugin, "dateSource", "options_both"),
 	});
-	const handleDateSourceChange = createSettingHandler({
-		plugin,
-		settingKey: "dateSource",
-	});
+	const handleDateSourceChange = createSettingHandler({ plugin, settingKey: "dateSource" });
 	dateSourceRenderer.render(contentEl, {
-		name: t.settings.dateSource.name,
-		description: t.settings.dateSource.description,
+		name: ts(plugin, "dateSource", "name"),
+		description: ts(plugin, "dateSource", "description"),
 		value: plugin.settings.dateSource,
 		onChange: handleDateSourceChange,
 	});
 
+	// Date field name setting
+	const dateFieldNameRenderer = new TextSettingRenderer(plugin, DEFAULTS.DATE_FIELD_NAME);
+	const handleDateFieldNameChange = createSettingHandler({
+		plugin,
+		settingKey: "dateFieldName",
+	});
+	dateFieldNameRenderer.render(contentEl, {
+		name: ts(plugin, "dateFieldName", "name"),
+		description: ts(plugin, "dateFieldName", "description"),
+		value: plugin.settings.dateFieldName,
+		onChange: handleDateFieldNameChange,
+	});
+
 	// Filename date format setting
-	const filenameFormatRenderer = new TextSettingRenderer(plugin, DEFAULTS.FILENAME_FORMAT_PLACEHOLDER);
-	const handleFilenameFormatChange = createSettingHandler({
+	const filenameDateFormatRenderer = new TextSettingRenderer(plugin, DEFAULTS.FILENAME_DATE_FORMAT);
+	const handleFilenameDateFormatChange = createSettingHandler({
 		plugin,
 		settingKey: "filenameDateFormat",
-		transform: (value) => value.trim() || DEFAULTS.FILENAME_DATE_FORMAT,
 	});
-	filenameFormatRenderer.render(contentEl, {
-		name: t.settings.filenameDateFormat.name,
-		description: t.settings.filenameDateFormat.description,
+	filenameDateFormatRenderer.render(contentEl, {
+		name: ts(plugin, "filenameDateFormat", "name"),
+		description: ts(plugin, "filenameDateFormat", "description"),
 		value: plugin.settings.filenameDateFormat,
-		onChange: handleFilenameFormatChange,
+		onChange: handleFilenameDateFormatChange,
 	});
 
 	// Ignored folders setting
-	const ignoredFoldersDesc = getIgnoredFoldersDescription(plugin);
 	const ignoredFoldersRenderer = new ButtonSettingRenderer(plugin);
+	const handleIgnoredFoldersChange = async (folders: string[]) => {
+		plugin.settings.ignoredFolders = folders;
+		await plugin.saveSettings();
+		plugin.refreshView();
+	};
 	ignoredFoldersRenderer.render(contentEl, {
-		name: t.settings.ignoredFolders.name,
-		description: ignoredFoldersDesc,
-		buttonText: t.settings.ignoredFolders.manageButton || "Manage",
+		name: ts(plugin, "ignoredFolders", "name"),
+		description: ts(plugin, "ignoredFolders", "description"),
+		buttonText: ts(plugin, "ignoredFolders", "manageButton"),
 		onClick: () => {
-			const modal = new IgnoredFoldersModal(
+			new IgnoredFoldersModal(
 				app,
 				plugin.settings.ignoredFolders,
-				plugin,
-				async (folders) => {
-					plugin.settings.ignoredFolders = folders;
-					await plugin.saveSettings();
-					refreshDisplay();
-					plugin.refreshView();
-				}
-			);
-			modal.open();
+				plugin.i18n,
+				handleIgnoredFoldersChange
+			).open();
 		},
 	});
-}
-
-/**
- * Generates a description element showing the currently ignored folders.
- * @param plugin - Plugin instance
- * @returns DocumentFragment with description and bullet list
- */
-function getIgnoredFoldersDescription(plugin: PluginLike): DocumentFragment {
-	const t = plugin.i18n.settings.ignoredFolders;
-	const fragment = document.createDocumentFragment();
-
-	fragment.appendText(t.description);
-
-	if (plugin.settings.ignoredFolders.length > 0) {
-		fragment.appendChild(document.createElement("br"));
-
-		for (const folder of plugin.settings.ignoredFolders) {
-			const line = document.createElement("div");
-			line.addClass("calendarz-settings-folder-item");
-			line.textContent = `• ${folder}`;
-			fragment.appendChild(line);
-		}
-	}
-
-	return fragment;
 }

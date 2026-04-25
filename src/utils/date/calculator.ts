@@ -1,6 +1,6 @@
 import dayjs, { setWeekStart } from "./dayjsConfig";
-import type { WeekStart } from "../../settings/types";
-import { DAY_OF_WEEK } from "../../constants";
+import type { WeekStart } from "../../core/types";
+import { DAY_OF_WEEK } from "../../core/constants";
 
 /**
  * Checks if a date is before today

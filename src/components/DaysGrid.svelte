@@ -1,6 +1,6 @@
 <script lang="ts">
 	import dayjs from "../utils/date/dayjsConfig";
-	import type { WeekStart, DisplayMode } from "../settings/types";
+	import type { WeekStart, DisplayMode } from "../core/types";
 	import {
 		formatDate,
 		isSameDay,
@@ -11,7 +11,7 @@
 		calculatePaddingDays,
 		getWeekNumber,
 	} from "../utils/date";
-	import { CSS_CLASSES, ATTRS, GRID, DOTS, HEATMAP } from "../constants";
+	import { CSS_CLASSES, ATTRS, GRID, DOTS, HEATMAP } from "../core/constants";
 	import type { DateCount, DateTodoStatus, WeekTodoStatus } from "./types";
 
 	interface Props {

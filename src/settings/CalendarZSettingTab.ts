@@ -1,5 +1,5 @@
 import {App, Plugin, PluginSettingTab} from "obsidian";
-import type { PluginLike } from "../types";
+import type { PluginLike } from "../core/types";
 import {renderLanguageSettings} from "./modules/language";
 import {renderBasicSettings} from "./modules/basic";
 import {renderStatisticsSettings} from "./modules/statistics";
@@ -13,22 +13,13 @@ import {renderWeekNoteSettings} from "./modules/weekNote";
  * Provides UI for configuring all plugin settings.
  */
 export class CalendarZSettingTab extends PluginSettingTab {
-	/** Reference to the main plugin instance */
 	plugin: PluginLike;
 
-	/**
-	 * Creates a new settings tab instance.
-	 * @param app - Obsidian App instance
-	 * @param plugin - Plugin instance satisfying PluginLike interface
-	 */
 	constructor(app: App, plugin: PluginLike) {
 		super(app, plugin as unknown as Plugin);
 		this.plugin = plugin;
 	}
 
-	/**
-	 * Renders the settings UI.
-	 */
 	display(): void {
 		const {containerEl} = this;
 		containerEl.empty();

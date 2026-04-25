@@ -1,7 +1,12 @@
-import type { PluginLike } from "../../types";
-import type { Language } from "../types";
+import type { PluginLike } from "../../core/types";
+import type { Language } from "../../core/types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { DropdownSettingRenderer, ButtonSettingRenderer } from "../ui/SettingRenderer";
+
+/** Helper to get nested i18n string values */
+function ts(plugin: PluginLike, section: string, key: string): string {
+	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
+}
 
 /**
  * Renders language settings.
@@ -19,8 +24,6 @@ export function renderLanguageSettings(
 	const contentEl = group.getContentEl();
 	if (!contentEl) return;
 
-	const t = plugin.i18n;
-
 	// Language setting with special handling (needs to reload i18n before refresh)
 	const handleLanguageChange = async (value: Language) => {
 		plugin.settings.language = value;
@@ -35,8 +38,8 @@ export function renderLanguageSettings(
 		"zh-CN": "中文",
 	});
 	languageRenderer.render(contentEl, {
-		name: t.settings.language.name,
-		description: t.settings.language.description,
+		name: ts(plugin, "language", "name"),
+		description: ts(plugin, "language", "description"),
 		value: plugin.settings.language,
 		onChange: handleLanguageChange,
 	});
@@ -44,18 +47,18 @@ export function renderLanguageSettings(
 	// Open calendar button
 	const openCalendarRenderer = new ButtonSettingRenderer(plugin);
 	openCalendarRenderer.render(contentEl, {
-		name: t.settings.openCalendar.name,
-		description: t.settings.openCalendar.description,
-		buttonText: t.settings.openCalendar.buttonText,
+		name: ts(plugin, "openCalendar", "name"),
+		description: ts(plugin, "openCalendar", "description"),
+		buttonText: ts(plugin, "openCalendar", "buttonText"),
 		onClick: () => plugin.activateView(),
 	});
 
 	// Refresh plugin button
 	const refreshPluginRenderer = new ButtonSettingRenderer(plugin);
 	refreshPluginRenderer.render(contentEl, {
-		name: t.settings.refreshPlugin.name,
-		description: t.settings.refreshPlugin.description,
-		buttonText: t.settings.refreshPlugin.buttonText,
+		name: ts(plugin, "refreshPlugin", "name"),
+		description: ts(plugin, "refreshPlugin", "description"),
+		buttonText: ts(plugin, "refreshPlugin", "buttonText"),
 		onClick: () => plugin.refreshView(),
 	});
 }

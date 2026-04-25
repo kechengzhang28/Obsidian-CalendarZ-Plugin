@@ -1,5 +1,5 @@
 import dayjs from "./dayjsConfig";
-import { DATE_FORMAT } from "../../constants";
+import { DATE_FORMAT } from "../../core/constants";
 
 /**
  * Formats a date to YYYY-MM-DD string

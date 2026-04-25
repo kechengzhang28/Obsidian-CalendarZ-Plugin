@@ -1,4 +1,4 @@
-import type {Language} from "./settings/types";
+import type {Language} from "./core/types";
 
 // Import locale files
 import enUS from "./locales/en-US.json";
@@ -7,8 +7,10 @@ import zhCN from "./locales/zh-CN.json";
 /**
  * Internationalization interface defining all translatable strings.
  * This interface matches the structure of locale JSON files.
+ * Includes index signature for compatibility with I18nLike.
  */
 export interface I18n {
+	[key: string]: unknown;
 	/** Calendar-related strings */
 	calendar: {
 		/** Label for the today button */

@@ -1,7 +1,12 @@
-import type { PluginLike } from "../../types";
+import type { PluginLike } from "../../core/types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { SliderSettingRenderer, NumberSettingRenderer, ToggleSettingRenderer } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
+
+/** Helper to get nested i18n string values */
+function ts(plugin: PluginLike, section: string, key: string): string {
+	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
+}
 
 /**
  * Renders heatmap settings (max notes for brightness).
@@ -12,9 +17,8 @@ export function renderHeatmapSettings(
 	containerEl: HTMLElement,
 	plugin: PluginLike
 ): void {
-	const t = plugin.i18n;
-
-	const group = new SettingGroup({ title: t.sectionTitles.heatmap });
+	const sectionTitles = plugin.i18n.sectionTitles as Record<string, string>;
+	const group = new SettingGroup({ title: sectionTitles.heatmap! });
 	group.render(containerEl);
 	const contentEl = group.getContentEl();
 	if (!contentEl) return;
@@ -23,8 +27,8 @@ export function renderHeatmapSettings(
 	const sliderRenderer = new SliderSettingRenderer(1, 40, 1, plugin);
 	const handleHeatmapMaxNotesChange = createSettingHandler({ plugin, settingKey: "heatmapMaxNotes" });
 	sliderRenderer.render(contentEl, {
-		name: t.settings.heatmapMaxNotes.name,
-		description: t.settings.heatmapMaxNotes.description,
+		name: ts(plugin, "heatmapMaxNotes", "name"),
+		description: ts(plugin, "heatmapMaxNotes", "description"),
 		value: plugin.settings.heatmapMaxNotes,
 		onChange: handleHeatmapMaxNotesChange,
 	});
@@ -33,8 +37,8 @@ export function renderHeatmapSettings(
 	const numberRenderer = new NumberSettingRenderer(plugin, 1);
 	const handleHeatmapMaxWordsChange = createSettingHandler({ plugin, settingKey: "heatmapMaxWords" });
 	numberRenderer.render(contentEl, {
-		name: t.settings.heatmapMaxWords.name,
-		description: t.settings.heatmapMaxWords.description,
+		name: ts(plugin, "heatmapMaxWords", "name"),
+		description: ts(plugin, "heatmapMaxWords", "description"),
 		value: plugin.settings.heatmapMaxWords,
 		onChange: handleHeatmapMaxWordsChange,
 	});
@@ -43,8 +47,8 @@ export function renderHeatmapSettings(
 	const toggleRenderer = new ToggleSettingRenderer(plugin);
 	const handleHeatmapHideDateNumbersChange = createSettingHandler({ plugin, settingKey: "heatmapHideDateNumbers" });
 	toggleRenderer.render(contentEl, {
-		name: t.settings.heatmapHideDateNumbers.name,
-		description: t.settings.heatmapHideDateNumbers.description,
+		name: ts(plugin, "heatmapHideDateNumbers", "name"),
+		description: ts(plugin, "heatmapHideDateNumbers", "description"),
 		value: plugin.settings.heatmapHideDateNumbers,
 		onChange: handleHeatmapHideDateNumbersChange,
 	});

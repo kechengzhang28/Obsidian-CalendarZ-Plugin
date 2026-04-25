@@ -9,8 +9,8 @@
 		WeekStart,
 		DisplayMode,
 		StatisticsType,
-	} from "../settings/types";
-	import { CSS_CLASSES, DISPLAY_MODE, DATE_FORMAT, STATISTICS_TYPE } from "../constants";
+	} from "../core/types";
+	import { CSS_CLASSES, DISPLAY_MODE, DATE_FORMAT, STATISTICS_TYPE } from "../core/constants";
 	import type { DateCount, DateTodoStatus, WeekTodoStatus } from "./types";
 
 	interface Props {
