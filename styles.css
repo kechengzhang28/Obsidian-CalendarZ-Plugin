@@ -144,7 +144,7 @@
 
 
 
-.calendarz-day:hover {
+.calendarz-day:not(.calendarz-day-heatmap):not(.calendarz-day-heatmap-empty):hover {
 	background-color: var(--background-modifier-hover);
 }
 
@@ -177,22 +177,11 @@
 /* Heatmap Styles - integrated into date cells */
 .calendarz-day-heatmap {
 	color: var(--text-normal);
-}
-
-.calendarz-day-heatmap::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: var(--interactive-accent);
-	opacity: var(--heatmap-opacity, 1);
+	background-color: color-mix(in srgb, var(--interactive-accent) calc(var(--heatmap-opacity, 1) * 100%), transparent);
 	border-radius: 4px;
-	z-index: -1;
 }
 
-.calendarz-day-heatmap:hover::before {
+.calendarz-day-heatmap:hover {
 	filter: brightness(1.1);
 }
 
