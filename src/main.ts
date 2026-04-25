@@ -36,19 +36,33 @@ export default class CalendarZ extends Plugin {
 		this.addCommand({
 			id: 'open-calendar-view',
 			name: this.i18n.commands.openCalendar,
-			callback: () => void this.activateView()
+			callback: () => {
+				this.activateView().catch(error => {
+					console.error("Failed to activate view:", error);
+				});
+			}
 		});
 
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
 
 		this.app.workspace.onLayoutReady(async () => {
 			await this.activateView();
-			this.forEachView(v => void v.refreshStatsOnly());
+			this.forEachView(v => {
+				v.refreshStatsOnly().catch(error => {
+					console.error("Failed to refresh stats:", error);
+				});
+			});
 		});
 
 		this.registerFileEvents();
 
-		this.registerInterval(window.setInterval(() => this.forEachView(v => void v.refreshStatsOnly()), 30000));
+		this.registerInterval(window.setInterval(() => {
+			this.forEachView(v => {
+				v.refreshStatsOnly().catch(error => {
+					console.error("Failed to refresh stats:", error);
+				});
+			});
+		}, 30000));
 	}
 
 	private registerFileEvents(): void {
@@ -75,7 +89,11 @@ export default class CalendarZ extends Plugin {
 
 			// Refresh view if date changed or file content changed (may affect todos)
 			if (dateChanged || mtimeChanged) {
-				this.forEachView(v => void v.refreshStatsOnly());
+				this.forEachView(v => {
+					v.refreshStatsOnly().catch(error => {
+						console.error("Failed to refresh stats:", error);
+					});
+				});
 			}
 
 			this.previousCaches.set(file.path, cache);
@@ -85,7 +103,11 @@ export default class CalendarZ extends Plugin {
 		this.registerEvent(this.app.vault.on("create", (file) => {
 			if (file instanceof TFile) {
 				this.fileMtimes.set(file.path, file.stat.mtime);
-				this.forEachView(v => void v.refreshStatsOnly());
+				this.forEachView(v => {
+					v.refreshStatsOnly().catch(error => {
+						console.error("Failed to refresh stats:", error);
+					});
+				});
 			}
 		}));
 
@@ -93,7 +115,11 @@ export default class CalendarZ extends Plugin {
 			if (file instanceof TFile) {
 				this.previousCaches.delete(file.path);
 				this.fileMtimes.delete(file.path);
-				this.forEachView(v => void v.refreshStatsOnly());
+				this.forEachView(v => {
+					v.refreshStatsOnly().catch(error => {
+						console.error("Failed to refresh stats:", error);
+					});
+				});
 			}
 		}));
 
@@ -106,7 +132,11 @@ export default class CalendarZ extends Plugin {
 				}
 				this.fileMtimes.delete(oldPath);
 				this.fileMtimes.set(file.path, file.stat.mtime);
-				this.forEachView(v => void v.refreshStatsOnly());
+				this.forEachView(v => {
+					v.refreshStatsOnly().catch(error => {
+						console.error("Failed to refresh stats:", error);
+					});
+				});
 			}
 		}));
 	}
@@ -143,7 +173,7 @@ export default class CalendarZ extends Plugin {
 		const existingLeaf = workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)[0];
 
 		if (existingLeaf) {
-			void workspace.revealLeaf(existingLeaf);
+			await workspace.revealLeaf(existingLeaf);
 			return;
 		}
 
@@ -151,7 +181,7 @@ export default class CalendarZ extends Plugin {
 		if (!leaf) return;
 
 		await leaf.setViewState({ type: CALENDARZ_VIEW_TYPE, active: true });
-		void workspace.revealLeaf(leaf);
+		await workspace.revealLeaf(leaf);
 	}
 
 	private getViewDeps(): CalendarZViewDeps {

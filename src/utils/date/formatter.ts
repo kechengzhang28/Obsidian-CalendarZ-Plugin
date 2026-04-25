@@ -2,7 +2,7 @@ import dayjs from "./dayjsConfig";
 import { DATE_FORMAT } from "../../core/constants";
 
 /**
- * Formats a date to YYYY-MM-DD string
+ * Formats a date to YYYY-MM-DD string.
  * @param date - Date to format (Date object or dayjs instance)
  * @returns Formatted date string in YYYY-MM-DD format
  */
@@ -11,12 +11,12 @@ export function formatDate(date: Date | dayjs.Dayjs): string {
 }
 
 /**
- * Formats a month display based on language and format preferences
- * 
+ * Formats a month display based on language and format preferences.
+ *
  * Special handling for Chinese locale with numeric format:
  * - Returns month number (1-12) without leading zero
  * - Other locales use standard toLocaleString formatting
- * 
+ *
  * @param date - Date to extract month from
  * @param language - Locale string (e.g., "en-US", "zh-CN")
  * @param format - Month format: "numeric" | "short" | "long"

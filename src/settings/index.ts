@@ -1,3 +1,8 @@
+/**
+ * Settings module index
+ * Centralizes all settings-related exports for the CalendarZ plugin.
+ */
+
 export * from "./types";
 export * from "./defaults";
 export * from "./CalendarZSettingTab";

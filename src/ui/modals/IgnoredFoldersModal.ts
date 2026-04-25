@@ -1,14 +1,29 @@
 import { App, Modal, Setting } from "obsidian";
 import type { I18nLike } from "../../core/types";
 
+/**
+ * Modal for managing the list of ignored folders.
+ * Allows users to add, remove, and save folders that should be excluded from note counting.
+ */
 export class IgnoredFoldersModal extends Modal {
+	/** Current list of ignored folders (mutated during editing) */
 	ignoredFolders: string[];
+	/** i18n object for translated strings */
 	private i18n: I18nLike;
+	/** Callback invoked when the user saves changes */
 	private onUpdate: (folders: string[]) => Promise<void>;
+	/** Container element for the folder list */
 	private folderListEl: HTMLElement | null = null;
-	/** Track event listeners for cleanup */
+	/** Track event listeners for cleanup to prevent memory leaks */
 	private removeListeners: Array<() => void> = [];
 
+	/**
+	 * Creates a new IgnoredFoldersModal instance
+	 * @param app - Obsidian app instance
+	 * @param ignoredFolders - Initial list of ignored folders
+	 * @param i18n - i18n object for translated strings
+	 * @param onUpdate - Callback invoked when changes are saved
+	 */
 	constructor(
 		app: App,
 		ignoredFolders: string[],
@@ -21,6 +36,10 @@ export class IgnoredFoldersModal extends Modal {
 		this.onUpdate = onUpdate;
 	}
 
+	/**
+	 * Builds the modal content when opened.
+	 * Renders the add-folder section, current folder list, and save button.
+	 */
 	onOpen(): void {
 		const { contentEl } = this;
 		const t = (this.i18n.settings as Record<string, Record<string, string>>).ignoredFolders!;
@@ -70,10 +89,15 @@ export class IgnoredFoldersModal extends Modal {
 			});
 	}
 
+	/**
+	 * Renders the list of currently ignored folders.
+	 * Each item shows the folder path and a remove button.
+	 * Re-renders are triggered after add/remove operations.
+	 */
 	private renderFolderList(): void {
 		if (!this.folderListEl) return;
 		this.folderListEl.empty();
-		// Clear previous listeners before re-rendering
+		// Clear previous listeners before re-rendering to prevent memory leaks
 		this.clearRemoveListeners();
 
 		const t = (this.i18n.settings as Record<string, Record<string, string>>).ignoredFolders!;
@@ -106,7 +130,10 @@ export class IgnoredFoldersModal extends Modal {
 		}
 	}
 
-	/** Clean up all tracked event listeners */
+	/**
+	 * Cleans up all tracked event listeners.
+	 * Must be called before re-rendering or closing the modal.
+	 */
 	private clearRemoveListeners(): void {
 		for (const cleanup of this.removeListeners) {
 			cleanup();
@@ -114,6 +141,10 @@ export class IgnoredFoldersModal extends Modal {
 		this.removeListeners = [];
 	}
 
+	/**
+	 * Cleans up resources when the modal is closed.
+	 * Removes all event listeners and clears the content.
+	 */
 	onClose(): void {
 		this.clearRemoveListeners();
 		const { contentEl } = this;

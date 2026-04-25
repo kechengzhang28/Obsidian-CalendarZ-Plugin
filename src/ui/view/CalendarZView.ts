@@ -18,7 +18,8 @@ import { createCalendarState } from "../../stores/calendarState.svelte";
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
 
 /**
- * Dependencies required by the CalendarZ view
+ * Dependencies required by the CalendarZ view.
+ * Passed from the plugin to avoid circular dependencies.
  */
 export interface CalendarZViewDeps {
 	/** Obsidian app instance */
@@ -27,47 +28,64 @@ export interface CalendarZViewDeps {
 	plugin: {
 		/** Get current i18n - use getter to always get latest */
 		getI18n: () => I18n;
+		/** Current plugin settings */
 		settings: CalendarZSettings;
+		/** Optional todo service for fetching todo statuses */
 		todoService?: import("../../services/todos/TodoService").TodoService;
+		/** Optional note counter for fetching date counts */
 		noteCounter?: import("../../services/notes/NoteCounter").NoteCounter;
 	};
 }
 
 /**
  * Calendar view component for Obsidian.
+ * Manages the Svelte component lifecycle and delegates business logic to the controller.
  */
 export class CalendarZView extends ItemView {
+	/** Controller handling all business logic for the calendar */
 	private controller: CalendarViewController;
+	/** Reference to the mounted Svelte component for cleanup */
 	private calendarComponent: ReturnType<typeof mount> | null = null;
+	/** Reactive state container shared with the Svelte component */
 	private state = createCalendarState();
 
+	/**
+	 * Creates a new CalendarZView instance
+	 * @param leaf - Obsidian workspace leaf
+	 * @param deps - Dependencies required by the view
+	 */
 	constructor(leaf: WorkspaceLeaf, deps: CalendarZViewDeps) {
 		super(leaf);
 		this.controller = new CalendarViewController(deps);
 	}
 
+	/** Access current settings via controller */
 	private get settings(): CalendarZSettings {
 		return this.controller.settings;
 	}
 
+	/** Access current i18n via controller */
 	private get i18n(): I18n {
 		return this.controller.getI18n() as unknown as I18n;
 	}
 
+	/** Returns the unique view type identifier */
 	getViewType(): string {
 		return CALENDARZ_VIEW_TYPE;
 	}
 
+	/** Returns the display text for the view tab */
 	getDisplayText(): string {
 		return this.i18n.calendar.viewTitle;
 	}
 
+	/** Returns the icon name for the view tab */
 	getIcon(): string {
 		return "calendar";
 	}
 
 	/**
-	 * Initialize state with current settings and data
+	 * Initialize state with current settings and data before mounting.
 	 */
 	private initializeState(): void {
 		this.state.setSettings(this.settings);
@@ -76,7 +94,8 @@ export class CalendarZView extends ItemView {
 	}
 
 	/**
-	 * Updates settings - state will trigger reactive updates in Svelte components
+	 * Updates settings in state, triggering reactive updates in Svelte components.
+	 * Called when plugin settings change.
 	 */
 	updateSettings(): void {
 		this.state.setSettings(this.settings);
@@ -100,6 +119,7 @@ export class CalendarZView extends ItemView {
 
 	/**
 	 * Updates the today highlight if the month has changed.
+	 * Called periodically to keep the today indicator accurate.
 	 */
 	updateTodayHighlight(): void {
 		if (this.controller.updateTodayHighlight()) {
@@ -107,6 +127,10 @@ export class CalendarZView extends ItemView {
 		}
 	}
 
+	/**
+	 * Called when the view is opened.
+	 * Initializes state, loads initial data, and mounts the Svelte component.
+	 */
 	async onOpen(): Promise<void> {
 		// Initialize state BEFORE mounting component
 		this.initializeState();
@@ -139,6 +163,10 @@ export class CalendarZView extends ItemView {
 		});
 	}
 
+	/**
+	 * Called when the view is closed.
+	 * Unmounts the Svelte component and cleans up the DOM.
+	 */
 	async onClose(): Promise<void> {
 		if (this.calendarComponent) {
 			await unmount(this.calendarComponent);

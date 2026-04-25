@@ -46,7 +46,7 @@ export function renderLanguageSettings(
 		name: ts(plugin, "openCalendar", "name"),
 		description: ts(plugin, "openCalendar", "description"),
 		buttonText: ts(plugin, "openCalendar", "buttonText"),
-		onClick: () => plugin.activateView(),
+		onClick: () => void plugin.activateView(),
 	});
 
 	// Refresh plugin button

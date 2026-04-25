@@ -3,7 +3,7 @@
  * Handles business logic for the calendar view:
  * - Data fetching (note counts, todo statuses)
  * - User interactions (day click, week click, navigation)
- * - Note creation (daily notes, week notes)
+ * - Note creation (daily notes, week notes, month notes, year notes)
  *
  * This separates business logic from the Obsidian view lifecycle.
  */
@@ -16,27 +16,50 @@ import { DATE_FORMAT } from "../../core/constants";
 import type { DateCount, DateTodoStatus, WeekTodoStatus } from "../../components/types";
 import { NoteCounter, TodoService, DailyNoteService, WeekNoteService, MonthNoteService, YearNoteService } from "../../services";
 
+/**
+ * Dependencies required by the CalendarViewController.
+ * Passed from the view to avoid circular dependencies.
+ */
 export interface CalendarViewControllerDeps {
+	/** Obsidian app instance */
 	app: App;
 	/** Plugin instance for accessing dynamic i18n and settings */
 	plugin: {
 		/** Get current i18n - use getter to always get latest */
 		getI18n: () => I18nLike;
+		/** Current plugin settings */
 		settings: CalendarZSettings;
+		/** Optional todo service for fetching todo statuses */
 		todoService?: TodoService;
+		/** Optional note counter for fetching date counts */
 		noteCounter?: NoteCounter;
 	};
 }
 
+/**
+ * Controller for calendar view business logic.
+ * Manages navigation, data fetching, and note creation actions.
+ */
 export class CalendarViewController {
+	/** Service for counting notes by date */
 	private noteCounter: NoteCounter;
+	/** Service for detecting todo statuses */
 	private todoService: TodoService;
+	/** Service for daily note operations */
 	private dailyNoteService: DailyNoteService;
+	/** Service for week note operations */
 	private weekNoteService: WeekNoteService;
+	/** Service for month note operations */
 	private monthNoteService: MonthNoteService;
+	/** Service for year note operations */
 	private yearNoteService: YearNoteService;
+	/** Currently displayed month/date in the calendar */
 	private currentDate = new Date();
 
+	/**
+	 * Creates a new CalendarViewController instance
+	 * @param deps - Dependencies required by the controller
+	 */
 	constructor(private deps: CalendarViewControllerDeps) {
 		this.noteCounter = deps.plugin.noteCounter ?? new NoteCounter(deps.app);
 		this.todoService = deps.plugin.todoService ?? new TodoService(deps.app);
@@ -46,38 +69,50 @@ export class CalendarViewController {
 		this.yearNoteService = new YearNoteService(deps.app);
 	}
 
-	/** Dynamically get current settings from plugin */
+	/** Dynamically gets current settings from the plugin */
 	get settings(): CalendarZSettings {
 		return this.deps.plugin.settings;
 	}
 
-	/** Get current i18n from plugin - always fetches latest */
+	/** Gets current i18n from plugin - always fetches latest */
 	getI18n(): I18nLike {
 		return this.deps.plugin.getI18n();
 	}
 
+	/** Obsidian app instance */
 	get app(): App {
 		return this.deps.app;
 	}
 
+	/** Returns the currently displayed date */
 	getCurrentDate(): Date {
 		return this.currentDate;
 	}
 
+	/** Sets the currently displayed date */
 	setCurrentDate(date: Date): void {
 		this.currentDate = date;
 	}
 
 	// ---- Navigation ----
 
+	/**
+	 * Navigates to the previous or next month.
+	 * @param direction - -1 for previous month, 1 for next month
+	 */
 	navigateMonth(direction: -1 | 1): void {
 		this.currentDate = dayjs(this.currentDate).add(direction, "month").toDate();
 	}
 
+	/** Resets the current date to today */
 	goToToday(): void {
 		this.currentDate = new Date();
 	}
 
+	/**
+	 * Updates the current date to today if the month has changed.
+	 * @returns True if the date was updated
+	 */
 	updateTodayHighlight(): boolean {
 		const today = dayjs();
 		const current = dayjs(this.currentDate);
@@ -90,20 +125,37 @@ export class CalendarViewController {
 
 	// ---- Data Fetching ----
 
+	/**
+	 * Fetches note counts grouped by date.
+	 * @returns Array of date-count pairs
+	 */
 	async getDateCounts(): Promise<DateCount[]> {
 		return this.noteCounter.getCounts(this.settings);
 	}
 
+	/**
+	 * Fetches todo statuses for daily notes.
+	 * @returns Array of date-todo status pairs
+	 */
 	async fetchTodoStatuses(): Promise<DateTodoStatus[]> {
 		return this.todoService.fetchDailyTodoStatuses(this.settings);
 	}
 
+	/**
+	 * Fetches todo statuses for week notes.
+	 * @returns Array of week-todo status pairs
+	 */
 	async fetchWeekTodoStatuses(): Promise<WeekTodoStatus[]> {
 		return this.todoService.fetchWeekTodoStatuses(this.settings);
 	}
 
 	// ---- Daily Note Actions ----
 
+	/**
+	 * Handles click on a day cell.
+	 * Opens existing daily note or shows confirmation to create a new one.
+	 * @param date - The clicked date
+	 */
 	async handleDayClick(date: Date): Promise<void> {
 		const existingNote = this.dailyNoteService.findDailyNote(date);
 
@@ -126,12 +178,21 @@ export class CalendarViewController {
 		}
 	}
 
+	/**
+	 * Creates or opens a daily note for the given date.
+	 * @param date - Target date for the daily note
+	 */
 	async createDailyNote(date: Date): Promise<void> {
 		await this.dailyNoteService.openOrCreateDailyNote(date, this.getI18n());
 	}
 
 	// ---- Week Note Actions ----
 
+	/**
+	 * Handles click on a week number.
+	 * Opens existing week note or shows confirmation to create a new one.
+	 * @param date - Any date within the target week
+	 */
 	async handleWeekClick(date: Date): Promise<void> {
 		if (!this.settings.weekNoteEnabled) return;
 
@@ -156,10 +217,19 @@ export class CalendarViewController {
 		}
 	}
 
+	/**
+	 * Creates or opens a week note for the given date.
+	 * @param date - Any date within the target week
+	 */
 	async createWeekNote(date: Date): Promise<void> {
 		await this.weekNoteService.openOrCreateWeekNote(date, this.settings, this.getI18n());
 	}
 
+	/**
+	 * Checks if a week note exists for the given date.
+	 * @param date - Any date within the target week
+	 * @returns True if a week note exists
+	 */
 	hasWeekNote(date: Date): boolean {
 		if (!this.settings.weekNoteEnabled) return false;
 		return this.weekNoteService.findWeekNote(date, this.settings) !== null;
@@ -167,6 +237,11 @@ export class CalendarViewController {
 
 	// ---- Month Note Actions ----
 
+	/**
+	 * Handles click on the month header.
+	 * Opens existing month note or shows confirmation to create a new one.
+	 * @param date - Any date within the target month
+	 */
 	async handleMonthClick(date: Date): Promise<void> {
 		if (!this.settings.monthNoteEnabled) return;
 
@@ -191,10 +266,19 @@ export class CalendarViewController {
 		}
 	}
 
+	/**
+	 * Creates or opens a month note for the given date.
+	 * @param date - Any date within the target month
+	 */
 	async createMonthNote(date: Date): Promise<void> {
 		await this.monthNoteService.openOrCreateMonthNote(date, this.settings, this.getI18n());
 	}
 
+	/**
+	 * Checks if a month note exists for the given date.
+	 * @param date - Any date within the target month
+	 * @returns True if a month note exists
+	 */
 	hasMonthNote(date: Date): boolean {
 		if (!this.settings.monthNoteEnabled) return false;
 		return this.monthNoteService.findMonthNote(date, this.settings) !== null;
@@ -202,6 +286,11 @@ export class CalendarViewController {
 
 	// ---- Year Note Actions ----
 
+	/**
+	 * Handles click on the year header.
+	 * Opens existing year note or shows confirmation to create a new one.
+	 * @param date - Any date within the target year
+	 */
 	async handleYearClick(date: Date): Promise<void> {
 		if (!this.settings.yearNoteEnabled) return;
 
@@ -226,10 +315,19 @@ export class CalendarViewController {
 		}
 	}
 
+	/**
+	 * Creates or opens a year note for the given date.
+	 * @param date - Any date within the target year
+	 */
 	async createYearNote(date: Date): Promise<void> {
 		await this.yearNoteService.openOrCreateYearNote(date, this.settings, this.getI18n());
 	}
 
+	/**
+	 * Checks if a year note exists for the given date.
+	 * @param date - Any date within the target year
+	 * @returns True if a year note exists
+	 */
 	hasYearNote(date: Date): boolean {
 		if (!this.settings.yearNoteEnabled) return false;
 		return this.yearNoteService.findYearNote(date, this.settings) !== null;

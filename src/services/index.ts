@@ -1,6 +1,12 @@
 /**
  * Services layer for CalendarZ plugin
- * Provides business logic services organized by domain
+ * Provides business logic services organized by domain:
+ * - notes: Note counting and statistics
+ * - todos: Todo status detection
+ * - dailyNote: Daily note integration
+ * - weekNote: Week note management
+ * - monthNote: Month note management
+ * - yearNote: Year note management
  */
 
 export { NoteCounter } from "./notes/NoteCounter";

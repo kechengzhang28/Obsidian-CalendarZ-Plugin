@@ -12,11 +12,22 @@ import {
 } from "obsidian-daily-notes-interface";
 import type { I18nLike } from "../../core/types";
 
+/**
+ * Service for daily note operations.
+ * Integrates with the core Daily Notes plugin to find and create daily notes.
+ */
 export class DailyNoteService {
+	/**
+	 * Creates a new DailyNoteService instance
+	 * @param app - Obsidian app instance
+	 */
 	constructor(private app: App) {}
 
 	/**
-	 * Finds an existing daily note for the given date
+	 * Finds an existing daily note for the given date.
+	 * Uses the core Daily Notes plugin's API to locate the note.
+	 * @param date - Target date
+	 * @returns The daily note file, or null if not found
 	 */
 	findDailyNote(date: Date): TFile | null {
 		if (!appHasDailyNotesPluginLoaded()) return null;
@@ -30,7 +41,10 @@ export class DailyNoteService {
 	}
 
 	/**
-	 * Opens an existing daily note or creates a new one
+	 * Opens an existing daily note or creates a new one.
+	 * Shows notifications on errors.
+	 * @param date - Target date
+	 * @param i18n - i18n object for translated notification messages
 	 */
 	async openOrCreateDailyNote(date: Date, i18n: I18nLike): Promise<void> {
 		const notifications = i18n.notifications as Record<string, string>;
