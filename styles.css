@@ -47,6 +47,10 @@
 	text-align: left;
 }
 
+.calendarz-month-clickable {
+	cursor: pointer;
+}
+
 .calendarz-month {
 	font-weight: 600;
 	font-size: 24px;

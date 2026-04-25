@@ -44,12 +44,12 @@ export class IgnoredFoldersModal extends Modal {
 				button
 					.setButtonText(t.addButton ?? "Add")
 					.setCta()
-					.onClick(async () => {
+					.onClick(() => {
 						const value = folderInput.value.trim();
 						if (value && !this.ignoredFolders.includes(value)) {
 							this.ignoredFolders.push(value);
 							folderInput.value = "";
-							await this.renderFolderList();
+							this.renderFolderList();
 						}
 					});
 			});
@@ -70,7 +70,7 @@ export class IgnoredFoldersModal extends Modal {
 			});
 	}
 
-	private async renderFolderList(): Promise<void> {
+	private renderFolderList(): void {
 		if (!this.folderListEl) return;
 		this.folderListEl.empty();
 		// Clear previous listeners before re-rendering
@@ -96,10 +96,8 @@ export class IgnoredFoldersModal extends Modal {
 			});
 
 			const handleRemove = (): void => {
-				void (async () => {
-					this.ignoredFolders = this.ignoredFolders.filter(f => f !== folder);
-					await this.renderFolderList();
-				})();
+				this.ignoredFolders = this.ignoredFolders.filter(f => f !== folder);
+				this.renderFolderList();
 			};
 
 			removeBtn.addEventListener("click", handleRemove);
