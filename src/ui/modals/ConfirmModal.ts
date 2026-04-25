@@ -32,7 +32,7 @@ export class ConfirmModal extends Modal {
 			.onClick(() => this.close());
 
 		new ButtonComponent(buttonContainer)
-			.setButtonText(t.confirmButton ?? "Create")
+			.setButtonText(t.createButton ?? "Create")
 			.setCta()
 			.onClick(() => {
 				this.close();
