@@ -4,6 +4,7 @@
  */
 
 import type { App, TFile } from "obsidian";
+import { normalizePath } from "obsidian";
 import type { DateTodoStatus, WeekTodoStatus } from "../../components/types";
 
 import { isPathIgnored } from "../../utils/path";
@@ -244,12 +245,13 @@ export class TodoService {
 	 * Extracts week key from file path if it's a week note
 	 */
 	private extractWeekKeyFromPath(filePath: string, settings: CalendarZSettings): string | null {
-		const folder = settings.weekNoteFolder.trim();
+		const folder = normalizePath(settings.weekNoteFolder.trim());
 		const format = settings.weekNoteFormat || "YYYY-[W]WW";
 
-		let filename = filePath;
-		if (folder && filePath.startsWith(folder + "/")) {
-			filename = filePath.slice(folder.length + 1);
+		const normalizedFilePath = normalizePath(filePath);
+		let filename = normalizedFilePath;
+		if (folder && normalizedFilePath.startsWith(folder + "/")) {
+			filename = normalizedFilePath.slice(folder.length + 1);
 		}
 		if (filename.endsWith(".md")) {
 			filename = filename.slice(0, -3);
