@@ -10,9 +10,11 @@
 		language: string;
 		titleFormat: TitleFormat;
 		currentDate: Date;
+		monthNoteEnabled: boolean;
 		onPrevMonth: () => void;
 		onNextMonth: () => void;
 		onToday: () => void;
+		onMonthClick: () => void;
 	}
 
 	let {
@@ -21,9 +23,11 @@
 		language,
 		titleFormat,
 		currentDate,
+		monthNoteEnabled,
 		onPrevMonth,
 		onNextMonth,
-		onToday
+		onToday,
+		onMonthClick,
 	}: Props = $props();
 
 	let yearText = $derived(dayjs(currentDate).year().toString());
@@ -36,7 +40,13 @@
 </script>
 
 <div class="calendarz-header">
-	<div class="calendarz-month-year">
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+	<div
+		class="calendarz-month-year"
+		class:calendarz-month-clickable={monthNoteEnabled}
+		onclick={monthNoteEnabled ? onMonthClick : undefined}
+		role={monthNoteEnabled ? "button" : undefined}
+	>
 		<span class="calendarz-month">{firstText}</span>
 		<span class="calendarz-year">{secondText}</span>
 	</div>

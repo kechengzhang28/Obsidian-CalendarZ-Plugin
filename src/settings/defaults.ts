@@ -23,5 +23,9 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	weekNoteTemplate: "",
 	weekNoteFolder: "",
 	weekNoteFormat: "YYYY-[W]WW",
+	monthNoteEnabled: false,
+	monthNoteTemplate: "",
+	monthNoteFolder: "",
+	monthNoteFormat: "YYYY-MM",
 	hideCompletedTodos: false,
 };

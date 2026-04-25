@@ -11,7 +11,8 @@
     "dots": "点图设置",
     "heatmap": "热力图设置",
     "click": "点击设置",
-    "weekNote": "周记设置"
+    "weekNote": "周记设置",
+    "monthNote": "月记设置"
   },
   "settings": {
     "language": {
@@ -146,6 +147,23 @@
       "description": "使用 YYYY 代表年份，WW 代表周数，用 [] 括起来的内容会原样显示。例如：YYYY-[W]WW 会生成 2024-W01.md",
       "placeholder": "YYYY-[W]WW"
     },
+    "monthNoteEnabled": {
+      "name": "启用月记",
+      "description": "点击月份标题时创建或打开月记"
+    },
+    "monthNoteTemplate": {
+      "name": "月记模板",
+      "description": "月记模板文件路径（留空使用默认样式）"
+    },
+    "monthNoteFolder": {
+      "name": "月记文件夹",
+      "description": "月记存放的文件夹路径（留空存放在根目录）"
+    },
+    "monthNoteFormat": {
+      "name": "月记命名格式",
+      "description": "使用 YYYY 代表年份，MM 代表月份，用 [] 括起来的内容会原样显示。例如：YYYY-MM 会生成 2024-01.md",
+      "placeholder": "YYYY-MM"
+    },
     "hideCompletedTodos": {
       "name": "隐藏已完成待办事项的点",
       "description": "当所有待办事项都已完成时，不显示待办状态圆点"
@@ -160,7 +178,8 @@
   "notifications": {
     "dailyNotesNotEnabled": "请先启用日记核心插件",
     "dailyNotesCreateFailed": "创建日记失败，请检查日记插件设置",
-    "weekNoteCreateFailed": "创建周记失败"
+    "weekNoteCreateFailed": "创建周记失败",
+    "monthNoteCreateFailed": "创建月记失败"
   },
   "modal": {
     "confirmTitle": "创建日记",

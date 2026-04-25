@@ -14,7 +14,7 @@ import type { CalendarZSettings } from "../../core/types";
 import type { I18nLike } from "../../core/types";
 import { DATE_FORMAT } from "../../core/constants";
 import type { DateCount, DateTodoStatus, WeekTodoStatus } from "../../components/types";
-import { NoteCounter, TodoService, DailyNoteService, WeekNoteService } from "../../services";
+import { NoteCounter, TodoService, DailyNoteService, WeekNoteService, MonthNoteService } from "../../services";
 
 export interface CalendarViewControllerDeps {
 	app: App;
@@ -33,6 +33,7 @@ export class CalendarViewController {
 	private todoService: TodoService;
 	private dailyNoteService: DailyNoteService;
 	private weekNoteService: WeekNoteService;
+	private monthNoteService: MonthNoteService;
 	private currentDate = new Date();
 
 	constructor(private deps: CalendarViewControllerDeps) {
@@ -40,6 +41,7 @@ export class CalendarViewController {
 		this.todoService = deps.plugin.todoService ?? new TodoService(deps.app);
 		this.dailyNoteService = new DailyNoteService(deps.app);
 		this.weekNoteService = new WeekNoteService(deps.app);
+		this.monthNoteService = new MonthNoteService(deps.app);
 	}
 
 	/** Dynamically get current settings from plugin */
@@ -159,5 +161,40 @@ export class CalendarViewController {
 	hasWeekNote(date: Date): boolean {
 		if (!this.settings.weekNoteEnabled) return false;
 		return this.weekNoteService.findWeekNote(date, this.settings) !== null;
+	}
+
+	// ---- Month Note Actions ----
+
+	async handleMonthClick(date: Date): Promise<void> {
+		if (!this.settings.monthNoteEnabled) return;
+
+		const existingNote = this.monthNoteService.findMonthNote(date, this.settings);
+
+		if (existingNote) {
+			await this.deps.app.workspace.openLinkText(existingNote.path, "", false);
+			return;
+		}
+
+		if (this.settings.confirmBeforeCreate) {
+			const { ConfirmModal } = await import("../modals/ConfirmModal");
+			const monthStr = dayjs(date).format("YYYY-MM");
+			new ConfirmModal(
+				this.deps.app,
+				this.getI18n(),
+				monthStr,
+				() => void this.createMonthNote(date)
+			).open();
+		} else {
+			await this.createMonthNote(date);
+		}
+	}
+
+	async createMonthNote(date: Date): Promise<void> {
+		await this.monthNoteService.openOrCreateMonthNote(date, this.settings, this.getI18n());
+	}
+
+	hasMonthNote(date: Date): boolean {
+		if (!this.settings.monthNoteEnabled) return false;
+		return this.monthNoteService.findMonthNote(date, this.settings) !== null;
 	}
 }
