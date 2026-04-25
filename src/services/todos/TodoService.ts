@@ -85,6 +85,17 @@ export class TodoService {
 	}
 
 	/**
+	 * Clears cache entries for a specific file
+	 */
+	clearFileCache(filePath: string): void {
+		for (const key of this.cache.keys()) {
+			if (key.startsWith(filePath)) {
+				this.cache.delete(key);
+			}
+		}
+	}
+
+	/**
 	 * Fetches todo statuses for all daily notes
 	 */
 	async fetchDailyTodoStatuses(settings: CalendarZSettings): Promise<DateTodoStatus[]> {

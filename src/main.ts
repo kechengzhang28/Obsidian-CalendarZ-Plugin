@@ -6,6 +6,7 @@ import {CALENDARZ_VIEW_TYPE, CalendarZView} from "./ui/view/CalendarZView";
 import type { CalendarZViewDeps } from "./ui/view/CalendarZView";
 import {loadI18n} from "./i18n";
 import type {I18n} from "./i18n";
+import { TodoService } from "./services/todos/TodoService";
 
 /**
  * Main plugin class for CalendarZ.
@@ -16,10 +17,12 @@ export default class CalendarZ extends Plugin {
 	i18n: I18n;
 	private previousCaches = new Map<string, CachedMetadata>();
 	private fileMtimes = new Map<string, number>();
+	private todoService: TodoService;
 
 	async onload() {
 		await this.loadSettings();
 		this.loadI18n();
+		this.todoService = new TodoService(this.app);
 
 		this.registerView(
 			CALENDARZ_VIEW_TYPE,
@@ -52,8 +55,19 @@ export default class CalendarZ extends Plugin {
 			const dateField = this.settings.dateFieldName;
 			const oldDate = oldCache?.frontmatter?.[dateField] as unknown;
 			const newDate = cache.frontmatter?.[dateField] as unknown;
+			const dateChanged = oldDate !== newDate;
 
-			if (oldDate !== newDate) {
+			// Check if todo status may have changed by comparing file modification time
+			const oldMtime = this.fileMtimes.get(file.path);
+			const mtimeChanged = oldMtime !== file.stat.mtime;
+
+			// Clear todo cache for this file if content may have changed
+			if (mtimeChanged) {
+				this.todoService.clearFileCache(file.path);
+			}
+
+			// Refresh view if date changed or file content changed (may affect todos)
+			if (dateChanged || mtimeChanged) {
 				this.forEachView(v => void v.refreshStatsOnly());
 			}
 
@@ -132,7 +146,11 @@ export default class CalendarZ extends Plugin {
 	private getViewDeps(): CalendarZViewDeps {
 		return {
 			app: this.app,
-			plugin: this,
+			plugin: {
+				i18n: this.i18n,
+				settings: this.settings,
+				todoService: this.todoService,
+			},
 		};
 	}
 }

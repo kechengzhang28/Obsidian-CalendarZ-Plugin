@@ -24,7 +24,7 @@ export interface CalendarZViewDeps {
 	/** Obsidian app instance */
 	app: App;
 	/** Plugin instance for accessing dynamic i18n and settings */
-	plugin: { i18n: I18n; settings: CalendarZSettings };
+	plugin: { i18n: I18n; settings: CalendarZSettings; todoService?: import("../../services/todos/TodoService").TodoService };
 }
 
 /**

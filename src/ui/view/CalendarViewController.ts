@@ -19,7 +19,7 @@ import { NoteCounter, TodoService, DailyNoteService, WeekNoteService } from "../
 export interface CalendarViewControllerDeps {
 	app: App;
 	/** Plugin instance for accessing dynamic i18n and settings */
-	plugin: { i18n: I18nLike; settings: CalendarZSettings };
+	plugin: { i18n: I18nLike; settings: CalendarZSettings; todoService?: TodoService };
 }
 
 export class CalendarViewController {
@@ -31,7 +31,7 @@ export class CalendarViewController {
 
 	constructor(private deps: CalendarViewControllerDeps) {
 		this.noteCounter = new NoteCounter(deps.app);
-		this.todoService = new TodoService(deps.app);
+		this.todoService = deps.plugin.todoService ?? new TodoService(deps.app);
 		this.dailyNoteService = new DailyNoteService(deps.app);
 		this.weekNoteService = new WeekNoteService(deps.app);
 	}
