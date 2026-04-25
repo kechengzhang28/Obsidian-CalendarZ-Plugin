@@ -14,7 +14,7 @@ import type { CalendarZSettings } from "../../core/types";
 import type { I18nLike } from "../../core/types";
 import { DATE_FORMAT } from "../../core/constants";
 import type { DateCount, DateTodoStatus, WeekTodoStatus } from "../../components/types";
-import { NoteCounter, TodoService, DailyNoteService, WeekNoteService, MonthNoteService } from "../../services";
+import { NoteCounter, TodoService, DailyNoteService, WeekNoteService, MonthNoteService, YearNoteService } from "../../services";
 
 export interface CalendarViewControllerDeps {
 	app: App;
@@ -34,6 +34,7 @@ export class CalendarViewController {
 	private dailyNoteService: DailyNoteService;
 	private weekNoteService: WeekNoteService;
 	private monthNoteService: MonthNoteService;
+	private yearNoteService: YearNoteService;
 	private currentDate = new Date();
 
 	constructor(private deps: CalendarViewControllerDeps) {
@@ -42,6 +43,7 @@ export class CalendarViewController {
 		this.dailyNoteService = new DailyNoteService(deps.app);
 		this.weekNoteService = new WeekNoteService(deps.app);
 		this.monthNoteService = new MonthNoteService(deps.app);
+		this.yearNoteService = new YearNoteService(deps.app);
 	}
 
 	/** Dynamically get current settings from plugin */
@@ -196,5 +198,40 @@ export class CalendarViewController {
 	hasMonthNote(date: Date): boolean {
 		if (!this.settings.monthNoteEnabled) return false;
 		return this.monthNoteService.findMonthNote(date, this.settings) !== null;
+	}
+
+	// ---- Year Note Actions ----
+
+	async handleYearClick(date: Date): Promise<void> {
+		if (!this.settings.yearNoteEnabled) return;
+
+		const existingNote = this.yearNoteService.findYearNote(date, this.settings);
+
+		if (existingNote) {
+			await this.deps.app.workspace.openLinkText(existingNote.path, "", false);
+			return;
+		}
+
+		if (this.settings.confirmBeforeCreate) {
+			const { ConfirmModal } = await import("../modals/ConfirmModal");
+			const yearStr = dayjs(date).format("YYYY");
+			new ConfirmModal(
+				this.deps.app,
+				this.getI18n(),
+				yearStr,
+				() => void this.createYearNote(date)
+			).open();
+		} else {
+			await this.createYearNote(date);
+		}
+	}
+
+	async createYearNote(date: Date): Promise<void> {
+		await this.yearNoteService.openOrCreateYearNote(date, this.settings, this.getI18n());
+	}
+
+	hasYearNote(date: Date): boolean {
+		if (!this.settings.yearNoteEnabled) return false;
+		return this.yearNoteService.findYearNote(date, this.settings) !== null;
 	}
 }

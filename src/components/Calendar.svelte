@@ -15,6 +15,7 @@
 		onDayClick: (date: Date) => void;
 		onWeekClick: (date: Date) => void;
 		onMonthClick: (date: Date) => void;
+		onYearClick: (date: Date) => void;
 		onNavigateMonth: (direction: -1 | 1) => void;
 		onGoToToday: () => void;
 		hasWeekNote: (date: Date) => boolean;
@@ -25,6 +26,7 @@
 		onDayClick,
 		onWeekClick,
 		onMonthClick,
+		onYearClick,
 		onNavigateMonth,
 		onGoToToday,
 		hasWeekNote,
@@ -62,10 +64,12 @@
 			titleFormat={settings.titleFormat}
 			{currentDate}
 			monthNoteEnabled={settings.monthNoteEnabled}
+			yearNoteEnabled={settings.yearNoteEnabled}
 			onPrevMonth={() => onNavigateMonth(-1)}
 			onNextMonth={() => onNavigateMonth(1)}
 			onToday={onGoToToday}
 			onMonthClick={() => onMonthClick(currentDate)}
+			onYearClick={() => onYearClick(currentDate)}
 		/>
 
 		<WeekdaysRow {i18n} weekStart={settings.weekStart} showWeekNumber={settings.showWeekNumber} />

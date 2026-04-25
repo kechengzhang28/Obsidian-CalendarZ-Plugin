@@ -51,6 +51,10 @@
 	cursor: pointer;
 }
 
+.calendarz-year-clickable {
+	cursor: pointer;
+}
+
 .calendarz-month {
 	font-weight: 600;
 	font-size: 24px;

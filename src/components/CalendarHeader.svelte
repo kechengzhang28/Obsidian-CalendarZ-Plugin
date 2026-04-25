@@ -11,10 +11,12 @@
 		titleFormat: TitleFormat;
 		currentDate: Date;
 		monthNoteEnabled: boolean;
+		yearNoteEnabled: boolean;
 		onPrevMonth: () => void;
 		onNextMonth: () => void;
 		onToday: () => void;
 		onMonthClick: () => void;
+		onYearClick: () => void;
 	}
 
 	let {
@@ -24,10 +26,12 @@
 		titleFormat,
 		currentDate,
 		monthNoteEnabled,
+		yearNoteEnabled,
 		onPrevMonth,
 		onNextMonth,
 		onToday,
 		onMonthClick,
+		onYearClick,
 	}: Props = $props();
 
 	let yearText = $derived(dayjs(currentDate).year().toString());
@@ -42,7 +46,15 @@
 <div class="calendarz-header">
 	<div class="calendarz-month-year">
 		{#if titleFormat === "yearMonth"}
-			<span class="calendarz-year">{yearText}</span>
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+			<span
+				class="calendarz-year"
+				class:calendarz-year-clickable={yearNoteEnabled}
+				onclick={yearNoteEnabled ? onYearClick : undefined}
+				role={yearNoteEnabled ? "button" : undefined}
+			>
+				{yearText}
+			</span>
 			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 			<span
 				class="calendarz-month"
@@ -62,7 +74,15 @@
 			>
 				{monthText}
 			</span>
-			<span class="calendarz-year">{yearText}</span>
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+			<span
+				class="calendarz-year"
+				class:calendarz-year-clickable={yearNoteEnabled}
+				onclick={yearNoteEnabled ? onYearClick : undefined}
+				role={yearNoteEnabled ? "button" : undefined}
+			>
+				{yearText}
+			</span>
 		{/if}
 	</div>
 

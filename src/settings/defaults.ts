@@ -27,5 +27,9 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	monthNoteTemplate: "",
 	monthNoteFolder: "",
 	monthNoteFormat: "YYYY-MM",
+	yearNoteEnabled: false,
+	yearNoteTemplate: "",
+	yearNoteFolder: "",
+	yearNoteFormat: "YYYY",
 	hideCompletedTodos: false,
 };
