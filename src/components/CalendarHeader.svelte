@@ -40,15 +40,30 @@
 </script>
 
 <div class="calendarz-header">
-	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div
-		class="calendarz-month-year"
-		class:calendarz-month-clickable={monthNoteEnabled}
-		onclick={monthNoteEnabled ? onMonthClick : undefined}
-		role={monthNoteEnabled ? "button" : undefined}
-	>
-		<span class="calendarz-month">{firstText}</span>
-		<span class="calendarz-year">{secondText}</span>
+	<div class="calendarz-month-year">
+		{#if titleFormat === "yearMonth"}
+			<span class="calendarz-year">{yearText}</span>
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+			<span
+				class="calendarz-month"
+				class:calendarz-month-clickable={monthNoteEnabled}
+				onclick={monthNoteEnabled ? onMonthClick : undefined}
+				role={monthNoteEnabled ? "button" : undefined}
+			>
+				{monthText}
+			</span>
+		{:else}
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+			<span
+				class="calendarz-month"
+				class:calendarz-month-clickable={monthNoteEnabled}
+				onclick={monthNoteEnabled ? onMonthClick : undefined}
+				role={monthNoteEnabled ? "button" : undefined}
+			>
+				{monthText}
+			</span>
+			<span class="calendarz-year">{yearText}</span>
+		{/if}
 	</div>
 
 	<button
