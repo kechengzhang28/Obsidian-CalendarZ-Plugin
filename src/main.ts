@@ -18,6 +18,7 @@ export default class CalendarZ extends Plugin {
 	private previousCaches = new Map<string, CachedMetadata>();
 	private fileMtimes = new Map<string, number>();
 	private todoService: TodoService;
+	private readonly MAX_CACHE_SIZE = 1000;
 
 	async onload() {
 		await this.loadSettings();
@@ -50,6 +51,9 @@ export default class CalendarZ extends Plugin {
 	private registerFileEvents(): void {
 		this.registerEvent(this.app.metadataCache.on("changed", (file: TFile, _data: string, cache: CachedMetadata) => {
 			if (file.extension !== "md") return;
+
+			// Enforce cache size limit to prevent memory leaks
+			this.enforceCacheSizeLimit();
 
 			const oldCache = this.previousCaches.get(file.path);
 			const dateField = this.settings.dateFieldName;
@@ -152,5 +156,35 @@ export default class CalendarZ extends Plugin {
 				todoService: this.todoService,
 			},
 		};
+	}
+
+	/**
+	 * Enforces cache size limit to prevent memory leaks.
+	 * Removes oldest entries when cache exceeds MAX_CACHE_SIZE.
+	 */
+	private enforceCacheSizeLimit(): void {
+		if (this.previousCaches.size > this.MAX_CACHE_SIZE) {
+			const keysToDelete = this.previousCaches.size - this.MAX_CACHE_SIZE;
+			const keys = Array.from(this.previousCaches.keys()).slice(0, keysToDelete);
+			for (const key of keys) {
+				this.previousCaches.delete(key);
+				this.fileMtimes.delete(key);
+			}
+		}
+	}
+
+	/**
+	 * Cleanup resources when plugin is unloaded.
+	 * Prevents memory leaks by clearing all caches and references.
+	 */
+	onunload(): void {
+		// Clear custom caches
+		this.previousCaches.clear();
+		this.fileMtimes.clear();
+
+		// Clear todo service cache
+		if (this.todoService) {
+			this.todoService.clearCache();
+		}
 	}
 }

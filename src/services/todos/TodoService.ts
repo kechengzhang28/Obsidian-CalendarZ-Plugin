@@ -27,6 +27,12 @@ const EMPTY_TODO_STATUS: TodoStatus = {
 
 const TODO_REGEX = /^(?:\s*[-*]\s+|\s*\d+\.\s+|\s*)\[([ xX])\]/gm;
 
+/** Cache entry with mtime for invalidation */
+interface CacheEntry {
+	mtime: number;
+	status: TodoStatus;
+}
+
 function detectTodosInContent(content: string): TodoStatus {
 	const matches = Array.from(content.matchAll(TODO_REGEX));
 	if (matches.length === 0) return EMPTY_TODO_STATUS;
@@ -53,31 +59,44 @@ async function detectTodosInFile(app: App, file: TFile): Promise<TodoStatus> {
 }
 
 export class TodoService {
-	private cache = new Map<string, TodoStatus>();
+	private cache = new Map<string, CacheEntry>();
+	private readonly MAX_CACHE_SIZE = 100;
 
 	constructor(private app: App) {}
 
 	/**
-	 * Gets todo status for a file with caching
+	 * Gets todo status for a file with caching.
+	 * Uses file path as key and mtime for cache invalidation.
 	 */
 	async getTodoStatus(file: TFile): Promise<TodoStatus> {
-		const cacheKey = `${file.path}-${file.stat.mtime}`;
-		if (this.cache.has(cacheKey)) {
-			const cached = this.cache.get(cacheKey);
-			if (cached) return cached;
+		const cached = this.cache.get(file.path);
+
+		// Return cached status if mtime matches (file hasn't changed)
+		if (cached && cached.mtime === file.stat.mtime) {
+			return cached.status;
 		}
 
+		// Fetch new status and update cache
 		const status = await detectTodosInFile(this.app, file);
-		this.cache.set(cacheKey, status);
+		this.cache.set(file.path, { mtime: file.stat.mtime, status });
 
-		if (this.cache.size > 100) {
+		// Enforce cache size limit
+		this.enforceCacheSizeLimit();
+
+		return status;
+	}
+
+	/**
+	 * Enforces cache size limit to prevent memory leaks.
+	 * Removes oldest entries when cache exceeds MAX_CACHE_SIZE.
+	 */
+	private enforceCacheSizeLimit(): void {
+		if (this.cache.size > this.MAX_CACHE_SIZE) {
 			const first = this.cache.keys().next();
 			if (!first.done && typeof first.value === "string") {
 				this.cache.delete(first.value);
 			}
 		}
-
-		return status;
 	}
 
 	clearCache(): void {
@@ -85,14 +104,10 @@ export class TodoService {
 	}
 
 	/**
-	 * Clears cache entries for a specific file
+	 * Clears cache entry for a specific file
 	 */
 	clearFileCache(filePath: string): void {
-		for (const key of this.cache.keys()) {
-			if (key.startsWith(filePath)) {
-				this.cache.delete(key);
-			}
-		}
+		this.cache.delete(filePath);
 	}
 
 	/**
