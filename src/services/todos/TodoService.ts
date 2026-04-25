@@ -210,11 +210,16 @@ export class TodoService {
 		}
 
 		if (settings.dateSource === DATE_SOURCE.FILENAME || settings.dateSource === DATE_SOURCE.BOTH) {
-			const dateMatch = file.basename.match(/(\d{4})[-_]?(\d{2})[-_]?(\d{2})/);
-			if (dateMatch) {
-				const [, year, month, day] = dateMatch;
-				const parsed = dayjs(`${year}-${month}-${day}`);
+			if (settings.filenameDateFormat) {
+				const parsed = dayjs(file.basename, settings.filenameDateFormat, true);
 				if (parsed.isValid()) return parsed.format("YYYY-MM-DD");
+			} else {
+				const dateMatch = file.basename.match(/(\d{4})[-_]?(\d{2})[-_]?(\d{2})/);
+				if (dateMatch) {
+					const [, year, month, day] = dateMatch;
+					const parsed = dayjs(`${year}-${month}-${day}`);
+					if (parsed.isValid()) return parsed.format("YYYY-MM-DD");
+				}
 			}
 		}
 
