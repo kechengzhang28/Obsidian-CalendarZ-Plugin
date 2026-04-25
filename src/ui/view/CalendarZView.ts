@@ -24,7 +24,12 @@ export interface CalendarZViewDeps {
 	/** Obsidian app instance */
 	app: App;
 	/** Plugin instance for accessing dynamic i18n and settings */
-	plugin: { i18n: I18n; settings: CalendarZSettings; todoService?: import("../../services/todos/TodoService").TodoService };
+	plugin: { 
+		/** Get current i18n - use getter to always get latest */
+		getI18n: () => I18n; 
+		settings: CalendarZSettings; 
+		todoService?: import("../../services/todos/TodoService").TodoService 
+	};
 }
 
 /**
@@ -45,7 +50,7 @@ export class CalendarZView extends ItemView {
 	}
 
 	private get i18n(): I18n {
-		return this.controller.i18n as unknown as I18n;
+		return this.controller.getI18n() as unknown as I18n;
 	}
 
 	getViewType(): string {

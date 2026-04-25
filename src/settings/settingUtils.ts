@@ -38,7 +38,7 @@ export function createSettingHandler<K extends keyof PluginLike["settings"]>(
 
 /** Get typed settings section from i18n */
 function getSettingsSection(plugin: PluginLike, section: string): Record<string, unknown> {
-	return (plugin.i18n.settings as Record<string, Record<string, unknown>>)[section] ?? {};
+	return (plugin.getI18n().settings as Record<string, Record<string, unknown>>)[section] ?? {};
 }
 
 /**
@@ -65,6 +65,6 @@ export function topt(plugin: PluginLike, section: string, optionKey: string): st
  * Usage: getSectionTitle(plugin, "basic") => "Basic Settings"
  */
 export function getSectionTitle(plugin: PluginLike, section: string): string {
-	const titles = plugin.i18n.sectionTitles as Record<string, string>;
+	const titles = plugin.getI18n().sectionTitles as Record<string, string>;
 	return titles[section] ?? section;
 }

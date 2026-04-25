@@ -117,7 +117,7 @@ export function renderStatisticsSettings(
 			new IgnoredFoldersModal(
 				app,
 				plugin.settings.ignoredFolders,
-				plugin.i18n,
+				plugin.getI18n(),
 				handleIgnoredFoldersChange
 			).open();
 		},

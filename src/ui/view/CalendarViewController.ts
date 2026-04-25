@@ -19,7 +19,12 @@ import { NoteCounter, TodoService, DailyNoteService, WeekNoteService } from "../
 export interface CalendarViewControllerDeps {
 	app: App;
 	/** Plugin instance for accessing dynamic i18n and settings */
-	plugin: { i18n: I18nLike; settings: CalendarZSettings; todoService?: TodoService };
+	plugin: { 
+		/** Get current i18n - use getter to always get latest */
+		getI18n: () => I18nLike; 
+		settings: CalendarZSettings; 
+		todoService?: TodoService 
+	};
 }
 
 export class CalendarViewController {
@@ -41,9 +46,9 @@ export class CalendarViewController {
 		return this.deps.plugin.settings;
 	}
 
-	/** Dynamically get current i18n from plugin */
-	get i18n(): I18nLike {
-		return this.deps.plugin.i18n;
+	/** Get current i18n from plugin - always fetches latest */
+	getI18n(): I18nLike {
+		return this.deps.plugin.getI18n();
 	}
 
 	get app(): App {
@@ -107,7 +112,7 @@ export class CalendarViewController {
 			const dateStr = dayjs(date).format(DATE_FORMAT);
 			new ConfirmModal(
 				this.deps.app,
-				this.i18n,
+				this.getI18n(),
 				dateStr,
 				() => void this.createDailyNote(date)
 			).open();
@@ -117,7 +122,7 @@ export class CalendarViewController {
 	}
 
 	async createDailyNote(date: Date): Promise<void> {
-		await this.dailyNoteService.openOrCreateDailyNote(date, this.i18n);
+		await this.dailyNoteService.openOrCreateDailyNote(date, this.getI18n());
 	}
 
 	// ---- Week Note Actions ----
@@ -137,7 +142,7 @@ export class CalendarViewController {
 			const dateRange = this.weekNoteService.getWeekDateRange(date, this.settings.weekStart);
 			new ConfirmModal(
 				this.deps.app,
-				this.i18n,
+				this.getI18n(),
 				dateRange,
 				() => void this.createWeekNote(date)
 			).open();
@@ -147,7 +152,7 @@ export class CalendarViewController {
 	}
 
 	async createWeekNote(date: Date): Promise<void> {
-		await this.weekNoteService.openOrCreateWeekNote(date, this.settings, this.i18n);
+		await this.weekNoteService.openOrCreateWeekNote(date, this.settings, this.getI18n());
 	}
 
 	hasWeekNote(date: Date): boolean {

@@ -15,9 +15,10 @@ export interface I18nLike {
 
 export interface PluginLike {
 	settings: CalendarZSettings;
-	i18n: I18nLike;
 	app: App;
 
+	/** Get current i18n - use method to always get latest */
+	getI18n(): I18nLike;
 	saveSettings(): Promise<void>;
 	refreshView(): void;
 	loadI18n(): void;

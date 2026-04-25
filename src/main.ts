@@ -127,6 +127,10 @@ export default class CalendarZ extends Plugin {
 		this.i18n = loadI18n(this.settings.language);
 	}
 
+	getI18n(): I18n {
+		return this.i18n;
+	}
+
 	refreshView(): void {
 		this.forEachView(v => v.updateSettings());
 	}
@@ -151,7 +155,7 @@ export default class CalendarZ extends Plugin {
 		return {
 			app: this.app,
 			plugin: {
-				i18n: this.i18n,
+				getI18n: () => this.i18n,
 				settings: this.settings,
 				todoService: this.todoService,
 			},
