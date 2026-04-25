@@ -29,47 +29,53 @@
 	}: Props = $props();
 
 	// Derived values from state - automatically update when state changes
-	const settings = $derived(state.settings!);
-	const i18n = $derived(state.i18n!);
+	const settings = $derived(state.settings);
+	const i18n = $derived(state.i18n);
 	const currentDate = $derived(state.currentDate);
 	const dateCounts = $derived(state.dateCounts);
 	const todoStatuses = $derived(state.todoStatuses);
 	const weekTodoStatuses = $derived(state.weekTodoStatuses);
 
 	// Determine which thresholds to use based on statistics type
-	const isWordCount = $derived(settings.statisticsType === STATISTICS_TYPE.WORD_COUNT);
-	const effectiveDotThreshold = $derived(isWordCount ? settings.dotWordThreshold : settings.dotThreshold);
-	const effectiveHeatmapMax = $derived(isWordCount ? settings.heatmapMaxWords : settings.heatmapMaxNotes);
+	const isWordCount = $derived(settings?.statisticsType === STATISTICS_TYPE.WORD_COUNT);
+	const effectiveDotThreshold = $derived(
+		isWordCount ? settings?.dotWordThreshold : settings?.dotThreshold
+	);
+	const effectiveHeatmapMax = $derived(
+		isWordCount ? settings?.heatmapMaxWords : settings?.heatmapMaxNotes
+	);
 </script>
 
-<div class="{CSS_CLASSES.CONTAINER}">
-	<CalendarHeader
-		{i18n}
-		monthFormat={settings.monthFormat}
-		language={settings.language}
-		titleFormat={settings.titleFormat}
-		{currentDate}
-		onPrevMonth={() => onNavigateMonth(-1)}
-		onNextMonth={() => onNavigateMonth(1)}
-		onToday={onGoToToday}
-	/>
+{#if settings && i18n}
+	<div class={CSS_CLASSES.CONTAINER}>
+		<CalendarHeader
+			{i18n}
+			monthFormat={settings.monthFormat}
+			language={settings.language}
+			titleFormat={settings.titleFormat}
+			{currentDate}
+			onPrevMonth={() => onNavigateMonth(-1)}
+			onNextMonth={() => onNavigateMonth(1)}
+			onToday={onGoToToday}
+		/>
 
-	<WeekdaysRow {i18n} weekStart={settings.weekStart} showWeekNumber={settings.showWeekNumber} />
+		<WeekdaysRow {i18n} weekStart={settings.weekStart} showWeekNumber={settings.showWeekNumber} />
 
-	<DaysGrid
-		{currentDate}
-		weekStart={settings.weekStart}
-		displayMode={settings.displayMode}
-		dotThreshold={effectiveDotThreshold}
-		heatmapMaxNotes={effectiveHeatmapMax}
-		heatmapHideDateNumbers={settings.heatmapHideDateNumbers}
-		showWeekNumber={settings.showWeekNumber}
-		weekNoteEnabled={settings.weekNoteEnabled}
-		{dateCounts}
-		{todoStatuses}
-		{weekTodoStatuses}
-		{onDayClick}
-		{onWeekClick}
-		{hasWeekNote}
-	/>
-</div>
+		<DaysGrid
+			{currentDate}
+			weekStart={settings.weekStart}
+			displayMode={settings.displayMode}
+			dotThreshold={effectiveDotThreshold ?? 1}
+			heatmapMaxNotes={effectiveHeatmapMax ?? 10}
+			heatmapHideDateNumbers={settings.heatmapHideDateNumbers}
+			showWeekNumber={settings.showWeekNumber}
+			weekNoteEnabled={settings.weekNoteEnabled}
+			{dateCounts}
+			{todoStatuses}
+			{weekTodoStatuses}
+			{onDayClick}
+			{onWeekClick}
+			{hasWeekNote}
+		/>
+	</div>
+{/if}

@@ -38,7 +38,6 @@ export class CalendarZView extends ItemView {
 	constructor(leaf: WorkspaceLeaf, deps: CalendarZViewDeps) {
 		super(leaf);
 		this.controller = new CalendarViewController(deps);
-		this.initializeState();
 	}
 
 	private get settings(): CalendarZSettings {
@@ -103,6 +102,9 @@ export class CalendarZView extends ItemView {
 	}
 
 	async onOpen(): Promise<void> {
+		// Initialize state BEFORE mounting component
+		this.initializeState();
+
 		// Initial data load
 		const dateCounts = await this.controller.getDateCounts();
 		const todoStatuses = await this.controller.fetchTodoStatuses();
