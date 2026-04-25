@@ -6,40 +6,35 @@
 	import type { I18n } from "../i18n";
 	import type {
 		CalendarZSettings,
-		WeekStart,
-		DisplayMode,
-		StatisticsType,
 	} from "../core/types";
-	import { CSS_CLASSES, DISPLAY_MODE, DATE_FORMAT, STATISTICS_TYPE } from "../core/constants";
-	import type { DateCount, DateTodoStatus, WeekTodoStatus } from "./types";
+	import { STATISTICS_TYPE, CSS_CLASSES } from "../core/constants";
+	import type { CalendarState } from "../stores/calendarState.svelte";
 
 	interface Props {
-		settings: CalendarZSettings;
-		i18n: I18n;
-		dateCounts: DateCount[];
-		todoStatuses: DateTodoStatus[];
-		weekTodoStatuses: WeekTodoStatus[];
+		state: CalendarState;
 		onDayClick: (date: Date) => void;
 		onWeekClick: (date: Date) => void;
 		onNavigateMonth: (direction: -1 | 1) => void;
 		onGoToToday: () => void;
-		currentDate: Date;
-		hasWeekNote?: (date: Date) => boolean;
+		hasWeekNote: (date: Date) => boolean;
 	}
 
 	let {
-		settings,
-		i18n,
-		dateCounts,
-		todoStatuses,
-		weekTodoStatuses,
+		state,
 		onDayClick,
 		onWeekClick,
 		onNavigateMonth,
 		onGoToToday,
-		currentDate,
 		hasWeekNote,
 	}: Props = $props();
+
+	// Derived values from state - automatically update when state changes
+	const settings = $derived(state.settings!);
+	const i18n = $derived(state.i18n!);
+	const currentDate = $derived(state.currentDate);
+	const dateCounts = $derived(state.dateCounts);
+	const todoStatuses = $derived(state.todoStatuses);
+	const weekTodoStatuses = $derived(state.weekTodoStatuses);
 
 	// Determine which thresholds to use based on statistics type
 	const isWordCount = $derived(settings.statisticsType === STATISTICS_TYPE.WORD_COUNT);
@@ -47,7 +42,7 @@
 	const effectiveHeatmapMax = $derived(isWordCount ? settings.heatmapMaxWords : settings.heatmapMaxNotes);
 </script>
 
-<div class={CSS_CLASSES.CONTAINER}>
+<div class="{CSS_CLASSES.CONTAINER}">
 	<CalendarHeader
 		{i18n}
 		monthFormat={settings.monthFormat}

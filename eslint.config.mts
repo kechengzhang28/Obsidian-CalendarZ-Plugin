@@ -8,6 +8,14 @@ export default tseslint.config(
 		languageOptions: {
 			globals: {
 				...globals.browser,
+				// Svelte 5 runes
+				$state: "readonly",
+				$derived: "readonly",
+				$effect: "readonly",
+				$props: "readonly",
+				$bindable: "readonly",
+				$inspect: "readonly",
+				$host: "readonly",
 			},
 			parserOptions: {
 				projectService: {

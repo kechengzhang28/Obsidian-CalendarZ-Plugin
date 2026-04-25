@@ -12,7 +12,7 @@ import type { I18n } from "../../i18n";
 import type { CalendarZSettings } from "../../core/types";
 import { CalendarViewController } from "./CalendarViewController";
 import Calendar from "../../components/Calendar.svelte";
-import type { DateCount } from "../../components/types";
+import { createCalendarState } from "../../stores/calendarState.svelte";
 
 /** Unique identifier for the CalendarZ view type */
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
@@ -33,10 +33,12 @@ export interface CalendarZViewDeps {
 export class CalendarZView extends ItemView {
 	private controller: CalendarViewController;
 	private calendarComponent: ReturnType<typeof mount> | null = null;
+	private state = createCalendarState();
 
 	constructor(leaf: WorkspaceLeaf, deps: CalendarZViewDeps) {
 		super(leaf);
 		this.controller = new CalendarViewController(deps);
+		this.initializeState();
 	}
 
 	private get settings(): CalendarZSettings {
@@ -60,18 +62,35 @@ export class CalendarZView extends ItemView {
 	}
 
 	/**
-	 * Updates settings and re-renders the calendar.
+	 * Initialize state with current settings and data
 	 */
-	updateSettings(): void {
-		void this.renderCalendar();
+	private initializeState(): void {
+		this.state.setSettings(this.settings);
+		this.state.setI18n(this.i18n);
+		this.state.setCurrentDate(this.controller.getCurrentDate());
 	}
 
 	/**
-	 * Refreshes only the statistics display without full re-render.
+	 * Updates settings - state will trigger reactive updates in Svelte components
+	 */
+	updateSettings(): void {
+		this.state.setSettings(this.settings);
+		this.state.setI18n(this.i18n);
+	}
+
+	/**
+	 * Refreshes statistics data only - uses reactive state updates instead of DOM manipulation.
+	 * This triggers Svelte's fine-grained reactivity to update only changed cells.
 	 */
 	async refreshStatsOnly(): Promise<void> {
 		if (this.settings.displayMode === "none") return;
-		void this.renderCalendar(await this.controller.getDateCounts());
+		
+		const dateCounts = await this.controller.getDateCounts();
+		const todoStatuses = await this.controller.fetchTodoStatuses();
+		const weekTodoStatuses = await this.controller.fetchWeekTodoStatuses();
+		
+		// Single state update triggers reactive re-render in Svelte
+		this.state.updateData(dateCounts, todoStatuses, weekTodoStatuses);
 	}
 
 	/**
@@ -79,12 +98,35 @@ export class CalendarZView extends ItemView {
 	 */
 	updateTodayHighlight(): void {
 		if (this.controller.updateTodayHighlight()) {
-			void this.renderCalendar();
+			this.state.setCurrentDate(this.controller.getCurrentDate());
 		}
 	}
 
 	async onOpen(): Promise<void> {
-		await this.renderCalendar();
+		// Initial data load
+		const dateCounts = await this.controller.getDateCounts();
+		const todoStatuses = await this.controller.fetchTodoStatuses();
+		const weekTodoStatuses = await this.controller.fetchWeekTodoStatuses();
+		this.state.updateData(dateCounts, todoStatuses, weekTodoStatuses);
+
+		// Mount Svelte component once - it will react to state changes
+		this.calendarComponent = mount(Calendar, {
+			target: this.contentEl,
+			props: {
+				state: this.state,
+				onDayClick: (date: Date) => { void this.controller.handleDayClick(date); },
+				onWeekClick: (date: Date) => { void this.controller.handleWeekClick(date); },
+				onNavigateMonth: (direction: -1 | 1) => {
+					this.controller.navigateMonth(direction);
+					this.state.setCurrentDate(this.controller.getCurrentDate());
+				},
+				onGoToToday: () => {
+					this.controller.goToToday();
+					this.state.setCurrentDate(this.controller.getCurrentDate());
+				},
+				hasWeekNote: (date: Date) => this.controller.hasWeekNote(date),
+			},
+		});
 	}
 
 	async onClose(): Promise<void> {
@@ -93,43 +135,5 @@ export class CalendarZView extends ItemView {
 			this.calendarComponent = null;
 		}
 		this.contentEl.empty();
-	}
-
-	/**
-	 * Renders the calendar Svelte component.
-	 */
-	private async renderCalendar(preloadedDateCounts?: DateCount[]): Promise<void> {
-		if (this.calendarComponent) {
-			await unmount(this.calendarComponent);
-			this.calendarComponent = null;
-		}
-		this.contentEl.empty();
-
-		const dateCounts = preloadedDateCounts ?? await this.controller.getDateCounts();
-		const todoStatuses = await this.controller.fetchTodoStatuses();
-		const weekTodoStatuses = await this.controller.fetchWeekTodoStatuses();
-
-		this.calendarComponent = mount(Calendar, {
-			target: this.contentEl,
-			props: {
-				settings: this.settings,
-				i18n: this.i18n,
-				dateCounts,
-				todoStatuses,
-				weekTodoStatuses,
-				currentDate: this.controller.getCurrentDate(),
-				onDayClick: (date: Date) => { void this.controller.handleDayClick(date); },
-				onWeekClick: (date: Date) => { void this.controller.handleWeekClick(date); },
-				onNavigateMonth: (direction: -1 | 1) => {
-					this.controller.navigateMonth(direction);
-					void this.renderCalendar();
-				},
-				onGoToToday: () => {
-					this.controller.goToToday();
-					void this.renderCalendar();
-				},
-				hasWeekNote: (date: Date) => this.controller.hasWeekNote(date),
-			},
-		});
 	}
 }
