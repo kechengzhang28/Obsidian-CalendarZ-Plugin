@@ -1,6 +1,7 @@
 /**
  * Settings type definitions
  * Re-export from core types for backward compatibility
+ * This module centralizes settings-related type imports.
  */
 
 export type {

@@ -3,7 +3,7 @@ import type { WeekStart } from "../../core/types";
 import { DAY_OF_WEEK } from "../../core/constants";
 
 /**
- * Checks if a date is before today
+ * Checks if a date is before today.
  * @param date - Date to check (Date object or dayjs instance)
  * @returns True if the date is in the past
  */
@@ -12,7 +12,7 @@ export function isBeforeToday(date: Date | dayjs.Dayjs): boolean {
 }
 
 /**
- * Checks if two dates represent the same day
+ * Checks if two dates represent the same day.
  * @param date1 - First date to compare
  * @param date2 - Second date to compare
  * @returns True if both dates are the same day
@@ -37,7 +37,7 @@ export function getAdjustedDayOfWeek(dayOfWeek: number, weekStart: WeekStart): n
 }
 
 /**
- * Gets the year and month for a date
+ * Gets the year and month for a date.
  * @param date - Date to extract from
  * @returns Object with year and month (0-11)
  */
@@ -47,7 +47,7 @@ export function getYearMonth(date: Date | dayjs.Dayjs): { year: number; month: n
 }
 
 /**
- * Gets the number of days in a month
+ * Gets the number of days in a month.
  * @param year - Full year (e.g., 2024)
  * @param month - Month index (0-11)
  * @returns Number of days in the month
@@ -57,8 +57,8 @@ export function getDaysInMonth(year: number, month: number): number {
 }
 
 /**
- * Gets the last day of the previous month
- * Used for calculating padding days in the calendar grid
+ * Gets the last day of the previous month.
+ * Used for calculating padding days in the calendar grid.
  *
  * @param year - Full year of current month
  * @param month - Month index (0-11) of current month
@@ -69,7 +69,7 @@ export function getPreviousMonthLastDay(year: number, month: number): number {
 }
 
 /**
- * Calculates padding days needed for the calendar grid
+ * Calculates padding days needed for the calendar grid.
  *
  * Determines how many days from the previous month should be
  * shown to align the first day of the month with the correct
@@ -86,7 +86,7 @@ export function calculatePaddingDays(year: number, month: number, weekStart: Wee
 }
 
 /**
- * Calculates the week number for a given date
+ * Calculates the week number for a given date.
  *
  * Week numbers are calculated based on the user's weekStart preference using
  * locale-based week numbering (via dayjs weekOfYear plugin):

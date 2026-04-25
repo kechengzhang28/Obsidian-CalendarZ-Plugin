@@ -12,12 +12,19 @@ import { DATE_SOURCE, STATISTICS_TYPE } from "../../core/constants";
 
 /** Cache entry for word count with mtime for invalidation */
 interface WordCountCacheEntry {
+	/** File modification time when cached */
 	mtime: number;
+	/** Cached word count */
 	count: number;
 }
 
 /**
- * Extracts date from file metadata cache (avoids disk I/O)
+ * Extracts date from file metadata cache without disk I/O.
+ * Uses the Obsidian metadata cache to read frontmatter values.
+ * @param file - Target file
+ * @param metadataCache - Obsidian metadata cache
+ * @param dateFieldName - YAML frontmatter field name for date
+ * @returns Parsed Date or null if not found/invalid
  */
 function extractDateFromMetadataCache(
 	file: TFile,
@@ -34,7 +41,10 @@ function extractDateFromMetadataCache(
 }
 
 /**
- * Counts words in a string (excluding markdown syntax)
+ * Counts words in a string, excluding markdown syntax.
+ * Supports both Chinese characters and English words.
+ * @param content - Markdown content to analyze
+ * @returns Total word count (Chinese chars + English words)
  */
 function countWords(content: string): number {
 	const withoutFrontmatter = content.replace(/^---\n[\s\S]*?\n---\n?/, "");
@@ -50,7 +60,11 @@ function countWords(content: string): number {
 }
 
 /**
- * Generic function to count items by date
+ * Generic function to count items by date.
+ * @param items - Array of items to process
+ * @param isIgnored - Function to check if an item should be skipped
+ * @param extractDate - Function to extract a Date from an item
+ * @returns Array of date-count pairs
  */
 function countByDate<T>(
 	items: T[],
@@ -71,12 +85,20 @@ function countByDate<T>(
 	return Array.from(counts.entries()).map(([date, count]) => ({ date, count }));
 }
 
+/**
+ * Service for counting notes and words by date.
+ * Supports multiple date sources (YAML, filename, both) and caching for performance.
+ */
 export class NoteCounter {
 	/** Cache for word counts to avoid re-reading unchanged files */
 	private wordCountCache = new Map<string, WordCountCacheEntry>();
 	/** Maximum cache size to prevent memory leaks */
 	private readonly MAX_CACHE_SIZE = 1000;
 
+	/**
+	 * Creates a new NoteCounter instance
+	 * @param app - Obsidian app instance
+	 */
 	constructor(private app: App) {}
 
 	/**

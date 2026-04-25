@@ -14,11 +14,11 @@ const DATE_FORMATS = [
 ];
 
 /**
- * Parses a date string using multiple common formats
- * 
+ * Parses a date string using multiple common formats.
+ *
  * Tries each format in DATE_FORMATS array, then falls back to
  * ISO 8601 parsing. Returns null if no valid date is found.
- * 
+ *
  * @param dateStr - Date string to parse
  * @returns Parsed Date or null if invalid
  */
@@ -35,11 +35,11 @@ export function parseDateString(dateStr: string): Date | null {
 }
 
 /**
- * Parses a date from a filename using a format pattern
- * 
+ * Parses a date from a filename using a format pattern.
+ *
  * Converts the format pattern to a regex and extracts the date.
  * Supports patterns like "YYYY-MM-DD", "YYYY/MM/DD", etc.
- * 
+ *
  * @param filename - Filename to parse (without extension)
  * @param format - Date format pattern (e.g., "YYYY-MM-DD")
  * @returns Parsed Date or null if not found
@@ -64,14 +64,14 @@ export function parseDateFromFilename(filename: string, format: string): Date | 
 }
 
 /**
- * Parses a date value from YAML frontmatter
- * 
+ * Parses a date value from YAML frontmatter.
+ *
  * Handles various YAML date representations:
  * - JavaScript Date objects
  * - ISO date strings
  * - Unix timestamps (numbers)
  * - Object with year, month, day properties
- * 
+ *
  * @param value - YAML value (could be string, Date, number, or object)
  * @returns Parsed Date or null
  */

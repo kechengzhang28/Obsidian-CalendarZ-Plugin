@@ -1,6 +1,9 @@
 import type {CalendarZSettings} from "../core/types";
 
-/** Default settings values */
+/**
+ * Default settings values for the CalendarZ plugin.
+ * Used as fallback when user has not customized a setting.
+ */
 export const DEFAULT_SETTINGS: CalendarZSettings = {
 	language: "en-US",
 	monthFormat: "numeric",

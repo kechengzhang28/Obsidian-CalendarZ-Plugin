@@ -12,13 +12,19 @@ import type { CalendarZSettings } from "../../core/types";
 import { DATE_SOURCE } from "../../core/constants";
 import dayjs from "../../utils/date/dayjsConfig";
 
+/** Represents the aggregated todo status for a file */
 export interface TodoStatus {
+	/** Whether the file contains any todo items */
 	hasTodos: boolean;
+	/** Whether all todo items are completed */
 	allCompleted: boolean;
+	/** Number of completed todo items */
 	completedCount: number;
+	/** Total number of todo items */
 	totalCount: number;
 }
 
+/** Default empty todo status for files without todos */
 const EMPTY_TODO_STATUS: TodoStatus = {
 	hasTodos: false,
 	allCompleted: false,
@@ -26,14 +32,25 @@ const EMPTY_TODO_STATUS: TodoStatus = {
 	totalCount: 0,
 };
 
+/**
+ * Regex for matching markdown todo items.
+ * Matches: - [ ], * [x], 1. [X], etc.
+ */
 const TODO_REGEX = /^(?:\s*[-*]\s+|\s*\d+\.\s+|\s*)\[([ xX])\]/gm;
 
 /** Cache entry with mtime for invalidation */
 interface CacheEntry {
+	/** File modification time when cached */
 	mtime: number;
+	/** Cached todo status */
 	status: TodoStatus;
 }
 
+/**
+ * Detects todo items in a string content.
+ * @param content - File content to scan
+ * @returns TodoStatus with counts and completion state
+ */
 function detectTodosInContent(content: string): TodoStatus {
 	const matches = Array.from(content.matchAll(TODO_REGEX));
 	if (matches.length === 0) return EMPTY_TODO_STATUS;
@@ -49,6 +66,12 @@ function detectTodosInContent(content: string): TodoStatus {
 	};
 }
 
+/**
+ * Detects todo items in a file using cached read.
+ * @param app - Obsidian app instance
+ * @param file - File to scan
+ * @returns TodoStatus with counts and completion state
+ */
 async function detectTodosInFile(app: App, file: TFile): Promise<TodoStatus> {
 	try {
 		const content = await app.vault.cachedRead(file);
@@ -59,14 +82,24 @@ async function detectTodosInFile(app: App, file: TFile): Promise<TodoStatus> {
 	}
 }
 
+/**
+ * Service for todo detection and status tracking.
+ * Provides caching and batch processing for efficient todo scanning across the vault.
+ */
 export class TodoService {
+	/** Cache mapping file paths to their todo status and mtime */
 	private cache = new Map<string, CacheEntry>();
+	/** Maximum number of entries in the todo cache */
 	private readonly MAX_CACHE_SIZE = 100;
 	/** Cache for compiled week note regex patterns */
 	private weekNoteRegexCache = new Map<string, RegExp>();
 	/** Maximum number of files to process concurrently */
 	private readonly CONCURRENT_BATCH_SIZE = 10;
 
+	/**
+	 * Creates a new TodoService instance
+	 * @param app - Obsidian app instance
+	 */
 	constructor(private app: App) {}
 
 	/**
