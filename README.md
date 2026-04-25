@@ -10,8 +10,8 @@ So, I made a new calendar plugin, CalendarZ.
 
 ### Visual Note Tracking
 
-- **Heatmap Mode**: Display varying color intensities based on note count, giving you an instant overview of your writing activity
-- **Dots Mode**: Each dot represents a configurable number of notes, providing a clean visual representation of daily output
+- **Heatmap Mode**: Display varying color intensities based on note count or word count, giving you an instant overview of your writing activity
+- **Dots Mode**: Each dot represents a configurable number of notes or words, providing a clean visual representation of daily output
 - **None Mode**: Clean calendar view focused purely on date navigation
 
 ### Flexible Date Recognition
@@ -25,17 +25,39 @@ So, I made a new calendar plugin, CalendarZ.
 - Click any date to open or create the corresponding daily note
 - Optional confirmation prompt before creating new notes to prevent accidental creation
 
+### Weekly Note Support
+
+- Enable weekly notes and click week numbers to create or open weekly notes
+- Customizable weekly note naming format (e.g., `YYYY-[W]WW` produces `2024-W01.md`)
+- Support for weekly note templates and custom folder paths
+
+### Todo Status Indicators
+
+- Visual indicators show todo completion status on calendar dates
+- Quickly identify dates with pending or completed todos at a glance
+
+### Statistics Options
+
+- **Note Count**: Track the number of notes per day
+- **Word Count**: Track total word count per day
+
 ### Customization
 
 - **Week Start**: Sunday or Monday
 - **Month Display Format**: Numeric, short, or long format
 - **Title Format**: Year-Month or Month-Year order
 - **Ignored Folders**: Exclude specific folders from note statistics
+- **Week Numbers**: Optionally display week numbers on the left side of the calendar
 
 ## Usage
 
 - **Settings → Community Plugins → CalendarZ** → **Open Calendar View**
 - Use the Command Palette (`Ctrl/Cmd + P`) and search for "CalendarZ: Open Calendar"
+
+## Supported Languages
+
+- **English** (en-US)
+- **简体中文** (zh-CN)
 
 ## Contributing
 
