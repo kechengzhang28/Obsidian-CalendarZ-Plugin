@@ -145,6 +145,10 @@
       "name": "Weekly Note Naming Format",
       "description": "Use YYYY for year, WW for week number. Content in [] brackets will be displayed as-is. Example: YYYY-[W]WW produces 2024-W01.md",
       "placeholder": "YYYY-[W]WW"
+    },
+    "hideCompletedTodos": {
+      "name": "Hide Completed Todo Dots",
+      "description": "Do not show todo status dots when all todo items are completed"
     }
   },
   "commands": {

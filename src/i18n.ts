@@ -200,6 +200,11 @@ export interface I18n {
 			description: string;
 			placeholder: string;
 		};
+		/** Hide completed todos setting strings */
+		hideCompletedTodos: {
+			name: string;
+			description: string;
+		};
 	};
 	/** Command names */
 	commands: {
