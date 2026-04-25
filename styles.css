@@ -177,23 +177,12 @@
 /* Heatmap Styles - integrated into date cells */
 .calendarz-day-heatmap {
 	color: var(--text-normal);
-}
-
-.calendarz-day-heatmap::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: var(--interactive-accent);
-	opacity: var(--heatmap-opacity, 1);
+	background-color: color-mix(in srgb, var(--interactive-accent) calc(var(--heatmap-opacity, 1) * 100%), transparent);
 	border-radius: 4px;
-	z-index: -1;
 }
 
-.calendarz-day-heatmap:hover::before {
-	filter: brightness(1.1);
+.calendarz-day.calendarz-day-heatmap:hover {
+	background-color: color-mix(in srgb, var(--interactive-accent) calc(max(var(--heatmap-opacity, 1) * 100% - 15%, 25%)), transparent);
 }
 
 /* Heatmap empty cells (no notes) - gray background */
