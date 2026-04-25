@@ -124,13 +124,34 @@ let {
 		return result;
 	});
 
+	/**
+	 * Returns the week-numbering year for a given date and its computed week number.
+	 * Works for both Sunday-start (US) and Monday-start (ISO-like) week numbering,
+	 * since both conventions define week 1 as the week that contains January 1.
+	 *
+	 * Year-boundary corrections:
+	 *  - weekNum === 1  in December  → the week belongs to the following year  (year + 1)
+	 *  - weekNum >= 52 in January    → the week belongs to the preceding year  (year − 1)
+	 */
+	function getWeekYear(date: dayjs.Dayjs, weekNum: number): number {
+		const month = date.month(); // 0-based: 11 = December, 0 = January
+		const year = date.year();
+		if (weekNum === 1 && month === 11) return year + 1;
+		if (weekNum >= 52 && month === 0) return year - 1;
+		return year;
+	}
+
 	let rows = $derived.by(() => {
-		const result: { weekNumber: number; cells: DayCell[] }[] = [];
+		const result: { weekNumber: number; weekKey: string; cells: DayCell[] }[] = [];
 		for (let i = 0; i < cells.length; i += GRID.DAYS_PER_WEEK) {
 			const rowCells = cells.slice(i, i + GRID.DAYS_PER_WEEK);
 			const firstCell = rowCells[0];
+			const weekNum = firstCell.weekNumber;
+			const weekYear = getWeekYear(firstCell.date, weekNum);
+			const weekKey = `${weekYear}-W${weekNum.toString().padStart(2, "0")}`;
 			result.push({
-				weekNumber: firstCell.weekNumber,
+				weekNumber: weekNum,
+				weekKey,
 				cells: rowCells,
 			});
 		}
@@ -228,12 +249,8 @@ let {
 		return todoMap.has(cell.dateStr);
 	}
 
-	function getWeekTodoStatusClass(row: { weekNumber: number; cells: DayCell[] }): string {
-		if (row.cells.length === 0) return "";
-		const firstDay = row.cells[0];
-		const year = firstDay.date.year();
-		const weekKey = `${year}-W${row.weekNumber.toString().padStart(2, "0")}`;
-		const weekTodoStatus = weekTodoMap.get(weekKey);
+	function getWeekTodoStatusClass(row: { weekNumber: number; weekKey: string; cells: DayCell[] }): string {
+		const weekTodoStatus = weekTodoMap.get(row.weekKey);
 		if (!weekTodoStatus) return "";
 
 		if (weekTodoStatus.allCompleted) {
@@ -243,12 +260,8 @@ let {
 		}
 	}
 
-	function hasWeekTodoStatus(row: { weekNumber: number; cells: DayCell[] }): boolean {
-		if (row.cells.length === 0) return false;
-		const firstDay = row.cells[0];
-		const year = firstDay.date.year();
-		const weekKey = `${year}-W${row.weekNumber.toString().padStart(2, "0")}`;
-		return weekTodoMap.has(weekKey);
+	function hasWeekTodoStatus(row: { weekNumber: number; weekKey: string; cells: DayCell[] }): boolean {
+		return weekTodoMap.has(row.weekKey);
 	}
 </script>
 
