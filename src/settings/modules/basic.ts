@@ -4,9 +4,15 @@ import { SettingGroup } from "../ui/SettingGroup";
 import { DropdownSettingRenderer, ToggleSettingRenderer } from "../ui/SettingRenderer";
 import { createSettingHandler } from "../settingUtils";
 
-/** Helper to get nested i18n string values */
+/** Helper to get nested i18n string values from settings section */
 function ts(plugin: PluginLike, section: string, key: string): string {
 	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
+}
+
+/** Helper to get dropdown option labels from nested options object */
+function topt(plugin: PluginLike, section: string, optionKey: string): string {
+	const opts = (plugin.i18n.settings as Record<string, unknown>)[section] as Record<string, unknown>;
+	return (opts.options as Record<string, string>)[optionKey]!;
 }
 
 /**
@@ -23,9 +29,9 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike
 
 	// Month format setting
 	const monthFormatRenderer = new DropdownSettingRenderer<MonthFormat>(plugin, {
-		numeric: ts(plugin, "monthFormat", "options_numeric"),
-		short: ts(plugin, "monthFormat", "options_short"),
-		long: ts(plugin, "monthFormat", "options_long"),
+		numeric: topt(plugin, "monthFormat", "numeric"),
+		short: topt(plugin, "monthFormat", "short"),
+		long: topt(plugin, "monthFormat", "long"),
 	});
 	const handleMonthFormatChange = createSettingHandler({ plugin, settingKey: "monthFormat" });
 	monthFormatRenderer.render(contentEl, {
@@ -37,8 +43,8 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike
 
 	// Title format setting
 	const titleFormatRenderer = new DropdownSettingRenderer<TitleFormat>(plugin, {
-		yearMonth: ts(plugin, "titleFormat", "options_yearMonth"),
-		monthYear: ts(plugin, "titleFormat", "options_monthYear"),
+		yearMonth: topt(plugin, "titleFormat", "yearMonth"),
+		monthYear: topt(plugin, "titleFormat", "monthYear"),
 	});
 	const handleTitleFormatChange = createSettingHandler({ plugin, settingKey: "titleFormat" });
 	titleFormatRenderer.render(contentEl, {
@@ -50,8 +56,8 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike
 
 	// Week start setting
 	const weekStartRenderer = new DropdownSettingRenderer<WeekStart>(plugin, {
-		sunday: ts(plugin, "weekStart", "options_sunday"),
-		monday: ts(plugin, "weekStart", "options_monday"),
+		sunday: topt(plugin, "weekStart", "sunday"),
+		monday: topt(plugin, "weekStart", "monday"),
 	});
 	const handleWeekStartChange = createSettingHandler({ plugin, settingKey: "weekStart" });
 	weekStartRenderer.render(contentEl, {

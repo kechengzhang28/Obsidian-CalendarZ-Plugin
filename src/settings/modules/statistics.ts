@@ -11,9 +11,15 @@ import {
 import { createSettingHandler } from "../settingUtils";
 import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE, STATISTICS_TYPE } from "../../core/constants";
 
-/** Helper to get nested i18n string values */
+/** Helper to get nested i18n string values from settings section */
 function ts(plugin: PluginLike, section: string, key: string): string {
 	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
+}
+
+/** Helper to get dropdown option labels from nested options object */
+function topt(plugin: PluginLike, section: string, optionKey: string): string {
+	const opts = (plugin.i18n.settings as Record<string, unknown>)[section] as Record<string, unknown>;
+	return (opts.options as Record<string, string>)[optionKey]!;
 }
 
 /**
@@ -37,9 +43,9 @@ export function renderStatisticsSettings(
 
 	// Display mode setting
 	const displayModeRenderer = new DropdownSettingRenderer<DisplayMode>(plugin, {
-		[DISPLAY_MODE.NONE]: ts(plugin, "displayMode", "options_none"),
-		[DISPLAY_MODE.DOTS]: ts(plugin, "displayMode", "options_dots"),
-		[DISPLAY_MODE.HEATMAP]: ts(plugin, "displayMode", "options_heatmap"),
+		[DISPLAY_MODE.NONE]: topt(plugin, "displayMode", "none"),
+		[DISPLAY_MODE.DOTS]: topt(plugin, "displayMode", "dots"),
+		[DISPLAY_MODE.HEATMAP]: topt(plugin, "displayMode", "heatmap"),
 	});
 	const handleDisplayModeChange = createSettingHandler({
 		plugin,
@@ -54,8 +60,8 @@ export function renderStatisticsSettings(
 
 	// Statistics type setting
 	const statisticsTypeRenderer = new DropdownSettingRenderer<StatisticsType>(plugin, {
-		[STATISTICS_TYPE.COUNT]: ts(plugin, "statisticsType", "options_count"),
-		[STATISTICS_TYPE.WORD_COUNT]: ts(plugin, "statisticsType", "options_wordCount"),
+		[STATISTICS_TYPE.COUNT]: topt(plugin, "statisticsType", "count"),
+		[STATISTICS_TYPE.WORD_COUNT]: topt(plugin, "statisticsType", "wordCount"),
 	});
 	const handleStatisticsTypeChange = createSettingHandler({
 		plugin,
@@ -70,9 +76,9 @@ export function renderStatisticsSettings(
 
 	// Date source setting
 	const dateSourceRenderer = new DropdownSettingRenderer<DateSource>(plugin, {
-		[DATE_SOURCE.YAML]: ts(plugin, "dateSource", "options_yaml"),
-		[DATE_SOURCE.FILENAME]: ts(plugin, "dateSource", "options_filename"),
-		[DATE_SOURCE.BOTH]: ts(plugin, "dateSource", "options_both"),
+		[DATE_SOURCE.YAML]: topt(plugin, "dateSource", "yaml"),
+		[DATE_SOURCE.FILENAME]: topt(plugin, "dateSource", "filename"),
+		[DATE_SOURCE.BOTH]: topt(plugin, "dateSource", "both"),
 	});
 	const handleDateSourceChange = createSettingHandler({ plugin, settingKey: "dateSource" });
 	dateSourceRenderer.render(contentEl, {
