@@ -2,18 +2,7 @@ import type { PluginLike } from "../../core/types";
 import type { MonthFormat, TitleFormat, WeekStart } from "../../core/types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { DropdownSettingRenderer, ToggleSettingRenderer } from "../ui/SettingRenderer";
-import { createSettingHandler } from "../settingUtils";
-
-/** Helper to get nested i18n string values from settings section */
-function ts(plugin: PluginLike, section: string, key: string): string {
-	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
-}
-
-/** Helper to get dropdown option labels from nested options object */
-function topt(plugin: PluginLike, section: string, optionKey: string): string {
-	const opts = (plugin.i18n.settings as Record<string, unknown>)[section] as Record<string, unknown>;
-	return (opts.options as Record<string, string>)[optionKey]!;
-}
+import { createSettingHandler, ts, topt, getSectionTitle } from "../settingUtils";
 
 /**
  * Renders basic settings (month format, title format, week start).
@@ -21,8 +10,7 @@ function topt(plugin: PluginLike, section: string, optionKey: string): string {
  * @param plugin - Plugin instance
  */
 export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike): void {
-	const sectionTitles = plugin.i18n.sectionTitles as Record<string, string>;
-	const group = new SettingGroup({ title: sectionTitles.basic! });
+	const group = new SettingGroup({ title: getSectionTitle(plugin, "basic") });
 	group.render(containerEl);
 	const contentEl = group.getContentEl();
 	if (!contentEl) return;

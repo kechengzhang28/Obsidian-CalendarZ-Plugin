@@ -1,12 +1,7 @@
 import type { PluginLike } from "../../core/types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { ToggleSettingRenderer, TextSettingRenderer } from "../ui/SettingRenderer";
-import { createSettingHandler } from "../settingUtils";
-
-/** Helper to get nested i18n string values */
-function ts(plugin: PluginLike, section: string, key: string): string {
-	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
-}
+import { createSettingHandler, ts, getSectionTitle } from "../settingUtils";
 
 /**
  * Renders week note settings.
@@ -14,8 +9,7 @@ function ts(plugin: PluginLike, section: string, key: string): string {
  * @param plugin - Plugin instance
  */
 export function renderWeekNoteSettings(containerEl: HTMLElement, plugin: PluginLike): void {
-	const sectionTitles = plugin.i18n.sectionTitles as Record<string, string>;
-	const group = new SettingGroup({ title: sectionTitles.weekNote! });
+	const group = new SettingGroup({ title: getSectionTitle(plugin, "weekNote") });
 	group.render(containerEl);
 	const contentEl = group.getContentEl();
 	if (!contentEl) return;

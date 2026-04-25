@@ -6,6 +6,8 @@ export class IgnoredFoldersModal extends Modal {
 	private i18n: I18nLike;
 	private onUpdate: (folders: string[]) => Promise<void>;
 	private folderListEl: HTMLElement | null = null;
+	/** Track event listeners for cleanup */
+	private removeListeners: Array<() => void> = [];
 
 	constructor(
 		app: App,
@@ -71,6 +73,8 @@ export class IgnoredFoldersModal extends Modal {
 	private async renderFolderList(): Promise<void> {
 		if (!this.folderListEl) return;
 		this.folderListEl.empty();
+		// Clear previous listeners before re-rendering
+		this.clearRemoveListeners();
 
 		const t = (this.i18n.settings as Record<string, Record<string, string>>).ignoredFolders!;
 
@@ -90,16 +94,30 @@ export class IgnoredFoldersModal extends Modal {
 				cls: "calendarz-modal-remove-btn",
 				text: t.removeButton ?? "Remove"
 			});
-			removeBtn.addEventListener("click", () => {
-			void (async () => {
-				this.ignoredFolders = this.ignoredFolders.filter(f => f !== folder);
-				await this.renderFolderList();
-			})();
-		});
+
+			const handleRemove = (): void => {
+				void (async () => {
+					this.ignoredFolders = this.ignoredFolders.filter(f => f !== folder);
+					await this.renderFolderList();
+				})();
+			};
+
+			removeBtn.addEventListener("click", handleRemove);
+			// Track listener for cleanup
+			this.removeListeners.push(() => removeBtn.removeEventListener("click", handleRemove));
 		}
 	}
 
+	/** Clean up all tracked event listeners */
+	private clearRemoveListeners(): void {
+		for (const cleanup of this.removeListeners) {
+			cleanup();
+		}
+		this.removeListeners = [];
+	}
+
 	onClose(): void {
+		this.clearRemoveListeners();
 		const { contentEl } = this;
 		contentEl.empty();
 	}

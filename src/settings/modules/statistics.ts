@@ -8,19 +8,8 @@ import {
 	TextSettingRenderer,
 	ButtonSettingRenderer,
 } from "../ui/SettingRenderer";
-import { createSettingHandler } from "../settingUtils";
+import { createSettingHandler, ts, topt, getSectionTitle } from "../settingUtils";
 import { DEFAULTS, DISPLAY_MODE, DATE_SOURCE, STATISTICS_TYPE } from "../../core/constants";
-
-/** Helper to get nested i18n string values from settings section */
-function ts(plugin: PluginLike, section: string, key: string): string {
-	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
-}
-
-/** Helper to get dropdown option labels from nested options object */
-function topt(plugin: PluginLike, section: string, optionKey: string): string {
-	const opts = (plugin.i18n.settings as Record<string, unknown>)[section] as Record<string, unknown>;
-	return (opts.options as Record<string, string>)[optionKey]!;
-}
 
 /**
  * Renders statistics settings (display mode, dot threshold, date source, etc.).
@@ -35,8 +24,7 @@ export function renderStatisticsSettings(
 	app: App,
 	refreshDisplay: () => void
 ): void {
-	const sectionTitles = plugin.i18n.sectionTitles as Record<string, string>;
-	const group = new SettingGroup({ title: sectionTitles.statistics! });
+	const group = new SettingGroup({ title: getSectionTitle(plugin, "statistics") });
 	group.render(containerEl);
 	const contentEl = group.getContentEl();
 	if (!contentEl) return;

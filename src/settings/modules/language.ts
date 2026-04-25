@@ -2,11 +2,7 @@ import type { PluginLike } from "../../core/types";
 import type { Language } from "../../core/types";
 import { SettingGroup } from "../ui/SettingGroup";
 import { DropdownSettingRenderer, ButtonSettingRenderer } from "../ui/SettingRenderer";
-
-/** Helper to get nested i18n string values */
-function ts(plugin: PluginLike, section: string, key: string): string {
-	return ((plugin.i18n.settings as Record<string, Record<string, string>>)[section]!)[key]!;
-}
+import { ts } from "../settingUtils";
 
 /**
  * Renders language settings.
@@ -59,6 +55,8 @@ export function renderLanguageSettings(
 		name: ts(plugin, "refreshPlugin", "name"),
 		description: ts(plugin, "refreshPlugin", "description"),
 		buttonText: ts(plugin, "refreshPlugin", "buttonText"),
-		onClick: () => plugin.refreshView(),
+		onClick: () => {
+			plugin.refreshView();
+		},
 	});
 }
