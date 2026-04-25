@@ -1,59 +1,89 @@
 <script lang="ts">
-	import dayjs from "dayjs";
+	import dayjs from "../utils/date/dayjsConfig";
 	import CalendarHeader from "./CalendarHeader.svelte";
 	import WeekdaysRow from "./WeekdaysRow.svelte";
 	import DaysGrid from "./DaysGrid.svelte";
 	import type { I18n } from "../i18n";
 	import type {
 		CalendarZSettings,
-		WeekStart,
-		DisplayMode,
-	} from "../settings/types";
-	import { CSS_CLASSES, DISPLAY_MODE, DATE_FORMAT } from "../constants";
-	import type { DateCount } from "./types";
+	} from "../core/types";
+	import { STATISTICS_TYPE, CSS_CLASSES } from "../core/constants";
+	import type { CalendarState } from "../stores/calendarState.svelte";
 
 	interface Props {
-		settings: CalendarZSettings;
-		i18n: I18n;
-		dateCounts: DateCount[];
+		state: CalendarState;
 		onDayClick: (date: Date) => void;
+		onWeekClick: (date: Date) => void;
 		onNavigateMonth: (direction: -1 | 1) => void;
 		onGoToToday: () => void;
-		currentDate: Date;
+		hasWeekNote: (date: Date) => boolean;
 	}
 
 	let {
-		settings,
-		i18n,
-		dateCounts,
+		state,
 		onDayClick,
+		onWeekClick,
 		onNavigateMonth,
 		onGoToToday,
-		currentDate,
+		hasWeekNote,
 	}: Props = $props();
+
+	// Derived values from state - automatically update when state changes
+	const settings = $derived(state.settings);
+	const i18n = $derived(state.i18n);
+	const currentDate = $derived(state.currentDate);
+	const dateCounts = $derived(state.dateCounts);
+	const todoStatuses = $derived(state.todoStatuses);
+	const weekTodoStatuses = $derived(state.weekTodoStatuses);
+
+	// Use pre-computed Maps from state to avoid recreating them
+	const countsMap = $derived(state.countsMap);
+	const todoMap = $derived(state.todoMap);
+	const weekTodoMap = $derived(state.weekTodoMap);
+
+	// Determine which thresholds to use based on statistics type
+	const isWordCount = $derived(settings?.statisticsType === STATISTICS_TYPE.WORD_COUNT);
+	const effectiveDotThreshold = $derived(
+		isWordCount ? settings?.dotWordThreshold : settings?.dotThreshold
+	);
+	const effectiveHeatmapMax = $derived(
+		isWordCount ? settings?.heatmapMaxWords : settings?.heatmapMaxNotes
+	);
 </script>
 
-<div class={CSS_CLASSES.CONTAINER}>
-	<CalendarHeader
-		{i18n}
-		monthFormat={settings.monthFormat}
-		language={settings.language}
-		titleFormat={settings.titleFormat}
-		{currentDate}
-		onPrevMonth={() => onNavigateMonth(-1)}
-		onNextMonth={() => onNavigateMonth(1)}
-		onToday={onGoToToday}
-	/>
+{#if settings && i18n}
+	<div class={CSS_CLASSES.CONTAINER}>
+		<CalendarHeader
+			{i18n}
+			monthFormat={settings.monthFormat}
+			language={settings.language}
+			titleFormat={settings.titleFormat}
+			{currentDate}
+			onPrevMonth={() => onNavigateMonth(-1)}
+			onNextMonth={() => onNavigateMonth(1)}
+			onToday={onGoToToday}
+		/>
 
-	<WeekdaysRow {i18n} weekStart={settings.weekStart} />
+		<WeekdaysRow {i18n} weekStart={settings.weekStart} showWeekNumber={settings.showWeekNumber} />
 
-	<DaysGrid
-		{currentDate}
-		weekStart={settings.weekStart}
-		displayMode={settings.displayMode}
-		dotThreshold={settings.dotThreshold}
-		heatmapMaxNotes={settings.heatmapMaxNotes}
-		{dateCounts}
-		{onDayClick}
-	/>
-</div>
+		<DaysGrid
+			{currentDate}
+			weekStart={settings.weekStart}
+			displayMode={settings.displayMode}
+			dotThreshold={effectiveDotThreshold ?? 1}
+			heatmapMaxNotes={effectiveHeatmapMax ?? 10}
+			heatmapHideDateNumbers={settings.heatmapHideDateNumbers}
+			showWeekNumber={settings.showWeekNumber}
+			weekNoteEnabled={settings.weekNoteEnabled}
+			{dateCounts}
+			{todoStatuses}
+			{weekTodoStatuses}
+			{countsMap}
+			{todoMap}
+			{weekTodoMap}
+			{onDayClick}
+			{onWeekClick}
+			{hasWeekNote}
+		/>
+	</div>
+{/if}

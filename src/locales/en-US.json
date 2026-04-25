@@ -2,14 +2,16 @@
   "calendar": {
     "today": "Today",
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    "viewTitle": "CalendarZ"
+    "viewTitle": "CalendarZ",
+    "weekLabel": "W"
   },
   "sectionTitles": {
     "basic": "Basic",
     "statistics": "Statistics",
     "dots": "Dots",
     "heatmap": "Heatmap",
-    "click": "Click Behavior"
+    "click": "Click Behavior",
+    "weekNote": "Weekly Note"
   },
   "settings": {
     "language": {
@@ -81,17 +83,41 @@
         "none": "None"
       }
     },
+    "statisticsType": {
+      "name": "Statistics Type",
+      "description": "Choose whether to count by note quantity or total word count",
+      "options": {
+        "count": "Note Count",
+        "wordCount": "Word Count"
+      }
+    },
     "dotThreshold": {
       "name": "Notes per Dot",
       "description": "Number of notes represented by each dot (1-10)"
+    },
+    "dotWordThreshold": {
+      "name": "Words per Dot",
+      "description": "Number of words represented by each dot (minimum 1)"
     },
     "heatmapMaxNotes": {
       "name": "Max Notes for Heatmap",
       "description": "Maximum note count to reach full brightness in heatmap mode. Any date with notes >= this value will show maximum brightness."
     },
+    "heatmapMaxWords": {
+      "name": "Max Words for Heatmap",
+      "description": "Maximum word count to reach full brightness in heatmap mode. Any date with words >= this value will show maximum brightness. (minimum 1)"
+    },
+    "heatmapHideDateNumbers": {
+      "name": "Hide Date Numbers",
+      "description": "Hide date numbers in heatmap mode, show only color blocks"
+    },
     "confirmBeforeCreate": {
       "name": "Confirm Before Creating",
       "description": "Show a confirmation dialog before creating a daily note when left-clicking a date"
+    },
+    "showWeekNumber": {
+      "name": "Show Week Numbers",
+      "description": "Display week numbers on the left side of the calendar"
     },
     "openCalendar": {
       "name": "Open Calendar View",
@@ -102,6 +128,23 @@
       "name": "Refresh Plugin",
       "description": "Refresh the calendar view to apply latest settings",
       "buttonText": "Refresh"
+    },
+    "weekNoteEnabled": {
+      "name": "Enable Weekly Note",
+      "description": "Create or open weekly note when clicking week number"
+    },
+    "weekNoteTemplate": {
+      "name": "Weekly Note Template",
+      "description": "Path to weekly note template file (leave empty for default style)"
+    },
+    "weekNoteFolder": {
+      "name": "Weekly Note Folder",
+      "description": "Folder path for weekly notes (leave empty for root directory)"
+    },
+    "weekNoteFormat": {
+      "name": "Weekly Note Naming Format",
+      "description": "Use YYYY for year, WW for week number. Content in [] brackets will be displayed as-is. Example: YYYY-[W]WW produces 2024-W01.md",
+      "placeholder": "YYYY-[W]WW"
     }
   },
   "commands": {
@@ -112,11 +155,12 @@
   },
   "notifications": {
     "dailyNotesNotEnabled": "Please enable the Daily Notes core plugin first",
-    "dailyNotesCreateFailed": "Failed to create daily note, please check the daily notes plugin settings"
+    "dailyNotesCreateFailed": "Failed to create daily note, please check the daily notes plugin settings",
+    "weekNoteCreateFailed": "Failed to create week note"
   },
   "modal": {
-    "confirmTitle": "Create Daily Note",
-    "confirmMessage": "Create daily note for {{date}}?",
+    "confirmTitle": "Create Note",
+    "confirmMessage": "Create note for {{date}}?",
     "cancelButton": "Cancel",
     "createButton": "Create"
   }

@@ -21,7 +21,7 @@ export const HEATMAP = {
 /** Dots display mode constants */
 export const DOTS = {
 	/** Maximum number of dots to display */
-	MAX_DOTS: 4,
+	MAX_DOTS: 3,
 } as const;
 
 /** Calendar grid layout constants */
@@ -47,10 +47,16 @@ export const CSS_CLASSES = {
 	DAY_TODAY: "calendarz-day-today",
 	DAY_TODAY_THEMED: "calendarz-day-today-themed",
 	DAY_HEATMAP: "calendarz-day-heatmap",
+	DAY_HEATMAP_EMPTY: "calendarz-day-heatmap-empty",
+	WEEK_NUMBER: "calendarz-week-number",
+	WEEK_NUMBER_CLICKABLE: "calendarz-week-number-clickable",
 	DOTS_CONTAINER: "calendarz-dots-container",
 	DOT: "calendarz-dot",
 	DOT_GRAY: "calendarz-dot-gray",
 	BAR_TODAY: "calendarz-bar-today",
+	STAR_TODAY: "calendarz-star-today",
+	TODO_CIRCLE_EMPTY: "calendarz-todo-circle-empty",
+	TODO_CIRCLE_FILLED: "calendarz-todo-circle-filled",
 } as const;
 
 /** CSS custom property names */
@@ -90,4 +96,10 @@ export const DATE_SOURCE = {
 	YAML: "yaml",
 	FILENAME: "filename",
 	BOTH: "both",
+} as const;
+
+/** Statistics type values */
+export const STATISTICS_TYPE = {
+	COUNT: "count",
+	WORD_COUNT: "wordCount",
 } as const;

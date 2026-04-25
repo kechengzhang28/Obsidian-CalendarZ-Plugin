@@ -1,66 +1,116 @@
-import {Plugin, WorkspaceLeaf} from 'obsidian';
+import {Plugin, WorkspaceLeaf, TFile} from 'obsidian';
+import type {CachedMetadata} from 'obsidian';
 import {DEFAULT_SETTINGS, CalendarZSettingTab} from "./settings/index";
-import type { CalendarZSettings } from "./settings/types";
-import {CALENDARZ_VIEW_TYPE, CalendarZView} from "./CalendarView";
-import type { CalendarZViewDeps } from "./CalendarView";
+import type { CalendarZSettings } from "./core/types";
+import {CALENDARZ_VIEW_TYPE, CalendarZView} from "./ui/view/CalendarZView";
+import type { CalendarZViewDeps } from "./ui/view/CalendarZView";
 import {loadI18n} from "./i18n";
 import type {I18n} from "./i18n";
+import { TodoService } from "./services/todos/TodoService";
+import { NoteCounter } from "./services/notes/NoteCounter";
 
 /**
  * Main plugin class for CalendarZ.
  * Manages plugin lifecycle, settings, commands, and view registration.
  */
 export default class CalendarZ extends Plugin {
-	/** Plugin settings */
 	settings: CalendarZSettings;
-	/** Internationalization strings */
 	i18n: I18n;
+	private previousCaches = new Map<string, CachedMetadata>();
+	private fileMtimes = new Map<string, number>();
+	private todoService: TodoService;
+	private noteCounter: NoteCounter;
+	private readonly MAX_CACHE_SIZE = 1000;
 
-	/**
-	 * Called when the plugin is loaded.
-	 * Initializes settings, i18n, view, commands, and file event listeners.
-	 */
 	async onload() {
 		await this.loadSettings();
 		this.loadI18n();
+		this.todoService = new TodoService(this.app);
+		this.noteCounter = new NoteCounter(this.app);
 
-		// Register the calendar view
 		this.registerView(
 			CALENDARZ_VIEW_TYPE,
 			(leaf: WorkspaceLeaf) => new CalendarZView(leaf, this.getViewDeps())
 		);
 
-		// Add command to open calendar view
 		this.addCommand({
 			id: 'open-calendar-view',
 			name: this.i18n.commands.openCalendar,
 			callback: () => void this.activateView()
 		});
 
-		// Add settings tab
 		this.addSettingTab(new CalendarZSettingTab(this.app, this));
+
+		this.app.workspace.onLayoutReady(async () => {
+			await this.activateView();
+			this.forEachView(v => void v.refreshStatsOnly());
+		});
+
 		this.registerFileEvents();
 
-		// Auto-refresh statistics every 30 seconds as a fallback
-		this.registerInterval(window.setInterval(() => this.forEachView(v => v.refreshStatsOnly()), 30000));
+		this.registerInterval(window.setInterval(() => this.forEachView(v => void v.refreshStatsOnly()), 30000));
 	}
 
-	/**
-	 * Registers file system event listeners to refresh statistics.
-	 * Triggers on create, delete, rename, and modify events.
-	 */
 	private registerFileEvents(): void {
-		const refresh = () => this.forEachView(v => void v.refreshStatsOnly());
-		this.registerEvent(this.app.vault.on("create", refresh));
-		this.registerEvent(this.app.vault.on("delete", refresh));
-		this.registerEvent(this.app.vault.on("rename", refresh));
-		this.registerEvent(this.app.vault.on("modify", refresh));
+		this.registerEvent(this.app.metadataCache.on("changed", (file: TFile, _data: string, cache: CachedMetadata) => {
+			if (file.extension !== "md") return;
+
+			// Enforce cache size limit to prevent memory leaks
+			this.enforceCacheSizeLimit();
+
+			const oldCache = this.previousCaches.get(file.path);
+			const dateField = this.settings.dateFieldName;
+			const oldDate = oldCache?.frontmatter?.[dateField] as unknown;
+			const newDate = cache.frontmatter?.[dateField] as unknown;
+			const dateChanged = oldDate !== newDate;
+
+			// Check if todo status may have changed by comparing file modification time
+			const oldMtime = this.fileMtimes.get(file.path);
+			const mtimeChanged = oldMtime !== file.stat.mtime;
+
+			// Clear todo cache for this file if content may have changed
+			if (mtimeChanged) {
+				this.todoService.clearFileCache(file.path);
+			}
+
+			// Refresh view if date changed or file content changed (may affect todos)
+			if (dateChanged || mtimeChanged) {
+				this.forEachView(v => void v.refreshStatsOnly());
+			}
+
+			this.previousCaches.set(file.path, cache);
+			this.fileMtimes.set(file.path, file.stat.mtime);
+		}));
+
+		this.registerEvent(this.app.vault.on("create", (file) => {
+			if (file instanceof TFile) {
+				this.fileMtimes.set(file.path, file.stat.mtime);
+				this.forEachView(v => void v.refreshStatsOnly());
+			}
+		}));
+
+		this.registerEvent(this.app.vault.on("delete", (file) => {
+			if (file instanceof TFile) {
+				this.previousCaches.delete(file.path);
+				this.fileMtimes.delete(file.path);
+				this.forEachView(v => void v.refreshStatsOnly());
+			}
+		}));
+
+		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
+			if (file instanceof TFile) {
+				const oldCache = this.previousCaches.get(oldPath);
+				if (oldCache) {
+					this.previousCaches.set(file.path, oldCache);
+					this.previousCaches.delete(oldPath);
+				}
+				this.fileMtimes.delete(oldPath);
+				this.fileMtimes.set(file.path, file.stat.mtime);
+				this.forEachView(v => void v.refreshStatsOnly());
+			}
+		}));
 	}
 
-	/**
-	 * Iterates over all calendar views and executes a callback.
-	 * @param callback - Function to execute for each view
-	 */
 	private forEachView(callback: (view: CalendarZView) => void): void {
 		this.app.workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)
 			.map(leaf => leaf.view)
@@ -68,39 +118,26 @@ export default class CalendarZ extends Plugin {
 			.forEach(callback);
 	}
 
-	/**
-	 * Loads plugin settings from storage.
-	 * Merges saved settings with defaults.
-	 */
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<CalendarZSettings>);
 	}
 
-	/**
-	 * Saves current settings to storage.
-	 */
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
 
-	/**
-	 * Loads i18n strings based on current language setting.
-	 */
 	loadI18n(): void {
 		this.i18n = loadI18n(this.settings.language);
 	}
 
-	/**
-	 * Refreshes all calendar views with current settings.
-	 */
+	getI18n(): I18n {
+		return this.i18n;
+	}
+
 	refreshView(): void {
 		this.forEachView(v => v.updateSettings());
 	}
 
-	/**
-	 * Activates or creates the calendar view.
-	 * Reveals existing view if open, otherwise creates a new leaf.
-	 */
 	async activateView(): Promise<void> {
 		const { workspace } = this.app;
 		const existingLeaf = workspace.getLeavesOfType(CALENDARZ_VIEW_TYPE)[0];
@@ -117,16 +154,50 @@ export default class CalendarZ extends Plugin {
 		void workspace.revealLeaf(leaf);
 	}
 
-	/**
-	 * Creates dependencies object for calendar views.
-	 * @returns Dependencies needed by CalendarZView
-	 */
 	private getViewDeps(): CalendarZViewDeps {
 		return {
-			settings: this.settings,
 			app: this.app,
-			plugin: this,
-			refreshView: () => this.refreshView(),
+			plugin: {
+				getI18n: () => this.i18n,
+				settings: this.settings,
+				todoService: this.todoService,
+				noteCounter: this.noteCounter,
+			},
 		};
+	}
+
+	/**
+	 * Enforces cache size limit to prevent memory leaks.
+	 * Removes oldest entries when cache exceeds MAX_CACHE_SIZE.
+	 */
+	private enforceCacheSizeLimit(): void {
+		if (this.previousCaches.size > this.MAX_CACHE_SIZE) {
+			const keysToDelete = this.previousCaches.size - this.MAX_CACHE_SIZE;
+			const keys = Array.from(this.previousCaches.keys()).slice(0, keysToDelete);
+			for (const key of keys) {
+				this.previousCaches.delete(key);
+				this.fileMtimes.delete(key);
+			}
+		}
+	}
+
+	/**
+	 * Cleanup resources when plugin is unloaded.
+	 * Prevents memory leaks by clearing all caches and references.
+	 */
+	onunload(): void {
+		// Clear custom caches
+		this.previousCaches.clear();
+		this.fileMtimes.clear();
+
+		// Clear todo service cache
+		if (this.todoService) {
+			this.todoService.clearCache();
+		}
+
+		// Clear note counter cache
+		if (this.noteCounter) {
+			this.noteCounter.clearCache();
+		}
 	}
 }

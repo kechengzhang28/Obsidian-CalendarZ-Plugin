@@ -1,8 +1,8 @@
 <script lang="ts">
-	import dayjs from "dayjs";
+	import dayjs from "../utils/date/dayjsConfig";
 	import { formatMonth } from "../utils/date";
 	import type { I18n } from "../i18n";
-	import type { MonthFormat, TitleFormat } from "../settings/types";
+	import type { MonthFormat, TitleFormat } from "../core/types";
 
 	interface Props {
 		i18n: I18n;

@@ -1,4 +1,4 @@
-import type {CalendarZSettings} from "./types";
+import type {CalendarZSettings} from "../core/types";
 
 /** Default settings values */
 export const DEFAULT_SETTINGS: CalendarZSettings = {
@@ -11,7 +11,16 @@ export const DEFAULT_SETTINGS: CalendarZSettings = {
 	dateSource: "yaml",
 	filenameDateFormat: "YYYY-MM-DD",
 	displayMode: "none",
+	statisticsType: "count",
 	dotThreshold: 1,
+	dotWordThreshold: 100,
 	heatmapMaxNotes: 10,
-	confirmBeforeCreate: true
+	heatmapMaxWords: 1000,
+	heatmapHideDateNumbers: false,
+	confirmBeforeCreate: true,
+	showWeekNumber: false,
+	weekNoteEnabled: false,
+	weekNoteTemplate: "",
+	weekNoteFolder: "",
+	weekNoteFormat: "YYYY-[W]WW"
 };

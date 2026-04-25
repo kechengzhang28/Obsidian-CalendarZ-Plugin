@@ -1,5 +1,5 @@
 import { Setting } from "obsidian";
-import type { PluginLike } from "../../types";
+import type { PluginLike } from "../../core/types";
 
 /**
  * Handler function type for setting value changes
@@ -227,6 +227,44 @@ export class SliderSettingRenderer extends SettingRenderer<number> {
 				.setDynamicTooltip()
 				.onChange((value) => this.onChange(config, value))
 		);
+	}
+}
+
+/**
+ * Number input setting renderer
+ * Renders a setting with a number input field
+ */
+export class NumberSettingRenderer extends SettingRenderer<number> {
+	/**
+	 * Creates a new number setting renderer
+	 * @param plugin - Plugin instance
+	 * @param min - Minimum value (default: 1)
+	 * @param placeholder - Placeholder text for the input field
+	 */
+	constructor(
+		plugin: PluginLike,
+		private min = 1,
+		private placeholder = ""
+	) {
+		super(plugin);
+	}
+
+	/**
+	 * Renders the number input setting
+	 */
+	render(container: HTMLElement, config: SettingConfig<number>): void {
+		this.createBaseSetting(container, config).addText(text => {
+			text.inputEl.type = "number";
+			text.inputEl.min = String(this.min);
+			text.setPlaceholder(this.placeholder || String(this.min));
+			text.setValue(String(config.value));
+			text.onChange((value) => {
+				const numValue = parseInt(value, 10);
+				const validValue = isNaN(numValue) || numValue < this.min ? this.min : numValue;
+				this.onChange(config, validValue);
+			});
+			return text;
+		});
 	}
 }
 

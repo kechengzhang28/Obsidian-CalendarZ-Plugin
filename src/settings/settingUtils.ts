@@ -1,22 +1,14 @@
-import type { PluginLike } from "../types";
+import type { PluginLike } from "../core/types";
 
 /** Options for creating a setting change handler */
 export interface SettingHandlerOptions<K extends keyof PluginLike["settings"]> {
-	/** Plugin instance */
 	plugin: PluginLike;
-	/** Key of the setting to handle */
 	settingKey: K;
-	/** Optional callback to refresh the display after change */
 	refreshDisplay?: () => void;
-	/** Optional transform function to modify the value before saving */
 	transform?: (value: PluginLike["settings"][K]) => PluginLike["settings"][K];
-	/** Optional callback to execute after saving */
 	postSave?: () => void | Promise<void>;
 }
 
-/**
- * Base handler that updates a setting, saves it, and refreshes the view
- */
 async function handleSettingChange<K extends keyof PluginLike["settings"]>(
 	plugin: PluginLike,
 	settingKey: K,
@@ -27,25 +19,6 @@ async function handleSettingChange<K extends keyof PluginLike["settings"]>(
 	plugin.refreshView();
 }
 
-/**
- * Universal setting change handler factory
- * Supports optional transform, refreshDisplay callback, and postSave hook
- *
- * @example
- * ```typescript
- * // Basic usage
- * const handler = createSettingHandler({ plugin, settingKey: 'monthFormat' });
- *
- * // With refresh
- * const handler = createSettingHandler({ plugin, settingKey: 'displayMode', refreshDisplay });
- *
- * // With transform
- * const handler = createSettingHandler({
- *   plugin, settingKey: 'dateFieldName',
- *   transform: (v) => v.trim() || 'date'
- * });
- * ```
- */
 export function createSettingHandler<K extends keyof PluginLike["settings"]>(
 	options: SettingHandlerOptions<K>
 ): (value: PluginLike["settings"][K]) => Promise<void> {
@@ -57,4 +30,41 @@ export function createSettingHandler<K extends keyof PluginLike["settings"]>(
 		refreshDisplay?.();
 		await postSave?.();
 	};
+}
+
+// ============================================================================
+// i18n Helper Functions - Extracted from settings modules to reduce duplication
+// ============================================================================
+
+/** Get typed settings section from i18n */
+function getSettingsSection(plugin: PluginLike, section: string): Record<string, unknown> {
+	return (plugin.getI18n().settings as Record<string, Record<string, unknown>>)[section] ?? {};
+}
+
+/**
+ * Get a string value from i18n settings section
+ * Usage: ts(plugin, "monthFormat", "name") => "Month Format"
+ */
+export function ts(plugin: PluginLike, section: string, key: string): string {
+	const sect = getSettingsSection(plugin, section);
+	return (sect[key] as string) ?? key;
+}
+
+/**
+ * Get a dropdown option label from nested options object
+ * Usage: topt(plugin, "monthFormat", "numeric") => "Numeric (1-12)"
+ */
+export function topt(plugin: PluginLike, section: string, optionKey: string): string {
+	const sect = getSettingsSection(plugin, section);
+	const opts = (sect.options as Record<string, string>) ?? {};
+	return opts[optionKey] ?? optionKey;
+}
+
+/**
+ * Get section title from i18n
+ * Usage: getSectionTitle(plugin, "basic") => "Basic Settings"
+ */
+export function getSectionTitle(plugin: PluginLike, section: string): string {
+	const titles = plugin.getI18n().sectionTitles as Record<string, string>;
+	return titles[section] ?? section;
 }

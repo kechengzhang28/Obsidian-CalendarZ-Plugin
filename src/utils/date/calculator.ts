@@ -1,6 +1,6 @@
-import dayjs from "dayjs";
-import type { WeekStart } from "../../settings/types";
-import { DAY_OF_WEEK } from "../../constants";
+import dayjs, { setWeekStart } from "./dayjsConfig";
+import type { WeekStart } from "../../core/types";
+import { DAY_OF_WEEK } from "../../core/constants";
 
 /**
  * Checks if a date is before today
@@ -53,7 +53,7 @@ export function getYearMonth(date: Date | dayjs.Dayjs): { year: number; month: n
  * @returns Number of days in the month
  */
 export function getDaysInMonth(year: number, month: number): number {
-	return dayjs(new Date(year, month + 1, 0)).date();
+	return dayjs(new Date(year, month, 1)).daysInMonth();
 }
 
 /**
@@ -65,16 +65,16 @@ export function getDaysInMonth(year: number, month: number): number {
  * @returns Last day number of previous month
  */
 export function getPreviousMonthLastDay(year: number, month: number): number {
-	return dayjs(new Date(year, month, 0)).date();
+	return dayjs(new Date(year, month, 0)).daysInMonth();
 }
 
 /**
  * Calculates padding days needed for the calendar grid
- * 
+ *
  * Determines how many days from the previous month should be
  * shown to align the first day of the month with the correct
  * weekday column.
- * 
+ *
  * @param year - Target year
  * @param month - Target month (0-11)
  * @param weekStart - Week start preference
@@ -83,6 +83,26 @@ export function getPreviousMonthLastDay(year: number, month: number): number {
 export function calculatePaddingDays(year: number, month: number, weekStart: WeekStart): number {
 	const firstDayOfWeek = dayjs(new Date(year, month, 1)).day();
 	return getAdjustedDayOfWeek(firstDayOfWeek, weekStart);
+}
+
+/**
+ * Calculates the week number for a given date
+ *
+ * Week numbers are calculated based on the user's weekStart preference using
+ * locale-based week numbering (via dayjs weekOfYear plugin):
+ * - If weekStart is "monday": Week 1 is the week containing Jan 1st, weeks start on Monday
+ * - If weekStart is "sunday": Week 1 is the week containing Jan 1st, weeks start on Sunday
+ *
+ * Note: This is NOT strict ISO 8601 week numbering (which requires yearStart=4 so week 1
+ * contains the first Thursday). Week numbers near year boundaries may differ from ISO 8601.
+ *
+ * @param date - Date to calculate week number for
+ * @param weekStart - Week start preference ("sunday" or "monday")
+ * @returns Week number (1-53)
+ */
+export function getWeekNumber(date: Date, weekStart: WeekStart): number {
+	setWeekStart(weekStart);
+	return dayjs(date).week();
 }
 
 

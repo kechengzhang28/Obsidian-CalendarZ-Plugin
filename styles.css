@@ -1,7 +1,7 @@
 /* CalendarZ Plugin Styles */
 
 .calendarz-container {
-	padding: 16px !important;
+	padding: 8px !important;
 	user-select: none;
 }
 
@@ -57,7 +57,7 @@
 .calendarz-year {
 	font-weight: 600;
 	font-size: 24px;
-	color: var(--text-accent);
+	color: var(--interactive-accent);
 	margin-right: 8px;
 }
 
@@ -79,6 +79,10 @@
 	margin-bottom: 6px;
 }
 
+.calendarz-weekdays-with-week {
+	grid-template-columns: repeat(8, 1fr);
+}
+
 .calendarz-weekday {
 	text-align: center;
 	font-size: 11px;
@@ -87,10 +91,47 @@
 	padding: 4px 0;
 }
 
+.calendarz-weekday-label {
+	font-size: 11px;
+	font-weight: 500;
+	color: var(--text-accent);
+}
+
 .calendarz-days {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
 	gap: 2px;
+}
+
+.calendarz-days-with-week {
+	grid-template-columns: repeat(8, 1fr);
+}
+
+.calendarz-week-number {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--text-accent);
+	background-color: transparent;
+	border-radius: 4px;
+	cursor: default;
+	transition: all 0.15s ease;
+	position: relative;
+	padding: 2px;
+	gap: 1px;
+	min-height: 0;
+}
+
+.calendarz-week-number-clickable {
+	cursor: pointer;
+}
+
+.calendarz-week-number-clickable:hover {
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
 }
 
 
@@ -147,6 +188,12 @@
 	filter: brightness(1.1);
 }
 
+/* Heatmap empty cells (no notes) - gray background */
+.calendarz-day-heatmap-empty {
+	background-color: var(--background-modifier-border-hover);
+	border-radius: 4px;
+}
+
 /* Remove button in modal */
 .calendarz-modal-remove-btn {
 	background-color: transparent !important;
@@ -157,10 +204,11 @@
 /* Dots container for dots mode */
 .calendarz-dots-container {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	justify-content: center;
+	align-items: center;
 	gap: 2px;
-	max-width: 24px;
+	max-width: 32px;
 	margin-top: 1px;
 }
 
@@ -176,7 +224,7 @@
 /* Gray dot for dates before today with no notes */
 .calendarz-dot-gray {
 	background-color: var(--text-muted);
-	opacity: 0.4;
+	opacity: 0.25;
 }
 
 /* Today indicator bar for heatmap mode */
@@ -188,6 +236,13 @@
 	flex-shrink: 0;
 }
 
+/* Today indicator star for heatmap mode when date numbers are hidden */
+.calendarz-star-today {
+	font-size: 12px;
+	color: var(--text-normal);
+	line-height: 1;
+}
+
 /* Settings folder item */
 .calendarz-settings-folder-item {
 	margin-top: 4px;
@@ -197,4 +252,23 @@
 .setting-item-heading h3 {
 	padding: 0;
 	margin: 0;
+}
+
+/* Todo circle styles - empty (hollow) circle for incomplete todos */
+.calendarz-todo-circle-empty {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	border: 1px solid var(--text-normal);
+	background-color: transparent;
+	flex-shrink: 0;
+}
+
+/* Todo circle styles - filled circle for all todos completed */
+.calendarz-todo-circle-filled {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background-color: var(--text-normal);
+	flex-shrink: 0;
 }

@@ -1,4 +1,4 @@
-import type {Language} from "./settings/types";
+import type {Language} from "./core/types";
 
 // Import locale files
 import enUS from "./locales/en-US.json";
@@ -7,8 +7,10 @@ import zhCN from "./locales/zh-CN.json";
 /**
  * Internationalization interface defining all translatable strings.
  * This interface matches the structure of locale JSON files.
+ * Includes index signature for compatibility with I18nLike.
  */
 export interface I18n {
+	[key: string]: unknown;
 	/** Calendar-related strings */
 	calendar: {
 		/** Label for the today button */
@@ -17,6 +19,8 @@ export interface I18n {
 		weekdays: string[];
 		/** Title displayed in the view tab */
 		viewTitle: string;
+		/** Label for week number column */
+		weekLabel: string;
 	};
 	/** Settings section titles */
 	sectionTitles: {
@@ -30,6 +34,8 @@ export interface I18n {
 		heatmap: string;
 		/** Click settings section title */
 		click: string;
+		/** Week note settings section title */
+		weekNote: string;
 	};
 	/** Settings panel strings */
 	settings: {
@@ -117,8 +123,22 @@ export interface I18n {
 				none: string;
 			};
 		};
+		/** Statistics type setting strings */
+		statisticsType: {
+			name: string;
+			description: string;
+			options: {
+				count: string;
+				wordCount: string;
+			};
+		};
 		/** Dot threshold setting strings */
 		dotThreshold: {
+			name: string;
+			description: string;
+		};
+		/** Dot word threshold setting strings */
+		dotWordThreshold: {
 			name: string;
 			description: string;
 		};
@@ -127,8 +147,23 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
+		/** Heatmap max words setting strings */
+		heatmapMaxWords: {
+			name: string;
+			description: string;
+		};
+		/** Heatmap hide date numbers setting strings */
+		heatmapHideDateNumbers: {
+			name: string;
+			description: string;
+		};
 		/** Confirm before creating daily note setting strings */
 		confirmBeforeCreate: {
+			name: string;
+			description: string;
+		};
+		/** Show week number setting strings */
+		showWeekNumber: {
 			name: string;
 			description: string;
 		};
@@ -143,6 +178,27 @@ export interface I18n {
 			name: string;
 			description: string;
 			buttonText: string;
+		};
+		/** Week note enabled setting strings */
+		weekNoteEnabled: {
+			name: string;
+			description: string;
+		};
+		/** Week note template setting strings */
+		weekNoteTemplate: {
+			name: string;
+			description: string;
+		};
+		/** Week note folder setting strings */
+		weekNoteFolder: {
+			name: string;
+			description: string;
+		};
+		/** Week note naming format setting strings */
+		weekNoteFormat: {
+			name: string;
+			description: string;
+			placeholder: string;
 		};
 	};
 	/** Command names */
@@ -161,6 +217,8 @@ export interface I18n {
 		dailyNotesNotEnabled: string;
 		/** Message shown when daily note creation fails */
 		dailyNotesCreateFailed: string;
+		/** Message shown when week note creation fails */
+		weekNoteCreateFailed: string;
 	};
 	/** Modal dialog strings */
 	modal: {

@@ -2,14 +2,16 @@
   "calendar": {
     "today": "今天",
     "weekdays": ["日", "一", "二", "三", "四", "五", "六"],
-    "viewTitle": "CalendarZ"
+    "viewTitle": "CalendarZ",
+    "weekLabel": "周"
   },
   "sectionTitles": {
     "basic": "基本设置",
     "statistics": "统计设置",
     "dots": "点图设置",
     "heatmap": "热力图设置",
-    "click": "点击设置"
+    "click": "点击设置",
+    "weekNote": "周记设置"
   },
   "settings": {
     "language": {
@@ -81,17 +83,41 @@
         "none": "无"
       }
     },
+    "statisticsType": {
+      "name": "统计类型",
+      "description": "选择根据笔记数量还是笔记总字数进行统计",
+      "options": {
+        "count": "笔记数量",
+        "wordCount": "笔记字数"
+      }
+    },
     "dotThreshold": {
       "name": "每点代表笔记数",
       "description": "每个点代表的笔记数量（1-10）"
+    },
+    "dotWordThreshold": {
+      "name": "每点代表字数",
+      "description": "每个点代表的字数（最小值为 1）"
     },
     "heatmapMaxNotes": {
       "name": "热力图最大笔记数",
       "description": "热力图达到最大亮度时的笔记数量。任何笔记数大于等于此值的日期都将显示最大亮度。"
     },
+    "heatmapMaxWords": {
+      "name": "热力图最大字数",
+      "description": "热力图达到最大亮度时的字数。任何字数大于等于此值的日期都将显示最大亮度。（最小值为 1）"
+    },
+    "heatmapHideDateNumbers": {
+      "name": "隐藏日期数字",
+      "description": "在热力图模式下隐藏日期数字，仅显示颜色块"
+    },
     "confirmBeforeCreate": {
       "name": "创建前确认",
       "description": "左键点击日期时，是否在创建日记前弹出确认对话框"
+    },
+    "showWeekNumber": {
+      "name": "显示周数",
+      "description": "在日历左侧显示周数"
     },
     "openCalendar": {
       "name": "打开日历视图",
@@ -102,6 +128,23 @@
       "name": "刷新插件",
       "description": "刷新日历视图以应用最新设置",
       "buttonText": "刷新"
+    },
+    "weekNoteEnabled": {
+      "name": "启用周记",
+      "description": "点击周数时创建或打开周记"
+    },
+    "weekNoteTemplate": {
+      "name": "周记模板",
+      "description": "周记模板文件路径（留空使用默认样式）"
+    },
+    "weekNoteFolder": {
+      "name": "周记文件夹",
+      "description": "周记存放的文件夹路径（留空存放在根目录）"
+    },
+    "weekNoteFormat": {
+      "name": "周记命名格式",
+      "description": "使用 YYYY 代表年份，WW 代表周数，用 [] 括起来的内容会原样显示。例如：YYYY-[W]WW 会生成 2024-W01.md",
+      "placeholder": "YYYY-[W]WW"
     }
   },
   "commands": {
@@ -112,7 +155,8 @@
   },
   "notifications": {
     "dailyNotesNotEnabled": "请先启用日记核心插件",
-    "dailyNotesCreateFailed": "创建日记失败，请检查日记插件设置"
+    "dailyNotesCreateFailed": "创建日记失败，请检查日记插件设置",
+    "weekNoteCreateFailed": "创建周记失败"
   },
   "modal": {
     "confirmTitle": "创建日记",
