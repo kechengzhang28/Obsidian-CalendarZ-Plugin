@@ -288,7 +288,12 @@ let {
 				</div>
 			{/if}
 		{/if}
-		{#each row.cells as cell (cell.dateStr)}
+		<!-- 
+			Key includes current month to prevent DOM reuse across months.
+			This fixes a flickering issue where other-month dates briefly 
+			appeared with wrong color during month navigation.
+		-->
+		{#each row.cells as cell (`${cell.dateStr}-${currentDate.getMonth()}`)}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<div
 				class={getDayClasses(cell)}
