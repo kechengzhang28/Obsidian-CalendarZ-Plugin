@@ -61,6 +61,10 @@ async function detectTodosInFile(app: App, file: TFile): Promise<TodoStatus> {
 export class TodoService {
 	private cache = new Map<string, CacheEntry>();
 	private readonly MAX_CACHE_SIZE = 100;
+	/** Cache for compiled week note regex patterns */
+	private weekNoteRegexCache = new Map<string, RegExp>();
+	/** Maximum number of files to process concurrently */
+	private readonly CONCURRENT_BATCH_SIZE = 10;
 
 	constructor(private app: App) {}
 
@@ -111,20 +115,39 @@ export class TodoService {
 	}
 
 	/**
+	 * Process items in batches to limit concurrent operations.
+	 * Prevents I/O blocking when processing large numbers of files.
+	 */
+	private async batchProcess<T, R>(
+		items: T[],
+		processor: (item: T) => Promise<R>,
+		batchSize: number = this.CONCURRENT_BATCH_SIZE
+	): Promise<R[]> {
+		const results: R[] = [];
+		for (let i = 0; i < items.length; i += batchSize) {
+			const batch = items.slice(i, i + batchSize);
+			const batchResults = await Promise.all(batch.map(processor));
+			results.push(...batchResults);
+		}
+		return results;
+	}
+
+	/**
 	 * Fetches todo statuses for all daily notes
 	 */
 	async fetchDailyTodoStatuses(settings: CalendarZSettings): Promise<DateTodoStatus[]> {
 		const files = this.app.vault.getMarkdownFiles();
 
-		// Pre-filter files to reduce concurrent processing overhead
+		// Pre-filter files to reduce processing overhead
 		const candidateFiles = files.filter(file => {
 			if (isPathIgnored(file.path, settings.ignoredFolders)) return false;
 			return this.extractDateFromFile(file, settings) !== null;
 		});
 
-		// Process files concurrently for better performance
-		const results = await Promise.all(
-			candidateFiles.map(async (file) => {
+		// Process files in batches to limit concurrent I/O
+		const results = await this.batchProcess(
+			candidateFiles,
+			async (file) => {
 				const dateStr = this.extractDateFromFile(file, settings)!;
 				const todoStatus = await this.getTodoStatus(file);
 				return todoStatus.hasTodos ? {
@@ -132,7 +155,7 @@ export class TodoService {
 					hasTodos: true,
 					allCompleted: todoStatus.allCompleted,
 				} : null;
-			})
+			}
 		);
 
 		return results.filter((item): item is DateTodoStatus => item !== null);
@@ -144,15 +167,16 @@ export class TodoService {
 	async fetchWeekTodoStatuses(settings: CalendarZSettings): Promise<WeekTodoStatus[]> {
 		const files = this.app.vault.getMarkdownFiles();
 
-		// Pre-filter files to reduce concurrent processing overhead
+		// Pre-filter files to reduce processing overhead
 		const candidateFiles = files.filter(file => {
 			if (isPathIgnored(file.path, settings.ignoredFolders)) return false;
 			return this.extractWeekKeyFromPath(file.path, settings) !== null;
 		});
 
-		// Process files concurrently for better performance
-		const results = await Promise.all(
-			candidateFiles.map(async (file) => {
+		// Process files in batches to limit concurrent I/O
+		const results = await this.batchProcess(
+			candidateFiles,
+			async (file) => {
 				const todoStatus = await this.getTodoStatus(file);
 				if (!todoStatus.hasTodos) return null;
 
@@ -162,7 +186,7 @@ export class TodoService {
 					hasTodos: true,
 					allCompleted: todoStatus.allCompleted,
 				} : null;
-			})
+			}
 		);
 
 		return results.filter((item): item is WeekTodoStatus => item !== null);
@@ -197,6 +221,26 @@ export class TodoService {
 	}
 
 	/**
+	 * Gets or creates a cached regex for week note format.
+	 * Avoids recompiling the same regex pattern repeatedly.
+	 */
+	private getWeekNoteRegex(format: string): RegExp {
+		const cached = this.weekNoteRegexCache.get(format);
+		if (cached) return cached;
+
+		const regexPattern = format
+			.replace(/\[/g, "\\[")
+			.replace(/\]/g, "\\]")
+			.replace(/YYYY/g, "(\\d{4})")
+			.replace(/WW/g, "(\\d{2})")
+			.replace(/\\\[([^\\\]]+)\\\]/g, "$1");
+
+		const regex = new RegExp(`^${regexPattern}$`);
+		this.weekNoteRegexCache.set(format, regex);
+		return regex;
+	}
+
+	/**
 	 * Extracts week key from file path if it's a week note
 	 */
 	private extractWeekKeyFromPath(filePath: string, settings: CalendarZSettings): string | null {
@@ -211,14 +255,8 @@ export class TodoService {
 			filename = filename.slice(0, -3);
 		}
 
-		const regexPattern = format
-			.replace(/\[/g, "\\[")
-			.replace(/\]/g, "\\]")
-			.replace(/YYYY/g, "(\\d{4})")
-			.replace(/WW/g, "(\\d{2})")
-			.replace(/\\\[([^\\\]]+)\\\]/g, "$1");
-
-		const regex = new RegExp(`^${regexPattern}$`);
+		// Use cached regex to avoid recompiling
+		const regex = this.getWeekNoteRegex(format);
 		const match = filename.match(regex);
 		if (!match) return null;
 

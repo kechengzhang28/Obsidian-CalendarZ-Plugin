@@ -7,6 +7,7 @@ import type { CalendarZViewDeps } from "./ui/view/CalendarZView";
 import {loadI18n} from "./i18n";
 import type {I18n} from "./i18n";
 import { TodoService } from "./services/todos/TodoService";
+import { NoteCounter } from "./services/notes/NoteCounter";
 
 /**
  * Main plugin class for CalendarZ.
@@ -18,12 +19,14 @@ export default class CalendarZ extends Plugin {
 	private previousCaches = new Map<string, CachedMetadata>();
 	private fileMtimes = new Map<string, number>();
 	private todoService: TodoService;
+	private noteCounter: NoteCounter;
 	private readonly MAX_CACHE_SIZE = 1000;
 
 	async onload() {
 		await this.loadSettings();
 		this.loadI18n();
 		this.todoService = new TodoService(this.app);
+		this.noteCounter = new NoteCounter(this.app);
 
 		this.registerView(
 			CALENDARZ_VIEW_TYPE,
@@ -158,6 +161,7 @@ export default class CalendarZ extends Plugin {
 				getI18n: () => this.i18n,
 				settings: this.settings,
 				todoService: this.todoService,
+				noteCounter: this.noteCounter,
 			},
 		};
 	}
@@ -189,6 +193,11 @@ export default class CalendarZ extends Plugin {
 		// Clear todo service cache
 		if (this.todoService) {
 			this.todoService.clearCache();
+		}
+
+		// Clear note counter cache
+		if (this.noteCounter) {
+			this.noteCounter.clearCache();
 		}
 	}
 }

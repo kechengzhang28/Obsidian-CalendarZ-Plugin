@@ -10,6 +10,12 @@ import { isPathIgnored } from "../../utils/path";
 import type { CalendarZSettings } from "../../core/types";
 import { DATE_SOURCE, STATISTICS_TYPE } from "../../core/constants";
 
+/** Cache entry for word count with mtime for invalidation */
+interface WordCountCacheEntry {
+	mtime: number;
+	count: number;
+}
+
 /**
  * Extracts date from file metadata cache (avoids disk I/O)
  */
@@ -66,7 +72,58 @@ function countByDate<T>(
 }
 
 export class NoteCounter {
+	/** Cache for word counts to avoid re-reading unchanged files */
+	private wordCountCache = new Map<string, WordCountCacheEntry>();
+	/** Maximum cache size to prevent memory leaks */
+	private readonly MAX_CACHE_SIZE = 1000;
+
 	constructor(private app: App) {}
+
+	/**
+	 * Gets word count for a file with caching based on mtime.
+	 * Avoids re-reading files that haven't changed.
+	 */
+	private async getWordCountWithCache(file: TFile): Promise<number> {
+		const cached = this.wordCountCache.get(file.path);
+
+		// Return cached count if file hasn't changed
+		if (cached && cached.mtime === file.stat.mtime) {
+			return cached.count;
+		}
+
+		// Read file and compute word count
+		const content = await this.app.vault.cachedRead(file);
+		const count = countWords(content);
+
+		// Update cache
+		this.wordCountCache.set(file.path, { mtime: file.stat.mtime, count });
+
+		// Enforce cache size limit
+		this.enforceCacheSizeLimit();
+
+		return count;
+	}
+
+	/**
+	 * Enforces cache size limit to prevent memory leaks.
+	 * Removes oldest entries when cache exceeds MAX_CACHE_SIZE.
+	 */
+	private enforceCacheSizeLimit(): void {
+		if (this.wordCountCache.size > this.MAX_CACHE_SIZE) {
+			const first = this.wordCountCache.keys().next();
+			if (!first.done && typeof first.value === "string") {
+				this.wordCountCache.delete(first.value);
+			}
+		}
+	}
+
+	/**
+	 * Clears the word count cache.
+	 * Should be called when the plugin is unloaded.
+	 */
+	clearCache(): void {
+		this.wordCountCache.clear();
+	}
 
 	/**
 	 * Gets note counts based on current settings
@@ -128,8 +185,7 @@ export class NoteCounter {
 			if (isPathIgnored(file.path, settings.ignoredFolders)) continue;
 			const date = extractDateFromMetadataCache(file, this.app.metadataCache, settings.dateFieldName);
 			if (!date) continue;
-			const content = await this.app.vault.cachedRead(file);
-			const wordCount = countWords(content);
+			const wordCount = await this.getWordCountWithCache(file);
 			const dateStr = formatDate(date);
 			counts.set(dateStr, (counts.get(dateStr) || 0) + wordCount);
 		}
@@ -145,8 +201,7 @@ export class NoteCounter {
 			if (isPathIgnored(file.path, settings.ignoredFolders)) continue;
 			const date = parseDateFromFilename(file.name.replace(/\.[^/.]+$/, ""), settings.filenameDateFormat);
 			if (!date) continue;
-			const content = await this.app.vault.cachedRead(file);
-			const wordCount = countWords(content);
+			const wordCount = await this.getWordCountWithCache(file);
 			const dateStr = formatDate(date);
 			counts.set(dateStr, (counts.get(dateStr) || 0) + wordCount);
 		}

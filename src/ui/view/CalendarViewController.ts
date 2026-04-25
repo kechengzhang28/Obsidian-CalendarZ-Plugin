@@ -19,11 +19,12 @@ import { NoteCounter, TodoService, DailyNoteService, WeekNoteService } from "../
 export interface CalendarViewControllerDeps {
 	app: App;
 	/** Plugin instance for accessing dynamic i18n and settings */
-	plugin: { 
+	plugin: {
 		/** Get current i18n - use getter to always get latest */
-		getI18n: () => I18nLike; 
-		settings: CalendarZSettings; 
-		todoService?: TodoService 
+		getI18n: () => I18nLike;
+		settings: CalendarZSettings;
+		todoService?: TodoService;
+		noteCounter?: NoteCounter;
 	};
 }
 
@@ -35,7 +36,7 @@ export class CalendarViewController {
 	private currentDate = new Date();
 
 	constructor(private deps: CalendarViewControllerDeps) {
-		this.noteCounter = new NoteCounter(deps.app);
+		this.noteCounter = deps.plugin.noteCounter ?? new NoteCounter(deps.app);
 		this.todoService = deps.plugin.todoService ?? new TodoService(deps.app);
 		this.dailyNoteService = new DailyNoteService(deps.app);
 		this.weekNoteService = new WeekNoteService(deps.app);

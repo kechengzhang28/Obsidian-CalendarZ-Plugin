@@ -24,41 +24,35 @@
 		showWeekNumber: boolean;
 		weekNoteEnabled: boolean;
 		dateCounts: DateCount[];
-		todoStatuses: DateTodoStatus[];
-		weekTodoStatuses: WeekTodoStatus[];
-		onDayClick: (date: Date) => void;
-		onWeekClick: (date: Date) => void;
-		hasWeekNote?: (date: Date) => boolean;
-	}
+	todoStatuses: DateTodoStatus[];
+	weekTodoStatuses: WeekTodoStatus[];
+	countsMap: Map<string, number>;
+	todoMap: Map<string, DateTodoStatus>;
+	weekTodoMap: Map<string, WeekTodoStatus>;
+	onDayClick: (date: Date) => void;
+	onWeekClick: (date: Date) => void;
+	hasWeekNote?: (date: Date) => boolean;
+}
 
-	let {
-		currentDate,
-		weekStart,
-		displayMode,
-		dotThreshold,
-		heatmapMaxNotes,
-		heatmapHideDateNumbers,
-		showWeekNumber,
-		weekNoteEnabled,
-		dateCounts,
-		todoStatuses,
-		weekTodoStatuses,
-		onDayClick,
-		onWeekClick,
-		hasWeekNote,
-	}: Props = $props();
-
-	const countsMap = $derived(
-		new Map(dateCounts.map((d) => [d.date, d.count]))
-	);
-
-	const todoMap = $derived(
-		new Map(todoStatuses.map((t) => [t.date, t]))
-	);
-
-	const weekTodoMap = $derived(
-		new Map(weekTodoStatuses.map((t) => [t.weekKey, t]))
-	);
+let {
+	currentDate,
+	weekStart,
+	displayMode,
+	dotThreshold,
+	heatmapMaxNotes,
+	heatmapHideDateNumbers,
+	showWeekNumber,
+	weekNoteEnabled,
+	dateCounts,
+	todoStatuses,
+	weekTodoStatuses,
+	countsMap,
+	todoMap,
+	weekTodoMap,
+	onDayClick,
+	onWeekClick,
+	hasWeekNote,
+}: Props = $props();
 
 	const today = $derived(dayjs());
 

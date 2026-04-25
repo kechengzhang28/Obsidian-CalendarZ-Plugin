@@ -24,11 +24,12 @@ export interface CalendarZViewDeps {
 	/** Obsidian app instance */
 	app: App;
 	/** Plugin instance for accessing dynamic i18n and settings */
-	plugin: { 
+	plugin: {
 		/** Get current i18n - use getter to always get latest */
-		getI18n: () => I18n; 
-		settings: CalendarZSettings; 
-		todoService?: import("../../services/todos/TodoService").TodoService 
+		getI18n: () => I18n;
+		settings: CalendarZSettings;
+		todoService?: import("../../services/todos/TodoService").TodoService;
+		noteCounter?: import("../../services/notes/NoteCounter").NoteCounter;
 	};
 }
 

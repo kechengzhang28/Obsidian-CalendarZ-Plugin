@@ -36,6 +36,11 @@
 	const todoStatuses = $derived(state.todoStatuses);
 	const weekTodoStatuses = $derived(state.weekTodoStatuses);
 
+	// Use pre-computed Maps from state to avoid recreating them
+	const countsMap = $derived(state.countsMap);
+	const todoMap = $derived(state.todoMap);
+	const weekTodoMap = $derived(state.weekTodoMap);
+
 	// Determine which thresholds to use based on statistics type
 	const isWordCount = $derived(settings?.statisticsType === STATISTICS_TYPE.WORD_COUNT);
 	const effectiveDotThreshold = $derived(
@@ -73,6 +78,9 @@
 			{dateCounts}
 			{todoStatuses}
 			{weekTodoStatuses}
+			{countsMap}
+			{todoMap}
+			{weekTodoMap}
 			{onDayClick}
 			{onWeekClick}
 			{hasWeekNote}
