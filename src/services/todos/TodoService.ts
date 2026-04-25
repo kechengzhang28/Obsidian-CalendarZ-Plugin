@@ -50,7 +50,7 @@ function detectTodosInContent(content: string): TodoStatus {
 
 async function detectTodosInFile(app: App, file: TFile): Promise<TodoStatus> {
 	try {
-		const content = await app.vault.read(file);
+		const content = await app.vault.cachedRead(file);
 		return detectTodosInContent(content);
 	} catch (error) {
 		console.error("Failed to read file for todo detection:", error);
@@ -114,52 +114,58 @@ export class TodoService {
 	 * Fetches todo statuses for all daily notes
 	 */
 	async fetchDailyTodoStatuses(settings: CalendarZSettings): Promise<DateTodoStatus[]> {
-		const statuses: DateTodoStatus[] = [];
 		const files = this.app.vault.getMarkdownFiles();
 
-		for (const file of files) {
-			if (isPathIgnored(file.path, settings.ignoredFolders)) continue;
+		// Pre-filter files to reduce concurrent processing overhead
+		const candidateFiles = files.filter(file => {
+			if (isPathIgnored(file.path, settings.ignoredFolders)) return false;
+			return this.extractDateFromFile(file, settings) !== null;
+		});
 
-			const dateStr = this.extractDateFromFile(file, settings);
-			if (!dateStr) continue;
-
-			const todoStatus = await this.getTodoStatus(file);
-			if (todoStatus.hasTodos) {
-				statuses.push({
+		// Process files concurrently for better performance
+		const results = await Promise.all(
+			candidateFiles.map(async (file) => {
+				const dateStr = this.extractDateFromFile(file, settings)!;
+				const todoStatus = await this.getTodoStatus(file);
+				return todoStatus.hasTodos ? {
 					date: dateStr,
 					hasTodos: true,
 					allCompleted: todoStatus.allCompleted,
-				});
-			}
-		}
+				} : null;
+			})
+		);
 
-		return statuses;
+		return results.filter((item): item is DateTodoStatus => item !== null);
 	}
 
 	/**
 	 * Fetches todo statuses for all week notes
 	 */
 	async fetchWeekTodoStatuses(settings: CalendarZSettings): Promise<WeekTodoStatus[]> {
-		const statuses: WeekTodoStatus[] = [];
 		const files = this.app.vault.getMarkdownFiles();
 
-		for (const file of files) {
-			if (isPathIgnored(file.path, settings.ignoredFolders)) continue;
+		// Pre-filter files to reduce concurrent processing overhead
+		const candidateFiles = files.filter(file => {
+			if (isPathIgnored(file.path, settings.ignoredFolders)) return false;
+			return this.extractWeekKeyFromPath(file.path, settings) !== null;
+		});
 
-			const todoStatus = await this.getTodoStatus(file);
-			if (!todoStatus.hasTodos) continue;
+		// Process files concurrently for better performance
+		const results = await Promise.all(
+			candidateFiles.map(async (file) => {
+				const todoStatus = await this.getTodoStatus(file);
+				if (!todoStatus.hasTodos) return null;
 
-			const weekKey = this.extractWeekKeyFromPath(file.path, settings);
-			if (weekKey) {
-				statuses.push({
+				const weekKey = this.extractWeekKeyFromPath(file.path, settings);
+				return weekKey ? {
 					weekKey,
 					hasTodos: true,
 					allCompleted: todoStatus.allCompleted,
-				});
-			}
-		}
+				} : null;
+			})
+		);
 
-		return statuses;
+		return results.filter((item): item is WeekTodoStatus => item !== null);
 	}
 
 	/**
