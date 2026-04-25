@@ -40,6 +40,12 @@
 	padding: 4px 0px;
 	border-radius: 4px;
 	box-shadow: none !important;
+	transition: all 0.15s ease;
+}
+
+.calendarz-nav-btn:hover {
+	background-color: var(--background-modifier-hover) !important;
+	color: var(--text-normal);
 }
 
 .calendarz-month-year {
@@ -49,10 +55,20 @@
 
 .calendarz-month-clickable {
 	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.calendarz-month-clickable:hover {
+	opacity: 0.7;
 }
 
 .calendarz-year-clickable {
 	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.calendarz-year-clickable:hover {
+	opacity: 0.7;
 }
 
 .calendarz-month {
@@ -74,10 +90,16 @@
 	color: var(--text-muted);
 	border: none !important;
 	border-radius: 4px;
-	padding: 4px 0px;
+	padding: 4px 8px;
 	font-size: 12px;
 	cursor: pointer;
 	box-shadow: none !important;
+	transition: all 0.15s ease;
+}
+
+.calendarz-today-btn:hover {
+	background-color: var(--background-modifier-hover) !important;
+	color: var(--text-normal);
 }
 
 .calendarz-weekdays {
