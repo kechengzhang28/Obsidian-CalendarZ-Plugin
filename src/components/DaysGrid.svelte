@@ -23,16 +23,18 @@
 		heatmapHideDateNumbers: boolean;
 		showWeekNumber: boolean;
 		weekNoteEnabled: boolean;
+		hideCompletedTodos: boolean;
+		isWordCount: boolean;
 		dateCounts: DateCount[];
-	todoStatuses: DateTodoStatus[];
-	weekTodoStatuses: WeekTodoStatus[];
-	countsMap: Map<string, number>;
-	todoMap: Map<string, DateTodoStatus>;
-	weekTodoMap: Map<string, WeekTodoStatus>;
-	onDayClick: (date: Date) => void;
-	onWeekClick: (date: Date) => void;
-	hasWeekNote?: (date: Date) => boolean;
-}
+		todoStatuses: DateTodoStatus[];
+		weekTodoStatuses: WeekTodoStatus[];
+		countsMap: Map<string, number>;
+		todoMap: Map<string, DateTodoStatus>;
+		weekTodoMap: Map<string, WeekTodoStatus>;
+		onDayClick: (date: Date) => void;
+		onWeekClick: (date: Date) => void;
+		hasWeekNote?: (date: Date) => boolean;
+	}
 
 let {
 	currentDate,
@@ -43,6 +45,8 @@ let {
 	heatmapHideDateNumbers,
 	showWeekNumber,
 	weekNoteEnabled,
+	hideCompletedTodos,
+	isWordCount,
 	dateCounts,
 	todoStatuses,
 	weekTodoStatuses,
@@ -246,12 +250,16 @@ let {
 	}
 
 	function hasTodoStatus(cell: DayCell): boolean {
-		return todoMap.has(cell.dateStr);
+		const todoStatus = todoMap.get(cell.dateStr);
+		if (!todoStatus) return false;
+		if (hideCompletedTodos && todoStatus.allCompleted) return false;
+		return true;
 	}
 
 	function getWeekTodoStatusClass(row: { weekNumber: number; weekKey: string; cells: DayCell[] }): string {
 		const weekTodoStatus = weekTodoMap.get(row.weekKey);
 		if (!weekTodoStatus) return "";
+		if (hideCompletedTodos && weekTodoStatus.allCompleted) return "";
 
 		if (weekTodoStatus.allCompleted) {
 			return CSS_CLASSES.TODO_CIRCLE_FILLED;
@@ -261,7 +269,10 @@ let {
 	}
 
 	function hasWeekTodoStatus(row: { weekNumber: number; weekKey: string; cells: DayCell[] }): boolean {
-		return weekTodoMap.has(row.weekKey);
+		const weekTodoStatus = weekTodoMap.get(row.weekKey);
+		if (!weekTodoStatus) return false;
+		if (hideCompletedTodos && weekTodoStatus.allCompleted) return false;
+		return true;
 	}
 </script>
 
@@ -314,7 +325,7 @@ let {
 				data-date={cell.dateStr}
 				data-count={cell.count > 0 ? cell.count : undefined}
 				aria-label={cell.count > 0 || cell.isBeforeToday
-					? `${cell.dateStr}: ${cell.count} ${statisticsType === "wordCount" ? "words" : "notes"}`
+					? `${cell.dateStr}: ${cell.count} ${isWordCount ? "words" : "notes"}`
 					: undefined}
 				role="button"
 				tabindex="0"

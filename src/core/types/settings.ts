@@ -71,4 +71,6 @@ export interface CalendarZSettings {
 	weekNoteFolder: string;
 	/** Week note naming format pattern (e.g., "YYYY-[W]WW", "YYYYWW", "[Week] WW, YYYY") */
 	weekNoteFormat: string;
+	/** Whether to hide todo dots for completed todos */
+	hideCompletedTodos: boolean;
 }

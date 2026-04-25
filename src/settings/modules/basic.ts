@@ -64,4 +64,14 @@ export function renderBasicSettings(containerEl: HTMLElement, plugin: PluginLike
 		value: plugin.settings.showWeekNumber,
 		onChange: handleShowWeekNumberChange,
 	});
+
+	// Hide completed todos setting
+	const hideCompletedTodosRenderer = new ToggleSettingRenderer(plugin);
+	const handleHideCompletedTodosChange = createSettingHandler({ plugin, settingKey: "hideCompletedTodos" });
+	hideCompletedTodosRenderer.render(contentEl, {
+		name: ts(plugin, "hideCompletedTodos", "name"),
+		description: ts(plugin, "hideCompletedTodos", "description"),
+		value: plugin.settings.hideCompletedTodos,
+		onChange: handleHideCompletedTodosChange,
+	});
 }

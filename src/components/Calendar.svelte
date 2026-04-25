@@ -75,6 +75,8 @@
 			heatmapHideDateNumbers={settings.heatmapHideDateNumbers}
 			showWeekNumber={settings.showWeekNumber}
 			weekNoteEnabled={settings.weekNoteEnabled}
+			hideCompletedTodos={settings.hideCompletedTodos}
+			isWordCount={isWordCount}
 			{dateCounts}
 			{todoStatuses}
 			{weekTodoStatuses}
