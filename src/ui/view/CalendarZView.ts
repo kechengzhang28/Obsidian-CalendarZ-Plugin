@@ -10,7 +10,6 @@ import { ItemView, WorkspaceLeaf, App } from "obsidian";
 import { mount, unmount } from "svelte";
 import type { I18n } from "../../i18n";
 import type { CalendarZSettings } from "../../core/types";
-import type { I18nLike } from "../../core/types";
 import { CalendarViewController } from "./CalendarViewController";
 import Calendar from "../../components/Calendar.svelte";
 import type { DateCount } from "../../components/types";
@@ -22,16 +21,10 @@ export const CALENDARZ_VIEW_TYPE = "calendarz-view";
  * Dependencies required by the CalendarZ view
  */
 export interface CalendarZViewDeps {
-	/** Plugin settings */
-	settings: CalendarZSettings;
 	/** Obsidian app instance */
 	app: App;
-	/** Internationalization strings */
-	i18n: I18n;
-	/** Plugin instance for accessing i18n dynamically */
+	/** Plugin instance for accessing dynamic i18n and settings */
 	plugin: { i18n: I18n; settings: CalendarZSettings };
-	/** Callback to refresh the view */
-	refreshView(): void;
 }
 
 /**
@@ -43,12 +36,7 @@ export class CalendarZView extends ItemView {
 
 	constructor(leaf: WorkspaceLeaf, deps: CalendarZViewDeps) {
 		super(leaf);
-		const controllerDeps = {
-			settings: deps.settings,
-			app: deps.app,
-			i18n: deps.i18n as unknown as I18nLike,
-		};
-		this.controller = new CalendarViewController(controllerDeps);
+		this.controller = new CalendarViewController(deps);
 	}
 
 	private get settings(): CalendarZSettings {

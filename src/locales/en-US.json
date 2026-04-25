@@ -159,8 +159,8 @@
     "weekNoteCreateFailed": "Failed to create week note"
   },
   "modal": {
-    "confirmTitle": "Create Daily Note",
-    "confirmMessage": "Create daily note for {{date}}?",
+    "confirmTitle": "Create Note",
+    "confirmMessage": "Create note for {{date}}?",
     "cancelButton": "Cancel",
     "createButton": "Create"
   }

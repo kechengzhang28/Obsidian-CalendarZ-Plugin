@@ -17,9 +17,9 @@ import type { DateCount, DateTodoStatus, WeekTodoStatus } from "../../components
 import { NoteCounter, TodoService, DailyNoteService, WeekNoteService } from "../../services";
 
 export interface CalendarViewControllerDeps {
-	settings: CalendarZSettings;
 	app: App;
-	i18n: I18nLike;
+	/** Plugin instance for accessing dynamic i18n and settings */
+	plugin: { i18n: I18nLike; settings: CalendarZSettings };
 }
 
 export class CalendarViewController {
@@ -36,12 +36,14 @@ export class CalendarViewController {
 		this.weekNoteService = new WeekNoteService(deps.app);
 	}
 
+	/** Dynamically get current settings from plugin */
 	get settings(): CalendarZSettings {
-		return this.deps.settings;
+		return this.deps.plugin.settings;
 	}
 
+	/** Dynamically get current i18n from plugin */
 	get i18n(): I18nLike {
-		return this.deps.i18n;
+		return this.deps.plugin.i18n;
 	}
 
 	get app(): App {

@@ -31,10 +31,10 @@ export class IgnoredFoldersModal extends Modal {
 		let folderInput: HTMLInputElement;
 
 		new Setting(addSection)
-			.setName(t.addFolderLabel ?? "Add folder")
+			.setName(t.addNewFolder ?? "Add folder")
 			.addText(text => {
 				folderInput = text.inputEl;
-				text.setPlaceholder(t.folderPlaceholder ?? "folder/path");
+				text.setPlaceholder(t.placeholder ?? "folder/path");
 			});
 
 		new Setting(addSection)
@@ -52,7 +52,7 @@ export class IgnoredFoldersModal extends Modal {
 					});
 			});
 
-		contentEl.createEl("h4", { text: t.currentFoldersLabel ?? "Current folders", cls: "calendarz-modal-section-title" });
+		contentEl.createEl("h4", { text: t.currentlyIgnored ?? "Current folders", cls: "calendarz-modal-section-title" });
 		this.folderListEl = contentEl.createDiv({ cls: "calendarz-modal-folder-list" });
 		void this.renderFolderList();
 
@@ -76,7 +76,7 @@ export class IgnoredFoldersModal extends Modal {
 
 		if (this.ignoredFolders.length === 0) {
 			this.folderListEl.createEl("p", {
-				text: t.noFolders ?? "No folders ignored",
+				text: t.empty ?? "No folders ignored",
 				cls: "calendarz-modal-empty"
 			});
 			return;
@@ -100,6 +100,7 @@ export class IgnoredFoldersModal extends Modal {
 	}
 
 	onClose(): void {
-		this.contentEl.empty();
+		const { contentEl } = this;
+		contentEl.empty();
 	}
 }
