@@ -243,9 +243,9 @@ let {
 		if (!todoStatus) return "";
 
 		if (todoStatus.allCompleted) {
-			return CSS_CLASSES.TODO_CIRCLE_FILLED;
+			return `${CSS_CLASSES.TODO} ${CSS_CLASSES.TODO_COMPLETED}`;
 		} else {
-			return CSS_CLASSES.TODO_CIRCLE_EMPTY;
+			return `${CSS_CLASSES.TODO} ${CSS_CLASSES.TODO_PENDING}`;
 		}
 	}
 
@@ -262,9 +262,9 @@ let {
 		if (hideCompletedTodos && weekTodoStatus.allCompleted) return "";
 
 		if (weekTodoStatus.allCompleted) {
-			return CSS_CLASSES.TODO_CIRCLE_FILLED;
+			return `${CSS_CLASSES.TODO} ${CSS_CLASSES.TODO_COMPLETED}`;
 		} else {
-			return CSS_CLASSES.TODO_CIRCLE_EMPTY;
+			return `${CSS_CLASSES.TODO} ${CSS_CLASSES.TODO_PENDING}`;
 		}
 	}
 
@@ -276,7 +276,7 @@ let {
 	}
 </script>
 
-<div class={CSS_CLASSES.DAYS} class:calendarz-days-with-week={showWeekNumber}>
+<div class={CSS_CLASSES.DAYS} class:calendarz__days--with-week={showWeekNumber}>
 	{#each rows as row (row.cells[0]?.dateStr ?? `${getYearMonth(currentDate)}-week-${row.weekNumber}`)}
 		{#if showWeekNumber}
 			{#if weekNoteEnabled}
@@ -289,14 +289,14 @@ let {
 				>
 					{row.weekNumber}
 					{#if getWeekNoteDotType(row) || hasWeekTodoStatus(row)}
-						<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
+						<div class={CSS_CLASSES.DOTS} aria-hidden="true">
 							{#if getWeekNoteDotType(row) === "normal"}
 								<div class={CSS_CLASSES.DOT}></div>
 							{:else if getWeekNoteDotType(row) === "gray"}
-								<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_GRAY}"></div>
+								<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_MUTED}"></div>
 							{/if}
 							{#if hasWeekTodoStatus(row)}
-								<div class="{getWeekTodoStatusClass(row)}"></div>
+								<div class={getWeekTodoStatusClass(row)}></div>
 							{/if}
 						</div>
 					{/if}
@@ -305,8 +305,8 @@ let {
 				<div class={CSS_CLASSES.WEEK_NUMBER}>
 					{row.weekNumber}
 					{#if hasWeekTodoStatus(row)}
-						<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
-							<div class="{getWeekTodoStatusClass(row)}"></div>
+						<div class={CSS_CLASSES.DOTS} aria-hidden="true">
+							<div class={getWeekTodoStatusClass(row)}></div>
 						</div>
 					{/if}
 				</div>
@@ -336,18 +336,18 @@ let {
 				{/if}
 
 				{#if getDotCount(cell) > 0 || showGrayDot(cell) || (showTodayIndicator(cell) && !heatmapHideDateNumbers) || hasTodoStatus(cell)}
-					<div class={CSS_CLASSES.DOTS_CONTAINER} aria-hidden="true">
+					<div class={CSS_CLASSES.DOTS} aria-hidden="true">
 						{#if showTodayIndicator(cell)}
-							<div class="{CSS_CLASSES.BAR_TODAY}"></div>
+							<div class="{CSS_CLASSES.INDICATOR} {CSS_CLASSES.INDICATOR_BAR}"></div>
 						{:else if showGrayDot(cell)}
-							<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_GRAY}"></div>
+							<div class="{CSS_CLASSES.DOT} {CSS_CLASSES.DOT_MUTED}"></div>
 						{:else}
 							{#each Array(getDotCount(cell)) as _, i (i)}
 								<div class={CSS_CLASSES.DOT}></div>
 							{/each}
 						{/if}
 						{#if hasTodoStatus(cell)}
-							<div class="{getTodoStatusClass(cell)}"></div>
+							<div class={getTodoStatusClass(cell)}></div>
 						{/if}
 					</div>
 				{/if}

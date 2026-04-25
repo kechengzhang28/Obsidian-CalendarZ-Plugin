@@ -3,6 +3,7 @@
 	import { formatMonth } from "../utils/date";
 	import type { I18n } from "../i18n";
 	import type { MonthFormat, TitleFormat } from "../core/types";
+	import { CSS_CLASSES } from "../core/constants";
 
 	interface Props {
 		i18n: I18n;
@@ -43,13 +44,13 @@
 	);
 </script>
 
-<div class="calendarz-header">
-	<div class="calendarz-month-year">
+<div class={CSS_CLASSES.HEADER}>
+	<div class={CSS_CLASSES.HEADER_TITLE}>
 		{#if titleFormat === "yearMonth"}
 			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 			<span
-				class="calendarz-year"
-				class:calendarz-year-clickable={yearNoteEnabled}
+				class={CSS_CLASSES.YEAR}
+				class:calendarz__year--clickable={yearNoteEnabled}
 				onclick={yearNoteEnabled ? onYearClick : undefined}
 				role={yearNoteEnabled ? "button" : undefined}
 			>
@@ -57,8 +58,8 @@
 			</span>
 			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 			<span
-				class="calendarz-month"
-				class:calendarz-month-clickable={monthNoteEnabled}
+				class={CSS_CLASSES.MONTH}
+				class:calendarz__month--clickable={monthNoteEnabled}
 				onclick={monthNoteEnabled ? onMonthClick : undefined}
 				role={monthNoteEnabled ? "button" : undefined}
 			>
@@ -67,8 +68,8 @@
 		{:else}
 			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 			<span
-				class="calendarz-month"
-				class:calendarz-month-clickable={monthNoteEnabled}
+				class={CSS_CLASSES.MONTH}
+				class:calendarz__month--clickable={monthNoteEnabled}
 				onclick={monthNoteEnabled ? onMonthClick : undefined}
 				role={monthNoteEnabled ? "button" : undefined}
 			>
@@ -76,8 +77,8 @@
 			</span>
 			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 			<span
-				class="calendarz-year"
-				class:calendarz-year-clickable={yearNoteEnabled}
+				class={CSS_CLASSES.YEAR}
+				class:calendarz__year--clickable={yearNoteEnabled}
 				onclick={yearNoteEnabled ? onYearClick : undefined}
 				role={yearNoteEnabled ? "button" : undefined}
 			>
@@ -87,7 +88,7 @@
 	</div>
 
 	<button
-		class="calendarz-nav-btn"
+		class="{CSS_CLASSES.BTN} {CSS_CLASSES.BTN_NAV}"
 		onclick={onPrevMonth}
 		aria-label="Previous month"
 		type="button"
@@ -98,7 +99,7 @@
 	</button>
 
 	<button
-		class="calendarz-today-btn"
+		class="{CSS_CLASSES.BTN} {CSS_CLASSES.BTN_TODAY}"
 		onclick={onToday}
 		type="button"
 	>
@@ -106,7 +107,7 @@
 	</button>
 
 	<button
-		class="calendarz-nav-btn"
+		class="{CSS_CLASSES.BTN} {CSS_CLASSES.BTN_NAV}"
 		onclick={onNextMonth}
 		aria-label="Next month"
 		type="button"

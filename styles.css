@@ -1,293 +1,366 @@
-/* CalendarZ Plugin Styles */
+/* ============================================
+   CalendarZ Plugin Styles
+   Naming Convention: BEM (Block Element Modifier)
+   ============================================ */
 
-.calendarz-container {
-	padding: 8px !important;
+/* ------------------------------------------
+   CSS Custom Properties (Variables)
+   ------------------------------------------ */
+.calendarz {
+	/* Colors */
+	--calz-color-primary: var(--interactive-accent);
+	--calz-color-text: var(--text-normal);
+	--calz-color-text-muted: var(--text-muted);
+	--calz-color-text-accent: var(--text-accent);
+	--calz-color-bg-hover: var(--background-modifier-hover);
+	--calz-color-bg-empty: var(--background-modifier-border-hover);
+
+	/* Spacing Scale (base 2px) */
+	--calz-space-xs: 2px;
+	--calz-space-sm: 4px;
+	--calz-space-md: 8px;
+	--calz-space-lg: 12px;
+	--calz-space-xl: 24px;
+
+	/* Typography */
+	--calz-font-size-xs: 11px;
+	--calz-font-size-sm: 12px;
+	--calz-font-size-md: 13px;
+	--calz-font-size-lg: 18px;
+	--calz-font-size-xl: 24px;
+	--calz-font-weight-medium: 500;
+	--calz-font-weight-semibold: 600;
+	--calz-font-weight-bold: 700;
+
+	/* Dimensions */
+	--calz-day-min-size: 0;
+	--calz-dot-size: 4px;
+	--calz-indicator-width: 12px;
+	--calz-indicator-height: 2px;
+	--calz-dots-max-width: 32px;
+
+	/* Border Radius */
+	--calz-radius-sm: 1px;
+	--calz-radius-md: 4px;
+
+	/* Transitions */
+	--calz-transition-duration: 0.15s;
+	--calz-transition-timing: ease;
+	--calz-transition-all: all var(--calz-transition-duration) var(--calz-transition-timing);
+
+	/* Opacity */
+	--calz-opacity-muted: 0.6;
+	--calz-opacity-subtle: 0.7;
+	--calz-opacity-faint: 0.25;
+
+	/* Grid */
+	--calz-grid-columns-week: 7;
+	--calz-grid-columns-with-week: 8;
+}
+
+/* ------------------------------------------
+   Block: Calendar (Main Container)
+   ------------------------------------------ */
+.calendarz {
+	padding: var(--calz-space-md);
 	user-select: none;
 }
 
-/* Day cell with dots - adjust layout */
-.calendarz-day {
+/* ------------------------------------------
+   Block: Header
+   ------------------------------------------ */
+.calendarz__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 0 var(--calz-space-md) var(--calz-space-lg);
+	gap: var(--calz-space-sm);
+}
+
+.calendarz__header-title {
+	flex: 1;
+	text-align: left;
+}
+
+.calendarz__month,
+.calendarz__year {
+	font-weight: var(--calz-font-weight-semibold);
+	font-size: var(--calz-font-size-xl);
+	margin-right: var(--calz-space-md);
+}
+
+.calendarz__month {
+	color: var(--calz-color-text);
+}
+
+.calendarz__year {
+	color: var(--calz-color-primary);
+}
+
+.calendarz__month--clickable,
+.calendarz__year--clickable {
+	cursor: pointer;
+	transition: var(--calz-transition-all);
+}
+
+.calendarz__month--clickable:hover,
+.calendarz__year--clickable:hover {
+	opacity: var(--calz-opacity-subtle);
+}
+
+/* ------------------------------------------
+   Block: Button (Navigation & Actions)
+   ------------------------------------------ */
+.calendarz__btn {
+	background: transparent !important;
+	border: none;
+	border-radius: var(--calz-radius-md);
+	cursor: pointer;
+	box-shadow: none !important;
+	transition: var(--calz-transition-all);
+}
+
+.calendarz__btn--nav {
+	color: var(--calz-color-text-muted);
+	font-size: var(--calz-font-size-lg);
+	padding: var(--calz-space-sm) 0;
+}
+
+.calendarz__btn--nav:hover {
+	background-color: var(--calz-color-bg-hover) !important;
+	color: var(--calz-color-text);
+}
+
+.calendarz__btn--today {
+	color: var(--calz-color-text-muted);
+	padding: var(--calz-space-sm) var(--calz-space-md);
+	font-size: var(--calz-font-size-sm);
+}
+
+.calendarz__btn--today:hover {
+	background-color: var(--calz-color-bg-hover) !important;
+	color: var(--calz-color-text);
+}
+
+.calendarz__btn--remove {
+	background-color: transparent;
+	box-shadow: none;
+	cursor: pointer;
+}
+
+/* ------------------------------------------
+   Block: Weekdays
+   ------------------------------------------ */
+.calendarz__weekdays {
+	display: grid;
+	grid-template-columns: repeat(var(--calz-grid-columns-week), 1fr);
+	gap: var(--calz-space-xs);
+	margin-bottom: var(--calz-space-sm);
+}
+
+.calendarz__weekdays--with-week {
+	grid-template-columns: repeat(var(--calz-grid-columns-with-week), 1fr);
+}
+
+.calendarz__weekday {
+	text-align: center;
+	font-size: var(--calz-font-size-xs);
+	font-weight: var(--calz-font-weight-medium);
+	color: var(--calz-color-text-muted);
+	padding: var(--calz-space-sm) 0;
+}
+
+.calendarz__weekday-label {
+	font-size: var(--calz-font-size-xs);
+	font-weight: var(--calz-font-weight-medium);
+	color: var(--calz-color-text-accent);
+}
+
+/* ------------------------------------------
+   Block: Days Grid
+   ------------------------------------------ */
+.calendarz__days {
+	display: grid;
+	grid-template-columns: repeat(var(--calz-grid-columns-week), 1fr);
+	gap: var(--calz-space-xs);
+}
+
+.calendarz__days--with-week {
+	grid-template-columns: repeat(var(--calz-grid-columns-with-week), 1fr);
+}
+
+/* ------------------------------------------
+   Block: Day Cell
+   ------------------------------------------ */
+.calendarz__day {
 	aspect-ratio: 1;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	font-size: 13px;
+	font-size: var(--calz-font-size-md);
 	cursor: pointer;
-	border-radius: 4px;
-	transition: all 0.15s ease;
-	color: var(--text-normal);
+	border-radius: var(--calz-radius-md);
+	transition: var(--calz-transition-all);
+	color: var(--calz-color-text);
 	background-color: transparent;
 	position: relative;
-	padding: 2px;
-	gap: 1px;
+	padding: var(--calz-space-xs);
+	gap: var(--calz-space-xs);
+	min-height: var(--calz-day-min-size);
 }
 
-.calendarz-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin: 0px 8px 12px 8px;
-	gap: 4px;
+.calendarz__day:hover {
+	background-color: var(--calz-color-bg-hover);
 }
 
-.calendarz-nav-btn {
-	background: transparent !important;
-	border: none !important;
-	color: var(--text-muted);
-	font-size: 18px;
-	cursor: pointer;
-	padding: 4px 0px;
-	border-radius: 4px;
-	box-shadow: none !important;
-	transition: all 0.15s ease;
+.calendarz__day--empty {
+	cursor: default;
 }
 
-.calendarz-nav-btn:hover {
-	background-color: var(--background-modifier-hover) !important;
-	color: var(--text-normal);
+.calendarz__day--empty:hover {
+	background-color: transparent;
 }
 
-.calendarz-month-year {
-	flex: 1;
-	text-align: left;
+.calendarz__day--today {
+	font-weight: var(--calz-font-weight-bold);
 }
 
-.calendarz-month-clickable {
-	cursor: pointer;
-	transition: all 0.15s ease;
+.calendarz__day--today:hover {
+	background-color: var(--calz-color-bg-hover);
 }
 
-.calendarz-month-clickable:hover {
-	opacity: 0.7;
+.calendarz__day--today-themed {
+	color: var(--calz-color-primary);
 }
 
-.calendarz-year-clickable {
-	cursor: pointer;
-	transition: all 0.15s ease;
+.calendarz__day--other-month {
+	color: var(--calz-color-text-muted);
+	opacity: var(--calz-opacity-muted);
 }
 
-.calendarz-year-clickable:hover {
-	opacity: 0.7;
-}
-
-.calendarz-month {
-	font-weight: 600;
-	font-size: 24px;
-	color: var(--text-normal);
-	margin-right: 8px;
-}
-
-.calendarz-year {
-	font-weight: 600;
-	font-size: 24px;
-	color: var(--interactive-accent);
-	margin-right: 8px;
-}
-
-.calendarz-today-btn {
-	background: transparent !important;
-	color: var(--text-muted);
-	border: none !important;
-	border-radius: 4px;
-	padding: 4px 8px;
-	font-size: 12px;
-	cursor: pointer;
-	box-shadow: none !important;
-	transition: all 0.15s ease;
-}
-
-.calendarz-today-btn:hover {
-	background-color: var(--background-modifier-hover) !important;
-	color: var(--text-normal);
-}
-
-.calendarz-weekdays {
-	display: grid;
-	grid-template-columns: repeat(7, 1fr);
-	gap: 2px;
-	margin-bottom: 6px;
-}
-
-.calendarz-weekdays-with-week {
-	grid-template-columns: repeat(8, 1fr);
-}
-
-.calendarz-weekday {
-	text-align: center;
-	font-size: 11px;
-	font-weight: 500;
-	color: var(--text-muted);
-	padding: 4px 0;
-}
-
-.calendarz-weekday-label {
-	font-size: 11px;
-	font-weight: 500;
-	color: var(--text-accent);
-}
-
-.calendarz-days {
-	display: grid;
-	grid-template-columns: repeat(7, 1fr);
-	gap: 2px;
-}
-
-.calendarz-days-with-week {
-	grid-template-columns: repeat(8, 1fr);
-}
-
-.calendarz-week-number {
+/* ------------------------------------------
+   Block: Week Number
+   ------------------------------------------ */
+.calendarz__week-number {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	font-size: 13px;
-	font-weight: 500;
-	color: var(--text-accent);
+	font-size: var(--calz-font-size-md);
+	font-weight: var(--calz-font-weight-medium);
+	color: var(--calz-color-text-accent);
 	background-color: transparent;
-	border-radius: 4px;
+	border-radius: var(--calz-radius-md);
 	cursor: default;
-	transition: all 0.15s ease;
+	transition: var(--calz-transition-all);
 	position: relative;
-	padding: 2px;
-	gap: 1px;
-	min-height: 0;
+	padding: var(--calz-space-xs);
+	gap: var(--calz-space-xs);
+	min-height: var(--calz-day-min-size);
 }
 
-.calendarz-week-number-clickable {
+.calendarz__week-number--clickable {
 	cursor: pointer;
 }
 
-.calendarz-week-number-clickable:hover {
-	background-color: var(--background-modifier-hover);
-	color: var(--text-normal);
+.calendarz__week-number--clickable:hover {
+	background-color: var(--calz-color-bg-hover);
+	color: var(--calz-color-text);
 }
 
-
-
-.calendarz-day:hover {
-	background-color: var(--background-modifier-hover);
+/* ------------------------------------------
+   Block: Heatmap
+   ------------------------------------------ */
+.calendarz__day--heatmap {
+	color: var(--calz-color-text);
+	background-color: color-mix(in srgb, var(--calz-color-primary) calc(var(--heatmap-opacity, 1) * 100%), transparent);
+	border-radius: var(--calz-radius-md);
 }
 
-.calendarz-day-empty {
-	cursor: default;
+.calendarz__day--heatmap:hover {
+	background-color: color-mix(in srgb, var(--calz-color-primary) calc(max(var(--heatmap-opacity, 1) * 100% - 15%, 25%)), transparent);
 }
 
-.calendarz-day-empty:hover {
-	background-color: transparent;
+.calendarz__day--heatmap-empty {
+	background-color: var(--calz-color-bg-empty);
+	border-radius: var(--calz-radius-md);
 }
 
-.calendarz-day-today {
-	font-weight: 700;
-}
-
-.calendarz-day-today:hover {
-	background-color: var(--background-modifier-hover);
-}
-
-/* Today with theme color (for non-heatmap modes) */
-.calendarz-day-today-themed {
-	color: var(--interactive-accent);
-}
-
-.calendarz-day-other-month {
-	color: var(--text-muted);
-	opacity: 0.6;
-}
-
-/* Heatmap Styles - integrated into date cells */
-.calendarz-day-heatmap {
-	color: var(--text-normal);
-	background-color: color-mix(in srgb, var(--interactive-accent) calc(var(--heatmap-opacity, 1) * 100%), transparent);
-	border-radius: 4px;
-}
-
-.calendarz-day.calendarz-day-heatmap:hover {
-	background-color: color-mix(in srgb, var(--interactive-accent) calc(max(var(--heatmap-opacity, 1) * 100% - 15%, 25%)), transparent);
-}
-
-/* Heatmap empty cells (no notes) - gray background */
-.calendarz-day-heatmap-empty {
-	background-color: var(--background-modifier-border-hover);
-	border-radius: 4px;
-}
-
-/* Remove button in modal */
-.calendarz-modal-remove-btn {
-	background-color: transparent !important;
-	box-shadow: none !important;
-	cursor: pointer;
-}
-
-/* Dots container for dots mode */
-.calendarz-dots-container {
+/* ------------------------------------------
+   Block: Dots (Indicators)
+   ------------------------------------------ */
+.calendarz__dots {
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: center;
 	align-items: center;
-	gap: 2px;
-	max-width: 32px;
-	margin-top: 1px;
+	gap: var(--calz-space-xs);
+	max-width: var(--calz-dots-max-width);
+	margin-top: var(--calz-space-xs);
 }
 
-/* Individual dot */
-.calendarz-dot {
-	width: 4px;
-	height: 4px;
+.calendarz__dot {
+	width: var(--calz-dot-size);
+	height: var(--calz-dot-size);
 	border-radius: 50%;
-	background-color: var(--interactive-accent);
+	background-color: var(--calz-color-primary);
 	flex-shrink: 0;
 }
 
-/* Gray dot for dates before today with no notes */
-.calendarz-dot-gray {
-	background-color: var(--text-muted);
-	opacity: 0.25;
+.calendarz__dot--muted {
+	background-color: var(--calz-color-text-muted);
+	opacity: var(--calz-opacity-faint);
 }
 
-/* Today indicator bar for heatmap mode */
-.calendarz-bar-today {
-	width: 12px;
-	height: 2px;
-	border-radius: 1px;
-	background-color: var(--text-normal);
+/* ------------------------------------------
+   Block: Todo Status
+   ------------------------------------------ */
+.calendarz__todo {
+	width: var(--calz-dot-size);
+	height: var(--calz-dot-size);
+	border-radius: 50%;
 	flex-shrink: 0;
 }
 
-/* Today indicator star for heatmap mode when date numbers are hidden */
-.calendarz-star-today {
-	font-size: 12px;
-	color: var(--text-normal);
+.calendarz__todo--pending {
+	border: 1px solid var(--calz-color-text);
+	background-color: transparent;
+}
+
+.calendarz__todo--completed {
+	background-color: var(--calz-color-text);
+}
+
+/* ------------------------------------------
+   Block: Today Indicator
+   ------------------------------------------ */
+.calendarz__indicator {
+	flex-shrink: 0;
+}
+
+.calendarz__indicator--bar {
+	width: var(--calz-indicator-width);
+	height: var(--calz-indicator-height);
+	border-radius: var(--calz-radius-sm);
+	background-color: var(--calz-color-text);
+}
+
+.calendarz__indicator--icon {
+	font-size: var(--calz-font-size-md);
+	color: var(--calz-color-text);
 	line-height: 1;
 }
 
-/* Settings folder item */
-.calendarz-settings-folder-item {
-	margin-top: 4px;
+/* ------------------------------------------
+   Block: Settings
+   ------------------------------------------ */
+.calendarz__settings-folder {
+	margin-top: var(--calz-space-sm);
 }
 
-/* Setting group heading - remove padding from H3 */
-.setting-item-heading h3 {
+/* Reset heading padding in settings group */
+.calendarz__settings-heading {
 	padding: 0;
 	margin: 0;
-}
-
-/* Todo circle styles - empty (hollow) circle for incomplete todos */
-.calendarz-todo-circle-empty {
-	width: 4px;
-	height: 4px;
-	border-radius: 50%;
-	border: 1px solid var(--text-normal);
-	background-color: transparent;
-	flex-shrink: 0;
-}
-
-/* Todo circle styles - filled circle for all todos completed */
-.calendarz-todo-circle-filled {
-	width: 4px;
-	height: 4px;
-	border-radius: 50%;
-	background-color: var(--text-normal);
-	flex-shrink: 0;
 }
