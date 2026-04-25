@@ -22,28 +22,15 @@ So, I made a new calendar plugin, CalendarZ.
 - **Filename Parsing**: Parse dates from filenames, supporting various date formats
 - **Both YAML and Filename**: Automatically detect and use dates from both sources
 
-### Daily Note Integration
+### Periodic Note Integration
 
-- Click any date to open or create the corresponding daily note
-- Optional confirmation prompt before creating new notes to prevent accidental creation
-
-### Weekly Note Support
-
-- Enable weekly notes and click week numbers to create or open weekly notes
-- Customizable weekly note naming format (e.g., `YYYY-[W]WW` produces `2024-W01.md`)
-- Support for weekly note templates and custom folder paths
-
-### Monthly Note Support
-
-- Enable monthly notes and click month headers to create or open monthly notes
-- Customizable monthly note naming format (e.g., `YYYY-MM` produces `2024-01.md`)
-- Support for monthly note templates and custom folder paths
-
-### Yearly Note Support
-
-- Enable yearly notes and click year headers to create or open yearly notes
-- Customizable yearly note naming format (e.g., `YYYY` produces `2024.md`)
-- Support for yearly note templates and custom folder paths
+- **Daily Notes**: Click any date to open or create the corresponding daily note
+- **Weekly Notes**: Enable weekly notes and click week numbers to create or open weekly notes
+- **Monthly Notes**: Enable monthly notes and click month headers to create or open monthly notes
+- **Yearly Notes**: Enable yearly notes and click year headers to create or open yearly notes
+- **Customizable Naming**: Configure naming formats for all note types (e.g., `YYYY-[W]WW`, `YYYY-MM`, `YYYY`)
+- **Template Support**: Use templates and custom folder paths for all periodic note types
+- **Confirmation Prompt**: Optional confirmation before creating new notes to prevent accidental creation
 
 ### Todo Status Indicators
 
