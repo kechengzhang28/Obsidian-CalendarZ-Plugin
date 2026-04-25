@@ -125,6 +125,7 @@ export class CalendarZView extends ItemView {
 				onDayClick: (date: Date) => { void this.controller.handleDayClick(date); },
 				onWeekClick: (date: Date) => { void this.controller.handleWeekClick(date); },
 				onMonthClick: (date: Date) => { void this.controller.handleMonthClick(date); },
+				onYearClick: (date: Date) => { void this.controller.handleYearClick(date); },
 				onNavigateMonth: (direction: -1 | 1) => {
 					this.controller.navigateMonth(direction);
 					this.state.setCurrentDate(this.controller.getCurrentDate());

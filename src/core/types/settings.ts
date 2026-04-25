@@ -79,6 +79,14 @@ export interface CalendarZSettings {
 	monthNoteFolder: string;
 	/** Month note naming format pattern (e.g., "YYYY-MM", "YYYY-[M]MM") */
 	monthNoteFormat: string;
+	/** Year note settings */
+	yearNoteEnabled: boolean;
+	/** Year note template file path */
+	yearNoteTemplate: string;
+	/** Year note folder path */
+	yearNoteFolder: string;
+	/** Year note naming format pattern (e.g., "YYYY") */
+	yearNoteFormat: string;
 	/** Whether to hide todo dots for completed todos */
 	hideCompletedTodos: boolean;
 }

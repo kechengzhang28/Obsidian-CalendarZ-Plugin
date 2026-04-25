@@ -8,3 +8,4 @@ export { TodoService } from "./todos/TodoService";
 export { DailyNoteService } from "./dailyNote/DailyNoteService";
 export { WeekNoteService } from "./weekNote/WeekNoteService";
 export { MonthNoteService } from "./monthNote/MonthNoteService";
+export { YearNoteService } from "./yearNote/YearNoteService";

@@ -12,7 +12,8 @@
     "heatmap": "Heatmap",
     "click": "Click Behavior",
     "weekNote": "Weekly Note",
-    "monthNote": "Monthly Note"
+    "monthNote": "Monthly Note",
+    "yearNote": "Yearly Note"
   },
   "settings": {
     "language": {
@@ -164,6 +165,23 @@
       "description": "Use YYYY for year, MM for month. Content in [] brackets will be displayed as-is. Example: YYYY-MM produces 2024-01.md",
       "placeholder": "YYYY-MM"
     },
+    "yearNoteEnabled": {
+      "name": "Enable Yearly Note",
+      "description": "Create or open yearly note when clicking the year header"
+    },
+    "yearNoteTemplate": {
+      "name": "Yearly Note Template",
+      "description": "Path to yearly note template file (leave empty for default style)"
+    },
+    "yearNoteFolder": {
+      "name": "Yearly Note Folder",
+      "description": "Folder path for yearly notes (leave empty for root directory)"
+    },
+    "yearNoteFormat": {
+      "name": "Yearly Note Naming Format",
+      "description": "Use YYYY for year. Content in [] brackets will be displayed as-is. Example: YYYY produces 2024.md",
+      "placeholder": "YYYY"
+    },
     "hideCompletedTodos": {
       "name": "Hide Completed Todo Dots",
       "description": "Do not show todo status dots when all todo items are completed"
@@ -179,7 +197,8 @@
     "dailyNotesNotEnabled": "Please enable the Daily Notes core plugin first",
     "dailyNotesCreateFailed": "Failed to create daily note, please check the daily notes plugin settings",
     "weekNoteCreateFailed": "Failed to create week note",
-    "monthNoteCreateFailed": "Failed to create month note"
+    "monthNoteCreateFailed": "Failed to create month note",
+    "yearNoteCreateFailed": "Failed to create year note"
   },
   "modal": {
     "confirmTitle": "Create Note",
