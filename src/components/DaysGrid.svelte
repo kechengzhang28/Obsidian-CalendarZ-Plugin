@@ -301,7 +301,7 @@ let {
 				data-date={cell.dateStr}
 				data-count={cell.count > 0 ? cell.count : undefined}
 				aria-label={cell.count > 0 || cell.isBeforeToday
-					? `${cell.dateStr}: ${cell.count} notes`
+					? `${cell.dateStr}: ${cell.count} ${statisticsType === "wordCount" ? "words" : "notes"}`
 					: undefined}
 				role="button"
 				tabindex="0"
