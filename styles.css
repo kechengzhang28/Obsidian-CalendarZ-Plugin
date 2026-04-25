@@ -144,7 +144,7 @@
 
 
 
-.calendarz-day:not(.calendarz-day-heatmap):not(.calendarz-day-heatmap-empty):hover {
+.calendarz-day:hover {
 	background-color: var(--background-modifier-hover);
 }
 
@@ -181,8 +181,8 @@
 	border-radius: 4px;
 }
 
-.calendarz-day-heatmap:hover {
-	filter: brightness(1.1);
+.calendarz-day.calendarz-day-heatmap:hover {
+	background-color: color-mix(in srgb, var(--interactive-accent) calc(max(var(--heatmap-opacity, 1) * 100% - 15%, 25%)), transparent);
 }
 
 /* Heatmap empty cells (no notes) - gray background */
