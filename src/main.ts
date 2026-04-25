@@ -24,7 +24,7 @@ export default class CalendarZ extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
-		await this.loadI18n();
+		this.loadI18n();
 		this.todoService = new TodoService(this.app);
 		this.noteCounter = new NoteCounter(this.app);
 
