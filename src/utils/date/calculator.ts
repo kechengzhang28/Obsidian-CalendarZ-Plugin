@@ -1,6 +1,5 @@
 import dayjs, { setWeekStart } from "./dayjsConfig";
 import type { WeekStart } from "../../core/types";
-import { DAY_OF_WEEK } from "../../core/constants";
 
 /**
  * Checks if a date is before today.
@@ -19,21 +18,6 @@ export function isBeforeToday(date: Date | dayjs.Dayjs): boolean {
  */
 export function isSameDay(date1: Date | dayjs.Dayjs, date2: Date | dayjs.Dayjs): boolean {
 	return dayjs(date1).isSame(dayjs(date2), "day");
-}
-
-/**
- * Adjusts day of week based on week start preference.
- * Converts Sunday-based (0-6) to Monday-based (0-6) if needed.
- *
- * @param dayOfWeek - Original day of week (0 = Sunday, 6 = Saturday)
- * @param weekStart - Week start preference ("sunday" or "monday")
- * @returns Adjusted day of week (0 = first day based on preference)
- */
-export function getAdjustedDayOfWeek(dayOfWeek: number, weekStart: WeekStart): number {
-	if (weekStart === "monday") {
-		return dayOfWeek === DAY_OF_WEEK.SUNDAY ? 6 : dayOfWeek - 1;
-	}
-	return dayOfWeek;
 }
 
 /**
@@ -82,7 +66,10 @@ export function getPreviousMonthLastDay(year: number, month: number): number {
  */
 export function calculatePaddingDays(year: number, month: number, weekStart: WeekStart): number {
 	const firstDayOfWeek = dayjs(new Date(year, month, 1)).day();
-	return getAdjustedDayOfWeek(firstDayOfWeek, weekStart);
+	if (weekStart === "monday") {
+		return firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+	}
+	return firstDayOfWeek;
 }
 
 /**

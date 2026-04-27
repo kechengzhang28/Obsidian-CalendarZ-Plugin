@@ -11,7 +11,7 @@
 		calculatePaddingDays,
 		getWeekNumber,
 	} from "../utils/date";
-	import { CSS_CLASSES, ATTRS, GRID, DOTS, HEATMAP } from "../core/constants";
+	import { CSS_CLASSES, GRID, DOTS, HEATMAP } from "../core/constants";
 	import type { DateCount, DateTodoStatus, WeekTodoStatus } from "./types";
 
 	interface Props {
