@@ -32,12 +32,6 @@ export const GRID = {
 	DAYS_PER_WEEK: 7,
 } as const;
 
-/** Day of week indices */
-export const DAY_OF_WEEK = {
-	SUNDAY: 0,
-	MONDAY: 1,
-} as const;
-
 /** CSS class names for calendar elements (BEM naming) */
 export const CSS_CLASSES = {
 	CONTAINER: "calendarz",
@@ -77,19 +71,6 @@ export const CSS_CLASSES = {
 	TODO_COMPLETED: "calendarz__todo--completed",
 	SETTINGS_FOLDER: "calendarz__settings-folder",
 	SETTINGS_HEADING: "calendarz__settings-heading",
-} as const;
-
-/** CSS custom property names */
-export const CSS_VARS = {
-	HEATMAP_OPACITY: "--heatmap-opacity",
-} as const;
-
-/** HTML attribute names */
-export const ATTRS = {
-	DATA_COUNT: "data-count",
-	DATA_DATE: "data-date",
-	ARIA_LABEL: "aria-label",
-	ARIA_HIDDEN: "aria-hidden",
 } as const;
 
 /** Default values for settings */

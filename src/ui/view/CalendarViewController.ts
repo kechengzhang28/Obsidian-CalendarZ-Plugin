@@ -274,16 +274,6 @@ export class CalendarViewController {
 		await this.monthNoteService.openOrCreateMonthNote(date, this.settings, this.getI18n());
 	}
 
-	/**
-	 * Checks if a month note exists for the given date.
-	 * @param date - Any date within the target month
-	 * @returns True if a month note exists
-	 */
-	hasMonthNote(date: Date): boolean {
-		if (!this.settings.monthNoteEnabled) return false;
-		return this.monthNoteService.findMonthNote(date, this.settings) !== null;
-	}
-
 	// ---- Year Note Actions ----
 
 	/**
@@ -321,15 +311,5 @@ export class CalendarViewController {
 	 */
 	async createYearNote(date: Date): Promise<void> {
 		await this.yearNoteService.openOrCreateYearNote(date, this.settings, this.getI18n());
-	}
-
-	/**
-	 * Checks if a year note exists for the given date.
-	 * @param date - Any date within the target year
-	 * @returns True if a year note exists
-	 */
-	hasYearNote(date: Date): boolean {
-		if (!this.settings.yearNoteEnabled) return false;
-		return this.yearNoteService.findYearNote(date, this.settings) !== null;
 	}
 }

@@ -22,7 +22,7 @@ const DATE_FORMATS = [
  * @param dateStr - Date string to parse
  * @returns Parsed Date or null if invalid
  */
-export function parseDateString(dateStr: string): Date | null {
+function parseDateString(dateStr: string): Date | null {
 	if (!dateStr) return null;
 
 	for (const format of DATE_FORMATS) {
