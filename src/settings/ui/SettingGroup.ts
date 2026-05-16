@@ -52,7 +52,7 @@ export class SettingGroup {
 
 		// Create heading
 		const headingEl = groupEl.createDiv({ cls: "setting-item-heading" });
-		headingEl.createEl("h3", { text: this.config.title, cls: "calendarz__settings-heading" });
+		headingEl.createDiv({ text: this.config.title, cls: "setting-item-name" });
 
 		// Create content container
 		this.contentEl = groupEl.createDiv({ cls: "setting-items" });

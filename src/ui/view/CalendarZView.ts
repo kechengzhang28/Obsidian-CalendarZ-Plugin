@@ -66,7 +66,7 @@ export class CalendarZView extends ItemView {
 
 	/** Access current i18n via controller */
 	private get i18n(): I18n {
-		return this.controller.getI18n() as unknown as I18n;
+		return this.controller.getI18n();
 	}
 
 	/** Returns the unique view type identifier */

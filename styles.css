@@ -358,9 +358,3 @@
 .calendarz__settings-folder {
 	margin-top: var(--calz-space-sm);
 }
-
-/* Reset heading padding in settings group */
-.calendarz__settings-heading {
-	padding: 0;
-	margin: 0;
-}

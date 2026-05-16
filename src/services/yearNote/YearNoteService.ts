@@ -5,7 +5,7 @@
 
 import { App, Notice, TFile, normalizePath } from "obsidian";
 import type { CalendarZSettings } from "../../core/types";
-import type { I18nLike } from "../../core/types";
+import type { I18n } from "../../i18n";
 import dayjs from "../../utils/date/dayjsConfig";
 
 /**
@@ -81,8 +81,8 @@ export class YearNoteService {
 	 * @param settings - Plugin settings
 	 * @param i18n - i18n object for translated notification messages
 	 */
-	async openOrCreateYearNote(date: Date, settings: CalendarZSettings, i18n: I18nLike): Promise<void> {
-		const notifications = i18n.notifications as Record<string, string>;
+	async openOrCreateYearNote(date: Date, settings: CalendarZSettings, i18n: I18n): Promise<void> {
+		const notifications = i18n.notifications;
 		try {
 			if (!settings.yearNoteEnabled) return;
 

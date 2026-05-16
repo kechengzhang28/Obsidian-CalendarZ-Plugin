@@ -11,7 +11,7 @@
 import type { App } from "obsidian";
 import dayjs from "../../utils/date/dayjsConfig";
 import type { CalendarZSettings } from "../../core/types";
-import type { I18nLike } from "../../core/types";
+import type { I18n } from "../../i18n";
 import { DATE_FORMAT } from "../../core/constants";
 import type { DateCount, DateTodoStatus, WeekTodoStatus } from "../../components/types";
 import { NoteCounter, TodoService, DailyNoteService, WeekNoteService, MonthNoteService, YearNoteService } from "../../services";
@@ -26,7 +26,7 @@ export interface CalendarViewControllerDeps {
 	/** Plugin instance for accessing dynamic i18n and settings */
 	plugin: {
 		/** Get current i18n - use getter to always get latest */
-		getI18n: () => I18nLike;
+		getI18n: () => I18n;
 		/** Current plugin settings */
 		settings: CalendarZSettings;
 		/** Optional todo service for fetching todo statuses */
@@ -75,7 +75,7 @@ export class CalendarViewController {
 	}
 
 	/** Gets current i18n from plugin - always fetches latest */
-	getI18n(): I18nLike {
+	getI18n(): I18n {
 		return this.deps.plugin.getI18n();
 	}
 

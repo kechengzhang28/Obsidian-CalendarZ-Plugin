@@ -1,5 +1,5 @@
 import { App, Modal, ButtonComponent } from "obsidian";
-import type { I18nLike } from "../../core/types";
+import type { I18n } from "../../i18n";
 
 /**
  * Confirmation modal dialog for creating notes.
@@ -7,7 +7,7 @@ import type { I18nLike } from "../../core/types";
  */
 export class ConfirmModal extends Modal {
 	/** i18n object for translated strings */
-	private i18n: I18nLike;
+	private i18n: I18n;
 	/** Date string to display in the confirmation message */
 	private dateStr: string;
 	/** Callback invoked when the user confirms creation */
@@ -22,7 +22,7 @@ export class ConfirmModal extends Modal {
 	 */
 	constructor(
 		app: App,
-		i18n: I18nLike,
+		i18n: I18n,
 		dateStr: string,
 		onConfirm: () => void
 	) {
@@ -38,7 +38,7 @@ export class ConfirmModal extends Modal {
 	 */
 	onOpen(): void {
 		const { contentEl } = this;
-		const t = this.i18n.modal as Record<string, string>;
+		const t = this.i18n.modal;
 
 		contentEl.createEl("h3", { text: t.confirmTitle ?? "Confirm" });
 		contentEl.createEl("p", { text: (t.confirmMessage ?? "Create note for {{date}}?").replace(/\{\{date\}\}/g, this.dateStr) });

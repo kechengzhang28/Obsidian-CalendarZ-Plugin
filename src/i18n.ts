@@ -10,7 +10,6 @@ import zhCN from "./locales/zh-CN.json";
  * Includes index signature for compatibility with I18nLike.
  */
 export interface I18n {
-	[key: string]: unknown;
 	/** Calendar-related strings */
 	calendar: {
 		/** Label for the today button */
@@ -36,6 +35,10 @@ export interface I18n {
 		click: string;
 		/** Week note settings section title */
 		weekNote: string;
+		/** Month note settings section title */
+		monthNote: string;
+		/** Year note settings section title */
+		yearNote: string;
 	};
 	/** Settings panel strings */
 	settings: {
@@ -205,6 +208,48 @@ export interface I18n {
 			name: string;
 			description: string;
 		};
+		/** Month note enabled setting strings */
+		monthNoteEnabled: {
+			name: string;
+			description: string;
+		};
+		/** Month note template setting strings */
+		monthNoteTemplate: {
+			name: string;
+			description: string;
+		};
+		/** Month note folder setting strings */
+		monthNoteFolder: {
+			name: string;
+			description: string;
+		};
+		/** Month note naming format setting strings */
+		monthNoteFormat: {
+			name: string;
+			description: string;
+			placeholder: string;
+		};
+		/** Year note enabled setting strings */
+		yearNoteEnabled: {
+			name: string;
+			description: string;
+		};
+		/** Year note template setting strings */
+		yearNoteTemplate: {
+			name: string;
+			description: string;
+		};
+		/** Year note folder setting strings */
+		yearNoteFolder: {
+			name: string;
+			description: string;
+		};
+		/** Year note naming format setting strings */
+		yearNoteFormat: {
+			name: string;
+			description: string;
+			placeholder: string;
+		};
 	};
 	/** Command names */
 	commands: {
@@ -224,6 +269,10 @@ export interface I18n {
 		dailyNotesCreateFailed: string;
 		/** Message shown when week note creation fails */
 		weekNoteCreateFailed: string;
+		/** Message shown when month note creation fails */
+		monthNoteCreateFailed: string;
+		/** Message shown when year note creation fails */
+		yearNoteCreateFailed: string;
 	};
 	/** Modal dialog strings */
 	modal: {

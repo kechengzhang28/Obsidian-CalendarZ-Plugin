@@ -10,7 +10,7 @@ import {
 	getDailyNote,
 	getAllDailyNotes,
 } from "obsidian-daily-notes-interface";
-import type { I18nLike } from "../../core/types";
+import type { I18n } from "../../i18n";
 
 /**
  * Service for daily note operations.
@@ -46,8 +46,8 @@ export class DailyNoteService {
 	 * @param date - Target date
 	 * @param i18n - i18n object for translated notification messages
 	 */
-	async openOrCreateDailyNote(date: Date, i18n: I18nLike): Promise<void> {
-		const notifications = i18n.notifications as Record<string, string>;
+	async openOrCreateDailyNote(date: Date, i18n: I18n): Promise<void> {
+		const notifications = i18n.notifications;
 		try {
 			if (!appHasDailyNotesPluginLoaded()) {
 				new Notice(notifications.dailyNotesNotEnabled ?? "Daily notes plugin not enabled");

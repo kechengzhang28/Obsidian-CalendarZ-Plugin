@@ -5,20 +5,13 @@
 
 import type { App } from "obsidian";
 import type { CalendarZSettings } from "./settings";
-
-/**
- * Base interface with index signature for compatibility with I18n
- */
-export interface I18nLike {
-	[key: string]: unknown;
-}
+import type { I18n } from "../../i18n";
 
 export interface PluginLike {
 	settings: CalendarZSettings;
 	app: App;
 
-	/** Get current i18n - use method to always get latest */
-	getI18n(): I18nLike;
+	getI18n(): I18n;
 	saveSettings(): Promise<void>;
 	refreshView(): void;
 	loadI18n(): void;

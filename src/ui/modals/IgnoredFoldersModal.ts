@@ -1,5 +1,5 @@
 import { App, Modal, Setting } from "obsidian";
-import type { I18nLike } from "../../core/types";
+import type { I18n } from "../../i18n";
 import { CSS_CLASSES } from "../../core/constants";
 
 /**
@@ -10,7 +10,7 @@ export class IgnoredFoldersModal extends Modal {
 	/** Current list of ignored folders (mutated during editing) */
 	ignoredFolders: string[];
 	/** i18n object for translated strings */
-	private i18n: I18nLike;
+	private i18n: I18n;
 	/** Callback invoked when the user saves changes */
 	private onUpdate: (folders: string[]) => Promise<void>;
 	/** Container element for the folder list */
@@ -28,7 +28,7 @@ export class IgnoredFoldersModal extends Modal {
 	constructor(
 		app: App,
 		ignoredFolders: string[],
-		i18n: I18nLike,
+		i18n: I18n,
 		onUpdate: (folders: string[]) => Promise<void>
 	) {
 		super(app);
@@ -43,7 +43,7 @@ export class IgnoredFoldersModal extends Modal {
 	 */
 	onOpen(): void {
 		const { contentEl } = this;
-		const t = (this.i18n.settings as Record<string, Record<string, string>>).ignoredFolders!;
+		const t = this.i18n.settings.ignoredFolders;
 
 		contentEl.empty();
 		this.titleEl.setText(t.modalTitle ?? "Ignored Folders");
@@ -101,7 +101,7 @@ export class IgnoredFoldersModal extends Modal {
 		// Clear previous listeners before re-rendering to prevent memory leaks
 		this.clearRemoveListeners();
 
-		const t = (this.i18n.settings as Record<string, Record<string, string>>).ignoredFolders!;
+		const t = this.i18n.settings.ignoredFolders;
 
 		if (this.ignoredFolders.length === 0) {
 			this.folderListEl.createEl("p", {
