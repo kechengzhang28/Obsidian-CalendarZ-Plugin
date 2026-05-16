@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-calendarz",
-	"version": "1.0.0",
+	"version": "2.1.2",
 	"description": "A visual calendar with heatmap & dots tracking for your daily notes.",
 	"main": "main.js",
 	"type": "module",
