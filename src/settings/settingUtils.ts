@@ -1,4 +1,5 @@
 import type { PluginLike } from "../core/types";
+import type { I18n } from "../i18n";
 
 /** Options for creating a setting change handler */
 export interface SettingHandlerOptions<K extends keyof PluginLike["settings"]> {
@@ -50,18 +51,12 @@ export function createSettingHandler<K extends keyof PluginLike["settings"]>(
 }
 
 // ============================================================================
-// i18n Helper Functions - Extracted from settings modules to reduce duplication
+// i18n Helper Functions
 // ============================================================================
 
-/**
- * Gets a typed settings section from the i18n object.
- * @param plugin - Plugin instance for accessing i18n
- * @param section - Section name in the settings i18n structure
- * @returns The section object or empty object if not found
- */
-function getSettingsSection(plugin: PluginLike, section: string): Record<string, unknown> {
-	return (plugin.getI18n().settings as Record<string, Record<string, unknown>>)[section] ?? {};
-}
+/** Type-safe mapping from section names to their settings object types */
+type SettingsSection = I18n["settings"];
+type SettingsSectionKey = keyof SettingsSection;
 
 /**
  * Gets a translated string from a settings section.
@@ -72,9 +67,10 @@ function getSettingsSection(plugin: PluginLike, section: string): Record<string,
  * @returns Translated string
  * @example ts(plugin, "monthFormat", "name") // => "Month Format"
  */
-export function ts(plugin: PluginLike, section: string, key: string): string {
-	const sect = getSettingsSection(plugin, section);
-	return (sect[key] as string) ?? key;
+export function ts(plugin: PluginLike, section: SettingsSectionKey, key: string): string {
+	const sect = plugin.getI18n().settings[section];
+	if (!sect || typeof sect !== "object") return key;
+	return (sect as Record<string, string>)[key] ?? key;
 }
 
 /**
@@ -86,9 +82,11 @@ export function ts(plugin: PluginLike, section: string, key: string): string {
  * @returns Translated option label
  * @example topt(plugin, "monthFormat", "numeric") // => "Numeric (1-12)"
  */
-export function topt(plugin: PluginLike, section: string, optionKey: string): string {
-	const sect = getSettingsSection(plugin, section);
-	const opts = (sect.options as Record<string, string>) ?? {};
+export function topt(plugin: PluginLike, section: SettingsSectionKey, optionKey: string): string {
+	const sect = plugin.getI18n().settings[section];
+	if (!sect || typeof sect !== "object") return optionKey;
+	const opts = "options" in sect ? (sect as { options: Record<string, string> }).options : undefined;
+	if (!opts) return optionKey;
 	return opts[optionKey] ?? optionKey;
 }
 
@@ -100,7 +98,6 @@ export function topt(plugin: PluginLike, section: string, optionKey: string): st
  * @returns Translated section title
  * @example getSectionTitle(plugin, "basic") // => "Basic Settings"
  */
-export function getSectionTitle(plugin: PluginLike, section: string): string {
-	const titles = plugin.getI18n().sectionTitles as Record<string, string>;
-	return titles[section] ?? section;
+export function getSectionTitle(plugin: PluginLike, section: keyof I18n["sectionTitles"]): string {
+	return plugin.getI18n().sectionTitles[section] ?? section;
 }

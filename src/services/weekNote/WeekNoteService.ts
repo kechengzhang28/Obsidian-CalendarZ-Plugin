@@ -5,7 +5,7 @@
 
 import { App, Notice, TFile, normalizePath } from "obsidian";
 import type { CalendarZSettings, WeekStart } from "../../core/types";
-import type { I18nLike } from "../../core/types";
+import type { I18n } from "../../i18n";
 import dayjs, { setWeekStart } from "../../utils/date/dayjsConfig";
 
 /**
@@ -99,8 +99,8 @@ export class WeekNoteService {
 	 * @param settings - Plugin settings
 	 * @param i18n - i18n object for translated notification messages
 	 */
-	async openOrCreateWeekNote(date: Date, settings: CalendarZSettings, i18n: I18nLike): Promise<void> {
-		const notifications = i18n.notifications as Record<string, string>;
+	async openOrCreateWeekNote(date: Date, settings: CalendarZSettings, i18n: I18n): Promise<void> {
+		const notifications = i18n.notifications;
 		try {
 			if (!settings.weekNoteEnabled) return;
 

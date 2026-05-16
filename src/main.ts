@@ -56,7 +56,7 @@ export default class CalendarZ extends Plugin {
 
 		this.registerFileEvents();
 
-		this.registerInterval(window.setInterval(() => {
+		this.registerInterval(activeWindow.setInterval(() => {
 			this.forEachView(v => {
 				v.refreshStatsOnly().catch(error => {
 					console.error("Failed to refresh stats:", error);
@@ -74,8 +74,8 @@ export default class CalendarZ extends Plugin {
 
 			const oldCache = this.previousCaches.get(file.path);
 			const dateField = this.settings.dateFieldName;
-			const oldDate = oldCache?.frontmatter?.[dateField] as unknown;
-			const newDate = cache.frontmatter?.[dateField] as unknown;
+			const oldDate: unknown = oldCache?.frontmatter?.[dateField];
+			const newDate: unknown = cache.frontmatter?.[dateField];
 			const dateChanged = oldDate !== newDate;
 
 			// Check if todo status may have changed by comparing file modification time

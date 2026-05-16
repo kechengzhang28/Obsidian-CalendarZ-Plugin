@@ -23,8 +23,8 @@ export class CalendarZSettingTab extends PluginSettingTab {
 	 * @param app - Obsidian app instance
 	 * @param plugin - Plugin instance implementing PluginLike interface
 	 */
-	constructor(app: App, plugin: PluginLike) {
-		super(app, plugin as unknown as Plugin);
+	constructor(app: App, plugin: Plugin & PluginLike) {
+		super(app, plugin);
 		this.plugin = plugin;
 	}
 

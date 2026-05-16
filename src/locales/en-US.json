@@ -10,10 +10,10 @@
     "statistics": "Statistics",
     "dots": "Dots",
     "heatmap": "Heatmap",
-    "click": "Click Behavior",
-    "weekNote": "Weekly Note",
-    "monthNote": "Monthly Note",
-    "yearNote": "Yearly Note"
+    "click": "Click behavior",
+    "weekNote": "Weekly note",
+    "monthNote": "Monthly note",
+    "yearNote": "Yearly note"
   },
   "settings": {
     "language": {
@@ -21,7 +21,7 @@
       "description": "Select the display language for the calendar"
     },
     "monthFormat": {
-      "name": "Month Format",
+      "name": "Month format",
       "description": "Select how months are displayed in the calendar header",
       "options": {
         "numeric": "Numeric (1-12)",
@@ -30,15 +30,15 @@
       }
     },
     "titleFormat": {
-      "name": "Title Format",
+      "name": "Title format",
       "description": "Select the order of year and month in the calendar header",
       "options": {
-        "yearMonth": "Year Month (2024 January)",
-        "monthYear": "Month Year (January 2024)"
+        "yearMonth": "Year month (2024 January)",
+        "monthYear": "Month year (January 2024)"
       }
     },
     "weekStart": {
-      "name": "Week Start",
+      "name": "Week start",
       "description": "Select the first day of the week",
       "options": {
         "sunday": "Sunday",
@@ -46,7 +46,7 @@
       }
     },
     "ignoredFolders": {
-      "name": "Ignored Folders",
+      "name": "Ignored folders",
       "description": "Set folder paths to ignore. Notes in these folders will not be counted",
       "addButton": "Add",
       "removeButton": "Remove",
@@ -54,17 +54,17 @@
       "empty": "No ignored folders",
       "manageButton": "Manage",
       "currentlyIgnored": "Currently ignored",
-      "modalTitle": "Manage Ignored Folders",
-      "addNewFolder": "Add Folder",
+      "modalTitle": "Manage ignored folders",
+      "addNewFolder": "Add folder",
       "saveButton": "Save",
       "cancelButton": "Cancel"
     },
     "dateFieldName": {
-      "name": "Date Field Name",
+      "name": "Date field name",
       "description": "The YAML frontmatter field name to use for date statistics (e.g., created, date, published)"
     },
     "dateSource": {
-      "name": "Date Source",
+      "name": "Date source",
       "description": "Select the source for note date statistics",
       "options": {
         "yaml": "YAML frontmatter",
@@ -73,11 +73,11 @@
       }
     },
     "filenameDateFormat": {
-      "name": "Filename Date Format",
+      "name": "Filename date format",
       "description": "The format pattern to extract date from filename (e.g., YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD)"
     },
     "displayMode": {
-      "name": "Display Mode",
+      "name": "Display mode",
       "description": "Choose how to display note statistics on the calendar",
       "options": {
         "heatmap": "Heatmap",
@@ -86,104 +86,104 @@
       }
     },
     "statisticsType": {
-      "name": "Statistics Type",
+      "name": "Statistics type",
       "description": "Choose whether to count by note quantity or total word count",
       "options": {
-        "count": "Note Count",
-        "wordCount": "Word Count"
+        "count": "Note count",
+        "wordCount": "Word count"
       }
     },
     "dotThreshold": {
-      "name": "Notes per Dot",
+      "name": "Notes per dot",
       "description": "Number of notes represented by each dot (1-10)"
     },
     "dotWordThreshold": {
-      "name": "Words per Dot",
+      "name": "Words per dot",
       "description": "Number of words represented by each dot (minimum 1)"
     },
     "heatmapMaxNotes": {
-      "name": "Max Notes for Heatmap",
+      "name": "Max notes for heatmap",
       "description": "Maximum note count to reach full brightness in heatmap mode. Any date with notes >= this value will show maximum brightness."
     },
     "heatmapMaxWords": {
-      "name": "Max Words for Heatmap",
+      "name": "Max words for heatmap",
       "description": "Maximum word count to reach full brightness in heatmap mode. Any date with words >= this value will show maximum brightness. (minimum 1)"
     },
     "heatmapHideDateNumbers": {
-      "name": "Hide Date Numbers",
+      "name": "Hide date numbers",
       "description": "Hide date numbers in heatmap mode, show only color blocks"
     },
     "confirmBeforeCreate": {
-      "name": "Confirm Before Creating",
+      "name": "Confirm before creating",
       "description": "Show a confirmation dialog before creating a daily note when left-clicking a date"
     },
     "showWeekNumber": {
-      "name": "Show Week Numbers",
+      "name": "Show week numbers",
       "description": "Display week numbers on the left side of the calendar"
     },
     "openCalendar": {
-      "name": "Open Calendar View",
+      "name": "Open calendar view",
       "description": "Display the calendar view in the right sidebar",
       "buttonText": "Open"
     },
     "refreshPlugin": {
-      "name": "Refresh Plugin",
+      "name": "Refresh plugin",
       "description": "Refresh the calendar view to apply latest settings",
       "buttonText": "Refresh"
     },
     "weekNoteEnabled": {
-      "name": "Enable Weekly Note",
+      "name": "Enable weekly note",
       "description": "Create or open weekly note when clicking week number"
     },
     "weekNoteTemplate": {
-      "name": "Weekly Note Template",
+      "name": "Weekly note template",
       "description": "Path to weekly note template file (leave empty for default style)"
     },
     "weekNoteFolder": {
-      "name": "Weekly Note Folder",
+      "name": "Weekly note folder",
       "description": "Folder path for weekly notes (leave empty for root directory)"
     },
     "weekNoteFormat": {
-      "name": "Weekly Note Naming Format",
+      "name": "Weekly note naming format",
       "description": "Use YYYY for year, WW for week number. Content in [] brackets will be displayed as-is. Example: YYYY-[W]WW produces 2024-W01.md",
       "placeholder": "YYYY-[W]WW"
     },
     "monthNoteEnabled": {
-      "name": "Enable Monthly Note",
+      "name": "Enable monthly note",
       "description": "Create or open monthly note when clicking the month header"
     },
     "monthNoteTemplate": {
-      "name": "Monthly Note Template",
+      "name": "Monthly note template",
       "description": "Path to monthly note template file (leave empty for default style)"
     },
     "monthNoteFolder": {
-      "name": "Monthly Note Folder",
+      "name": "Monthly note folder",
       "description": "Folder path for monthly notes (leave empty for root directory)"
     },
     "monthNoteFormat": {
-      "name": "Monthly Note Naming Format",
+      "name": "Monthly note naming format",
       "description": "Use YYYY for year, MM for month. Content in [] brackets will be displayed as-is. Example: YYYY-MM produces 2024-01.md",
       "placeholder": "YYYY-MM"
     },
     "yearNoteEnabled": {
-      "name": "Enable Yearly Note",
+      "name": "Enable yearly note",
       "description": "Create or open yearly note when clicking the year header"
     },
     "yearNoteTemplate": {
-      "name": "Yearly Note Template",
+      "name": "Yearly note template",
       "description": "Path to yearly note template file (leave empty for default style)"
     },
     "yearNoteFolder": {
-      "name": "Yearly Note Folder",
+      "name": "Yearly note folder",
       "description": "Folder path for yearly notes (leave empty for root directory)"
     },
     "yearNoteFormat": {
-      "name": "Yearly Note Naming Format",
+      "name": "Yearly note naming format",
       "description": "Use YYYY for year. Content in [] brackets will be displayed as-is. Example: YYYY produces 2024.md",
       "placeholder": "YYYY"
     },
     "hideCompletedTodos": {
-      "name": "Hide Completed Todo Dots",
+      "name": "Hide completed todo dots",
       "description": "Do not show todo status dots when all todo items are completed"
     }
   },
@@ -201,7 +201,7 @@
     "yearNoteCreateFailed": "Failed to create year note"
   },
   "modal": {
-    "confirmTitle": "Create Note",
+    "confirmTitle": "Create note",
     "confirmMessage": "Create note for {{date}}?",
     "cancelButton": "Cancel",
     "createButton": "Create"

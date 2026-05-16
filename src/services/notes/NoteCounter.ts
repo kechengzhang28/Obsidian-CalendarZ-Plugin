@@ -34,7 +34,7 @@ function extractDateFromMetadataCache(
 	const cache = metadataCache.getFileCache(file);
 	if (!cache?.frontmatter) return null;
 
-	const dateValue = cache.frontmatter[dateFieldName] as unknown;
+	const dateValue: unknown = cache.frontmatter[dateFieldName];
 	if (!dateValue) return null;
 
 	return parseYamlDate(dateValue);
