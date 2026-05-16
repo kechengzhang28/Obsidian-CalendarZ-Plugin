@@ -70,7 +70,6 @@ export const CSS_CLASSES = {
 	TODO_PENDING: "calendarz__todo--pending",
 	TODO_COMPLETED: "calendarz__todo--completed",
 	SETTINGS_FOLDER: "calendarz__settings-folder",
-	SETTINGS_HEADING: "calendarz__settings-heading",
 } as const;
 
 /** Default values for settings */
