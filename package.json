@@ -21,6 +21,7 @@
 		"eslint-plugin-obsidianmd": "^0.1.9",
 		"globals": "14.0.0",
 		"jiti": "2.6.1",
+		"obsidian": "^1.12.3",
 		"picomatch": "^4.0.4",
 		"svelte": "^5.55.4",
 		"svelte-check": "^4.4.6",
@@ -31,7 +32,6 @@
 	},
 	"dependencies": {
 		"dayjs": "^1.11.20",
-		"obsidian": "latest",
 		"obsidian-daily-notes-interface": "^0.9.4"
 	}
 }
