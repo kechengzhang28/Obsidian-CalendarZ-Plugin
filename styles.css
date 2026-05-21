@@ -287,13 +287,16 @@
    Block: Dots (Indicators)
    ------------------------------------------ */
 .calendarz__dots {
+	position: absolute;
+	bottom: var(--calz-space-xs);
+	left: 50%;
+	transform: translateX(-50%);
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: center;
 	align-items: center;
 	gap: var(--calz-space-xs);
 	max-width: var(--calz-dots-max-width);
-	margin-top: var(--calz-space-xs);
 }
 
 .calendarz__dot {
