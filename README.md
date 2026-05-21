@@ -60,6 +60,7 @@ So, I made a new calendar plugin, CalendarZ.
 
 - **English** (en-US)
 - **简体中文** (zh-CN)
+- **Português Brasileiro** (pt-BR)
 
 ## Contributing
 
@@ -68,6 +69,7 @@ Issues and Pull Requests are welcome!
 ## Special Thanks
 
 - [liamcain](https://github.com/liamcain) for the [obsidian-calendar-plugin](https://github.com/liamcain/obsidian-calendar-plugin).
+- All the contributors who have helped me improve this plugin.
 
 ***
 
