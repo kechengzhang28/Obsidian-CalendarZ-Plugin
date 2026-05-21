@@ -32,9 +32,10 @@ export function formatMonth(
 		return (dayjs(date).month() + 1).toString();
 	} else if (language === "pt-BR") {
 		if (format === "short") {
-			return dayjs(date).toDate().toLocaleString(language, { month: "short" }).toUpperCase().slice(0, 3);	
-		} else if (format === "long") {	
-			return dayjs(date).toDate().toLocaleString(language, { month: "long" }).charAt(0).toUpperCase() + dayjs(date).toDate().toLocaleString(language, { month: "long" }).slice(1);
+			return dayjs(date).toDate().toLocaleString(language, { month: "short" }).toUpperCase().slice(0, 3);
+		} else if (format === "long") {
+			const monthLong = dayjs(date).toDate().toLocaleString(language, { month: "long" });
+			return monthLong.charAt(0).toUpperCase() + monthLong.slice(1);
 		}
 	}
 	return dayjs(date).toDate().toLocaleString(language, { month: format });
