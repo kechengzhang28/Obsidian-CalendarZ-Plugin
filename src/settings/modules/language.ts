@@ -32,6 +32,7 @@ export function renderLanguageSettings(
 	const languageRenderer = new DropdownSettingRenderer<Language>(plugin, {
 		"en-US": "English",
 		"zh-CN": "中文",
+		"pt-BR": "Português (Brasil)",
 	});
 	languageRenderer.render(contentEl, {
 		name: ts(plugin, "language", "name"),

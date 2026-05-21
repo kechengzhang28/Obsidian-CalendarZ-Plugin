@@ -3,6 +3,7 @@ import type {Language} from "./core/types";
 // Import locale files
 import enUS from "./locales/en-US.json";
 import zhCN from "./locales/zh-CN.json";
+import ptBR from "./locales/pt-BR.json";
 
 /**
  * Internationalization interface defining all translatable strings.
@@ -296,6 +297,7 @@ export interface I18n {
 const locales: Record<Language, I18n> = {
 	"en-US": enUS as I18n,
 	"zh-CN": zhCN as I18n,
+	"pt-BR": ptBR as I18n,
 };
 
 /**

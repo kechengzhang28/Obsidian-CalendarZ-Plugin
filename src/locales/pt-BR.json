@@ -1,0 +1,213 @@
+{
+  "calendar": {
+    "today": "Hoje",
+    "weekdays": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+    "viewTitle": "CalendarZ",
+    "weekLabel": "S"
+  },
+  "sectionTitles": {
+    "basic": "Básico",
+    "statistics": "Estatísticas",
+    "dots": "Pontos",
+    "heatmap": "Mapa de calor",
+    "click": "Comportamento ao clicar",
+    "weekNote": "Nota semanal",
+    "monthNote": "Nota mensal",
+    "yearNote": "Nota anual"
+  },
+  "settings": {
+    "language": {
+      "name": "Idioma",
+      "description": "Selecione o idioma de exibição do calendário"
+    },
+    "monthFormat": {
+      "name": "Formato do mês",
+      "description": "Selecione como os meses são exibidos no cabeçalho do calendário",
+      "options": {
+        "numeric": "Numérico (1-12)",
+        "short": "Abreviado (JAN-DEZ)",
+        "long": "Por extenso (Janeiro-Dezembro)"
+      }
+    },
+    "titleFormat": {
+      "name": "Formato do título",
+      "description": "Selecione a ordem de ano e mês no cabeçalho do calendário",
+      "options": {
+        "yearMonth": "Ano mês (2024 Janeiro)",
+        "monthYear": "Mês ano (Janeiro 2024)"
+      }
+    },
+    "weekStart": {
+      "name": "Início da semana",
+      "description": "Selecione o primeiro dia da semana",
+      "options": {
+        "sunday": "Domingo",
+        "monday": "Segunda-feira"
+      }
+    },
+    "ignoredFolders": {
+      "name": "Pastas ignoradas",
+      "description": "Defina caminhos de pastas a ignorar. Notas nessas pastas não serão contabilizadas",
+      "addButton": "Adicionar",
+      "removeButton": "Remover",
+      "placeholder": "Digite o caminho da pasta",
+      "empty": "Nenhuma pasta ignorada",
+      "manageButton": "Gerenciar",
+      "currentlyIgnored": "Atualmente ignoradas",
+      "modalTitle": "Gerenciar pastas ignoradas",
+      "addNewFolder": "Adicionar pasta",
+      "saveButton": "Salvar",
+      "cancelButton": "Cancelar"
+    },
+    "dateFieldName": {
+      "name": "Nome do campo de data",
+      "description": "Nome do campo no frontmatter YAML usado para estatísticas de data (ex.: created, date, published)"
+    },
+    "dateSource": {
+      "name": "Fonte da data",
+      "description": "Selecione a origem das datas para as estatísticas das notas",
+      "options": {
+        "yaml": "Frontmatter YAML",
+        "filename": "Data no nome do arquivo",
+        "both": "Ambos"
+      }
+    },
+    "filenameDateFormat": {
+      "name": "Formato de data no nome do arquivo",
+      "description": "Padrão de formato para extrair a data do nome do arquivo (ex.: YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD)"
+    },
+    "displayMode": {
+      "name": "Modo de exibição",
+      "description": "Escolha como exibir as estatísticas das notas no calendário",
+      "options": {
+        "heatmap": "Mapa de calor",
+        "dots": "Pontos",
+        "none": "Nenhum"
+      }
+    },
+    "statisticsType": {
+      "name": "Tipo de estatística",
+      "description": "Escolha se a contagem será por quantidade de notas ou por total de palavras",
+      "options": {
+        "count": "Quantidade de notas",
+        "wordCount": "Contagem de palavras"
+      }
+    },
+    "dotThreshold": {
+      "name": "Notas por ponto",
+      "description": "Número de notas representadas por cada ponto (1-10)"
+    },
+    "dotWordThreshold": {
+      "name": "Palavras por ponto",
+      "description": "Número de palavras representadas por cada ponto (mínimo 1)"
+    },
+    "heatmapMaxNotes": {
+      "name": "Máximo de notas no mapa de calor",
+      "description": "Quantidade máxima de notas para atingir brilho total no modo mapa de calor. Qualquer data com notas >= esse valor exibirá brilho máximo."
+    },
+    "heatmapMaxWords": {
+      "name": "Máximo de palavras no mapa de calor",
+      "description": "Quantidade máxima de palavras para atingir brilho total no modo mapa de calor. Qualquer data com palavras >= esse valor exibirá brilho máximo. (mínimo 1)"
+    },
+    "heatmapHideDateNumbers": {
+      "name": "Ocultar números das datas",
+      "description": "Ocultar os números das datas no modo mapa de calor e exibir apenas blocos de cor"
+    },
+    "confirmBeforeCreate": {
+      "name": "Confirmar antes de criar",
+      "description": "Exibir um diálogo de confirmação antes de criar uma nota diária ao clicar com o botão esquerdo em uma data"
+    },
+    "showWeekNumber": {
+      "name": "Exibir números da semana",
+      "description": "Mostrar os números da semana no lado esquerdo do calendário"
+    },
+    "openCalendar": {
+      "name": "Abrir visualização do calendário",
+      "description": "Exibir a visualização do calendário na barra lateral direita",
+      "buttonText": "Abrir"
+    },
+    "autoOpenView": {
+      "name": "Abrir automaticamente ao iniciar",
+      "description": "Abrir automaticamente a visualização do calendário na barra lateral direita quando o Obsidian iniciar"
+    },
+    "refreshPlugin": {
+      "name": "Atualizar plugin",
+      "description": "Atualizar a visualização do calendário para aplicar as configurações mais recentes",
+      "buttonText": "Atualizar"
+    },
+    "weekNoteEnabled": {
+      "name": "Ativar nota semanal",
+      "description": "Criar ou abrir a nota semanal ao clicar no número da semana"
+    },
+    "weekNoteTemplate": {
+      "name": "Modelo da nota semanal",
+      "description": "Caminho do arquivo de modelo da nota semanal (deixe vazio para o estilo padrão)"
+    },
+    "weekNoteFolder": {
+      "name": "Pasta da nota semanal",
+      "description": "Caminho da pasta das notas semanais (deixe vazio para o diretório raiz)"
+    },
+    "weekNoteFormat": {
+      "name": "Formato de nome da nota semanal",
+      "description": "Use YYYY para o ano e WW para o número da semana. O conteúdo entre colchetes [] será exibido como está. Exemplo: YYYY-[W]WW gera 2024-W01.md",
+      "placeholder": "YYYY-[W]WW"
+    },
+    "monthNoteEnabled": {
+      "name": "Ativar nota mensal",
+      "description": "Criar ou abrir a nota mensal ao clicar no cabeçalho do mês"
+    },
+    "monthNoteTemplate": {
+      "name": "Modelo da nota mensal",
+      "description": "Caminho do arquivo de modelo da nota mensal (deixe vazio para o estilo padrão)"
+    },
+    "monthNoteFolder": {
+      "name": "Pasta da nota mensal",
+      "description": "Caminho da pasta das notas mensais (deixe vazio para o diretório raiz)"
+    },
+    "monthNoteFormat": {
+      "name": "Formato de nome da nota mensal",
+      "description": "Use YYYY para o ano e MM para o mês. O conteúdo entre colchetes [] será exibido como está. Exemplo: YYYY-MM gera 2024-01.md",
+      "placeholder": "YYYY-MM"
+    },
+    "yearNoteEnabled": {
+      "name": "Ativar nota anual",
+      "description": "Criar ou abrir a nota anual ao clicar no cabeçalho do ano"
+    },
+    "yearNoteTemplate": {
+      "name": "Modelo da nota anual",
+      "description": "Caminho do arquivo de modelo da nota anual (deixe vazio para o estilo padrão)"
+    },
+    "yearNoteFolder": {
+      "name": "Pasta da nota anual",
+      "description": "Caminho da pasta das notas anuais (deixe vazio para o diretório raiz)"
+    },
+    "yearNoteFormat": {
+      "name": "Formato de nome da nota anual",
+      "description": "Use YYYY para o ano. O conteúdo entre colchetes [] será exibido como está. Exemplo: YYYY gera 2024.md",
+      "placeholder": "YYYY"
+    },
+    "hideCompletedTodos": {
+      "name": "Ocultar pontos de tarefas concluídas",
+      "description": "Não exibir pontos de status de tarefas quando todos os itens estiverem concluídos"
+    }
+  },
+  "commands": {
+    "openCalendar": "Abrir visualização do CalendarZ"
+  },
+  "ribbon": {
+    "tooltip": "Abrir CalendarZ"
+  },
+  "notifications": {
+    "dailyNotesNotEnabled": "Ative primeiro o plugin principal Notas diárias",
+    "dailyNotesCreateFailed": "Falha ao criar a nota diária. Verifique as configurações do plugin de notas diárias",
+    "weekNoteCreateFailed": "Falha ao criar a nota semanal",
+    "monthNoteCreateFailed": "Falha ao criar a nota mensal",
+    "yearNoteCreateFailed": "Falha ao criar a nota anual"
+  },
+  "modal": {
+    "confirmTitle": "Criar nota",
+    "confirmMessage": "Criar nota para {{date}}?",
+    "cancelButton": "Cancelar",
+    "createButton": "Criar"
+  }
+}
