@@ -183,7 +183,7 @@ export class CalendarViewController {
 	 * @param date - Target date for the daily note
 	 */
 	async createDailyNote(date: Date): Promise<void> {
-		await this.dailyNoteService.openOrCreateDailyNote(date, this.getI18n());
+		await this.dailyNoteService.openOrCreateDailyNote(date, this.settings, this.getI18n());
 	}
 
 	// ---- Week Note Actions ----

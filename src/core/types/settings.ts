@@ -4,7 +4,7 @@
  */
 
 /** Supported display languages */
-export type Language = "en-US" | "zh-CN";
+export type Language = "en-US" | "zh-CN" | "pt-BR";
 
 /** Month display format options */
 export type MonthFormat = "numeric" | "short" | "long";

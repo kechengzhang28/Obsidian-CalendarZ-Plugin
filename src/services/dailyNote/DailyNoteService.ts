@@ -10,7 +10,9 @@ import {
 	getDailyNote,
 	getAllDailyNotes,
 } from "obsidian-daily-notes-interface";
+import type { CalendarZSettings } from "../../core/types";
 import type { I18n } from "../../i18n";
+import { formatDate } from "../../utils/date/formatter";
 
 /**
  * Service for daily note operations.
@@ -44,9 +46,14 @@ export class DailyNoteService {
 	 * Opens an existing daily note or creates a new one.
 	 * Shows notifications on errors.
 	 * @param date - Target date
+	 * @param settings - Plugin settings (used for date frontmatter field name)
 	 * @param i18n - i18n object for translated notification messages
 	 */
-	async openOrCreateDailyNote(date: Date, i18n: I18n): Promise<void> {
+	async openOrCreateDailyNote(
+		date: Date,
+		settings: CalendarZSettings,
+		i18n: I18n
+	): Promise<void> {
 		const notifications = i18n.notifications;
 		try {
 			if (!appHasDailyNotesPluginLoaded()) {
@@ -62,11 +69,31 @@ export class DailyNoteService {
 
 			const file = await createDailyNoteInterface(moment(date));
 			if (file) {
+				await this.setDateFrontmatter(file, date, settings.dateFieldName);
 				await this.app.workspace.openLinkText(file.path, "", false);
 			}
 		} catch (error) {
 			console.error("Failed to create daily note:", error);
 			new Notice(notifications.dailyNotesCreateFailed ?? "Failed to create daily note");
 		}
+	}
+
+	/**
+	 * Sets the configured date field in frontmatter to the target day (YYYY-MM-DD).
+	 * @param file - Note file to update
+	 * @param date - Target date
+	 * @param dateFieldName - YAML frontmatter field name from settings
+	 */
+	private async setDateFrontmatter(
+		file: TFile,
+		date: Date,
+		dateFieldName: string
+	): Promise<void> {
+		const field = dateFieldName.trim();
+		if (!field) return;
+
+		await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+			frontmatter[field] = formatDate(date);
+		});
 	}
 }
