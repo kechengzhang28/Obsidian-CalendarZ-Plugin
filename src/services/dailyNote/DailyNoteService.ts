@@ -93,7 +93,8 @@ export class DailyNoteService {
 		if (!field) return;
 
 		await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
-			frontmatter[field] = formatDate(date);
+			const fm = frontmatter as Record<string, unknown>;
+			fm[field] = formatDate(date);
 		});
 	}
 }
