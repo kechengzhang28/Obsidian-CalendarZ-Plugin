@@ -15,7 +15,15 @@ npm run build    # production build
 npm run dev      # watch mode
 ```
 
-Copy `main.js`, `manifest.json`, and `styles.css` into your vault's `.obsidian/plugins/calendarz/` folder, then reload Obsidian.
+### Test in Obsidian
+
+1. Run `npm run test:vault` to build CalendarZ and install it in the test vault at `.misc/calendarz-test-vault`.
+2. In Obsidian, select **Open folder as vault** and open that folder. In the test vault, go to **Settings → Community plugins**, turn off restricted mode, and enable **CalendarZ**.
+3. Open **CalendarZ test checklist** in the test vault and follow the checks for dots, tasks, week notes, and the heatmap.
+
+After editing the plugin, run `npm run test:vault` again and reload CalendarZ. If the Obsidian CLI is enabled and the test vault is open, run `obsidian vault=calendarz-test-vault plugin:reload id=calendarz`. You can also turn CalendarZ off and on again under **Settings → Community plugins**.
+
+The sample notes live in `test/fixtures/vault`. Open the generated vault at `.misc/calendarz-test-vault` for testing. Git ignores that vault, and rebuilding preserves its notes and settings. To start over, close the test vault, move the generated folder aside, and run `npm run test:vault` again.
 
 ### Lint
 

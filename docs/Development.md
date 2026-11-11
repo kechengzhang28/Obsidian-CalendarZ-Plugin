@@ -22,6 +22,8 @@ npm run build
 npm run lint
 ```
 
+Run `npm run test:vault` to install the current build in a separate Obsidian test vault. Follow the [test vault setup in the contributing guide](../CONTRIBUTING.md#test-in-obsidian).
+
 ## Project Structure
 ```
 src/
