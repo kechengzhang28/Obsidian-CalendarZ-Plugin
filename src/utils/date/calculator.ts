@@ -4,10 +4,11 @@ import type { WeekStart } from "../../core/types";
 /**
  * Checks if a date is before today.
  * @param date - Date to check (Date object or dayjs instance)
+ * @param today - Reference date for the current day
  * @returns True if the date is in the past
  */
-export function isBeforeToday(date: Date | dayjs.Dayjs): boolean {
-	return dayjs(date).isBefore(dayjs(), "day");
+export function isBeforeToday(date: Date | dayjs.Dayjs, today: Date | dayjs.Dayjs = new Date()): boolean {
+	return dayjs(date).isBefore(today, "day");
 }
 
 /**

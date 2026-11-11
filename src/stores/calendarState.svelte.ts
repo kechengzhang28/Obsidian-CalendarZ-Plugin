@@ -14,6 +14,7 @@ import type { I18n } from "../i18n";
 export function createCalendarState() {
 	// Core state - these trigger updates when changed
 	let currentDate = $state<Date>(new Date());
+	let today = $state<Date>(new Date());
 	let dateCounts = $state<DateCount[]>([]);
 	let todoStatuses = $state<DateTodoStatus[]>([]);
 	let weekTodoStatuses = $state<WeekTodoStatus[]>([]);
@@ -36,6 +37,7 @@ export function createCalendarState() {
 	return {
 		// Getters
 		get currentDate() { return currentDate; },
+		get today() { return today; },
 		get dateCounts() { return dateCounts; },
 		get todoStatuses() { return todoStatuses; },
 		get weekTodoStatuses() { return weekTodoStatuses; },
@@ -47,6 +49,7 @@ export function createCalendarState() {
 
 		// Setters
 		setCurrentDate(date: Date) { currentDate = date; },
+		setToday(date: Date) { today = date; },
 		setDateCounts(counts: DateCount[]) { dateCounts = counts; },
 		setTodoStatuses(statuses: DateTodoStatus[]) { todoStatuses = statuses; },
 		setWeekTodoStatuses(statuses: WeekTodoStatus[]) { weekTodoStatuses = statuses; },

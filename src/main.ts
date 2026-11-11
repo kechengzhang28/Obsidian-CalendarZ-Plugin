@@ -59,6 +59,10 @@ export default class CalendarZ extends Plugin {
 		this.registerFileEvents();
 
 		this.registerInterval(activeWindow.setInterval(() => {
+			this.forEachView(v => v.updateTodayHighlight());
+		}, 1000));
+
+		this.registerInterval(activeWindow.setInterval(() => {
 			this.forEachView(v => {
 				v.refreshStatsOnly().catch(error => {
 					console.error("Failed to refresh stats:", error);

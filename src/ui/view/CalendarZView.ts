@@ -13,6 +13,7 @@ import type { CalendarZSettings } from "../../core/types";
 import { CalendarViewController } from "./CalendarViewController";
 import Calendar from "../../components/Calendar.svelte";
 import { createCalendarState } from "../../stores/calendarState.svelte";
+import { isSameDay } from "../../utils/date";
 
 /** Unique identifier for the CalendarZ view type */
 export const CALENDARZ_VIEW_TYPE = "calendarz-view";
@@ -91,6 +92,7 @@ export class CalendarZView extends ItemView {
 		this.state.setSettings(this.settings);
 		this.state.setI18n(this.i18n);
 		this.state.setCurrentDate(this.controller.getCurrentDate());
+		this.updateTodayHighlight();
 	}
 
 	/**
@@ -118,13 +120,16 @@ export class CalendarZView extends ItemView {
 	}
 
 	/**
-	 * Updates the today highlight if the month has changed.
-	 * Called periodically to keep the today indicator accurate.
+	 * Updates the today highlight when the local calendar date changes.
 	 */
 	updateTodayHighlight(): void {
-		if (this.controller.updateTodayHighlight()) {
-			this.state.setCurrentDate(this.controller.getCurrentDate());
-		}
+		const today = new Date();
+		const previousToday = this.state.today;
+		if (isSameDay(previousToday, today)) return;
+
+		this.controller.followTodayMonth(previousToday, today);
+		this.state.setToday(today);
+		this.state.setCurrentDate(this.controller.getCurrentDate());
 	}
 
 	/**
@@ -155,7 +160,8 @@ export class CalendarZView extends ItemView {
 					this.state.setCurrentDate(this.controller.getCurrentDate());
 				},
 				onGoToToday: () => {
-					this.controller.goToToday();
+					this.updateTodayHighlight();
+					this.controller.goToToday(this.state.today);
 					this.state.setCurrentDate(this.controller.getCurrentDate());
 				},
 				hasWeekNote: (date: Date) => this.controller.hasWeekNote(date),

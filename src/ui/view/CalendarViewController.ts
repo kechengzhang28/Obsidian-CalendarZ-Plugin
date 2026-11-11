@@ -89,11 +89,6 @@ export class CalendarViewController {
 		return this.currentDate;
 	}
 
-	/** Sets the currently displayed date */
-	setCurrentDate(date: Date): void {
-		this.currentDate = date;
-	}
-
 	// ---- Navigation ----
 
 	/**
@@ -105,22 +100,15 @@ export class CalendarViewController {
 	}
 
 	/** Resets the current date to today */
-	goToToday(): void {
-		this.currentDate = new Date();
+	goToToday(today: Date): void {
+		this.currentDate = today;
 	}
 
-	/**
-	 * Updates the current date to today if the month has changed.
-	 * @returns True if the date was updated
-	 */
-	updateTodayHighlight(): boolean {
-		const today = dayjs();
-		const current = dayjs(this.currentDate);
-		if (today.year() !== current.year() || today.month() !== current.month()) {
-			this.currentDate = new Date();
-			return true;
+	/** Follow a new month only if the calendar was displaying the previous current month. */
+	followTodayMonth(previousToday: Date, today: Date): void {
+		if (!dayjs(today).isSame(previousToday, "month") && dayjs(this.currentDate).isSame(previousToday, "month")) {
+			this.goToToday(today);
 		}
-		return false;
 	}
 
 	// ---- Data Fetching ----
