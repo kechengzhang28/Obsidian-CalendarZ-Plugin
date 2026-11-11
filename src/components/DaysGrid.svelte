@@ -70,6 +70,13 @@ let {
 		weekNumber: number;
 	}
 
+	interface WeekRow {
+		weekNumber: number;
+		weekKey: string;
+		firstCell: DayCell;
+		cells: DayCell[];
+	}
+
 	function calculateHeatmapOpacity(count: number, maxNotes: number): number {
 		if (maxNotes <= 0) return HEATMAP.MIN_OPACITY;
 		const intensity = Math.min(count / maxNotes, 1);
@@ -146,16 +153,18 @@ let {
 	}
 
 	let rows = $derived.by(() => {
-		const result: { weekNumber: number; weekKey: string; cells: DayCell[] }[] = [];
+		const result: WeekRow[] = [];
 		for (let i = 0; i < cells.length; i += GRID.DAYS_PER_WEEK) {
 			const rowCells = cells.slice(i, i + GRID.DAYS_PER_WEEK);
 			const firstCell = rowCells[0];
+			if (!firstCell) continue;
 			const weekNum = firstCell.weekNumber;
 			const weekYear = getWeekYear(firstCell.date, weekNum);
 			const weekKey = `${weekYear}-W${weekNum.toString().padStart(2, "0")}`;
 			result.push({
 				weekNumber: weekNum,
 				weekKey,
+				firstCell,
 				cells: rowCells,
 			});
 		}
@@ -163,7 +172,7 @@ let {
 	});
 
 	function getDayClasses(cell: DayCell): string {
-		const classes = [CSS_CLASSES.DAY];
+		const classes: string[] = [CSS_CLASSES.DAY];
 		if (cell.isOtherMonth) classes.push(CSS_CLASSES.DAY_OTHER_MONTH);
 		if (cell.isToday) {
 			classes.push(CSS_CLASSES.DAY_TODAY);
@@ -212,18 +221,17 @@ let {
 		onDayClick(cell.date.toDate());
 	}
 
-	function handleWeekClick(row: { weekNumber: number; cells: DayCell[] }) {
-		if (weekNoteEnabled && row.cells.length > 0) {
-			// Use the first day of the week to identify the week
-			onWeekClick(row.cells[0].date.toDate());
+	function handleWeekClick(row: WeekRow) {
+		if (weekNoteEnabled) {
+			onWeekClick(row.firstCell.date.toDate());
 		}
 	}
 
-	function getWeekNoteDotType(row: { weekNumber: number; cells: DayCell[] }): "normal" | "gray" | "" {
-		if (!weekNoteEnabled || displayMode !== "dots" || !hasWeekNote || row.cells.length === 0) {
+	function getWeekNoteDotType(row: WeekRow): "normal" | "gray" | "" {
+		if (!weekNoteEnabled || displayMode !== "dots" || !hasWeekNote) {
 			return "";
 		}
-		const firstDay = row.cells[0];
+		const firstDay = row.firstCell;
 		const hasNote = hasWeekNote(firstDay.date.toDate());
 		const isCurrentWeek = row.cells.some(cell => cell.isToday);
 		const isBeforeCurrentWeek = firstDay.date.isBefore(today, "week");
@@ -256,7 +264,7 @@ let {
 		return true;
 	}
 
-	function getWeekTodoStatusClass(row: { weekNumber: number; weekKey: string; cells: DayCell[] }): string {
+	function getWeekTodoStatusClass(row: WeekRow): string {
 		const weekTodoStatus = weekTodoMap.get(row.weekKey);
 		if (!weekTodoStatus) return "";
 		if (hideCompletedTodos && weekTodoStatus.allCompleted) return "";
@@ -268,7 +276,7 @@ let {
 		}
 	}
 
-	function hasWeekTodoStatus(row: { weekNumber: number; weekKey: string; cells: DayCell[] }): boolean {
+	function hasWeekTodoStatus(row: WeekRow): boolean {
 		const weekTodoStatus = weekTodoMap.get(row.weekKey);
 		if (!weekTodoStatus) return false;
 		if (hideCompletedTodos && weekTodoStatus.allCompleted) return false;
@@ -277,7 +285,7 @@ let {
 </script>
 
 <div class={CSS_CLASSES.DAYS} class:calendarz__days--with-week={showWeekNumber}>
-	{#each rows as row (row.cells[0]?.dateStr ?? `${getYearMonth(currentDate)}-week-${row.weekNumber}`)}
+	{#each rows as row (row.firstCell.dateStr)}
 		{#if showWeekNumber}
 			{#if weekNoteEnabled}
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
