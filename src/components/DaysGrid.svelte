@@ -16,6 +16,7 @@
 
 	interface Props {
 		currentDate: Date;
+		todayDate: Date;
 		weekStart: WeekStart;
 		displayMode: DisplayMode;
 		dotThreshold: number;
@@ -38,6 +39,7 @@
 
 let {
 	currentDate,
+	todayDate,
 	weekStart,
 	displayMode,
 	dotThreshold,
@@ -58,7 +60,7 @@ let {
 	hasWeekNote,
 }: Props = $props();
 
-	const today = $derived(dayjs());
+	const today = $derived(dayjs(todayDate));
 
 	interface DayCell {
 		date: dayjs.Dayjs;
@@ -95,7 +97,7 @@ let {
 			isOtherMonth,
 			count: countsMap.get(dateStr) || 0,
 			isToday: isSameDay(date, today),
-			isBeforeToday: isBeforeToday(date),
+			isBeforeToday: isBeforeToday(date, today),
 			dateStr,
 			weekNumber: getWeekNumber(date.toDate(), weekStart),
 		};

@@ -76,6 +76,7 @@
 
 		<DaysGrid
 			{currentDate}
+			todayDate={state.today}
 			weekStart={settings.weekStart}
 			displayMode={settings.displayMode}
 			dotThreshold={effectiveDotThreshold ?? 1}
